@@ -1,11 +1,17 @@
 version: "3.5"
 services:
+  splash:
+    image: scrapinghub/splash
+    container_name: pcts-scraper-splash
+    ports:
+      - 8050:8050
+    command: "--disable-private-mode"
   pcts-scraper:
     container_name: pcts-scraper
     # restart: unless-stopped
     build: .
     image: pcts-scraper
-    env_file: dev-env
+    # env_file: dev-env
     command: "echo 'Hello World'"
     networks:
       - pcts-network
