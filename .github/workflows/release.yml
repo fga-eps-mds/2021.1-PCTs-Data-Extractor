@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  pull_request:
+    types: closed
+    branches: main
+
+jobs:
+  build:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged && !contains( github.event.pull_request.labels.*.name, 'NOT RELEASE')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: RELEASE IS MAJOR
+        if: contains( github.event.pull_request.labels.*.name, 'MAJOR' )
+        run: echo "RELEASE_TYPE=MAJOR" >> $GITHUB_ENV
+
+      - name: RELEASE IS MINOR
+        if: contains( github.event.pull_request.labels.*.name, 'MINOR' )
+        run: echo "RELEASE_TYPE=MINOR" >> $GITHUB_ENV
+
+      - name: RELEASE IS PATCH
+        if: contains( github.event.pull_request.labels.*.name, 'PATCH' )
+        run: echo "RELEASE_TYPE=PATCH" >> $GITHUB_ENV
+
+      - name: Create Release
+        run: |
+          pip install pytz && \
+          python3 scripts/release.py --repo-owner=fga-eps-mds --reponame=2021.1-PCTs-Scraper \
+            --user=Ridersk --token=${{ secrets.GITHUB_TOKEN }} \
+            --release-type=${{ env.RELEASE_TYPE }} --sonar-cloud-filename-prefix=fga-eps-mds_2021.1-PCTs-Scraper \
+            --sonar-cloud-metrics-uri="https://sonarcloud.io/api/measures/component_tree?component=fga-eps-mds_2021.1-PCTs-Scraper&metricKeys=files,functions,complexity,comment_lines_density,duplicated_lines_density,coverage,ncloc,security_rating,tests,test_success_density,test_execution_time,reliability_rating&ps=500"
