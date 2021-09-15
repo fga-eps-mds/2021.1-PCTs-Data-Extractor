@@ -22,6 +22,9 @@ def launch_release(repo_owner, reponame, token, release_type,
     check_valid_pr(release_type)
 
     latest_tag = get_latest_tag(repo_owner, reponame)
+
+    print("Latest tag version:", latest_tag)
+
     new_tag_version = get_new_version(latest_tag, release_type)
 
     print("New tag version:", new_tag_version)
@@ -40,12 +43,12 @@ def check_valid_pr(release_type):
 
 
 def get_latest_tag(repo_owner, reponame):
-    releases = requests.get(
-        f"https://api.github.com/repos/{repo_owner}/{reponame}/releases"
+    tags = requests.get(
+        f"https://api.github.com/repos/{repo_owner}/{reponame}/tags"
     ).json()
 
-    if len(releases):
-        return releases[0]['tag_name'][1:]
+    if len(tags):
+        return tags[0]['name'][1:]
     else:
         return "0.0.0"
 
