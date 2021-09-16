@@ -16,6 +16,7 @@ def run_scraper():
         called_by_python_script=True,
         allow_domains=['pesquisa.apps.tcu.gov.br'],
         allow=['#/documento'],
+        pagination_retries=3,
     )
 
     # # Senado Example

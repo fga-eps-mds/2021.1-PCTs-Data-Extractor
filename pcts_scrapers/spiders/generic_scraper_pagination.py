@@ -32,7 +32,8 @@ class ScraperPagination(Spider):
     scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None, *args, **kwargs):
+    def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None,
+                 pagination_retries=1, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
@@ -49,6 +50,7 @@ class ScraperPagination(Spider):
         self.site_name = site_name
         self.search_steps = search_steps
         self.next_button_xpath = next_button_xpath
+        self.pagination_retries = pagination_retries
         self.options = kwargs
 
         ScraperPagination.start_urls.append(root)
@@ -93,45 +95,49 @@ class ScraperPagination(Spider):
         page = 0
 
         while True:
-            try:
-                response = self.get_current_page_response(driver)
-                # Get links and call inner pages
-                old_found_urls = found_urls
-                found_urls = self.get_page_links(response)
+            page += 1
+            pagination_content_retrieved = False
+            for retry in range(self.pagination_retries):
+                try:
+                    print(f"Page: {page},\tRetry: {retry + 1}")
+                    sleep(10)
+                    response = self.get_current_page_response(driver)
+                    # Get links and call inner pages
+                    old_found_urls = found_urls
+                    found_urls = self.get_page_links(response)
 
-                # Pagination stop condition
-                if found_urls == old_found_urls:
-                    raise Exception("End of Pagination")
+                    # Pagination stop condition
+                    if found_urls == old_found_urls:
+                        raise Exception("Old and new urls are the same")
 
-                if len(found_urls) > 0:
-                    for url in found_urls:
-                        yield dict(
-                            link=url,
-                            meta=dict(source=self.source)
-                        )
-                        yield SplashRequest(
-                            url=url,
-                            callback=self.parse_document_page,
-                            endpoint='render.html',
-                            args={'wait': 1},
-                        )
+                    if len(found_urls) > 0:
+                        for url in found_urls:
+                            yield dict(
+                                link=url,
+                                meta=dict(source=self.source)
+                            )
+                            yield SplashRequest(
+                                url=url,
+                                callback=self.parse_document_page,
+                                endpoint='render.html',
+                                args={'wait': 1},
+                            )
 
-                        sleep(0.1)
+                            sleep(0.1)
+                    pagination_content_retrieved = True
+                    break
+                except Exception as e:
+                    print(str(e))
+                    # break
+            
+            if not pagination_content_retrieved:
+                raise Exception("End of Pagination")
 
-                # Follow next Pagination
-                next_button = driver.find_element_by_xpath(
-                    self.next_button_xpath)
-                page += 1
-                print("Page:", page)
-                old_url = driver.current_url
-
-                # click the button to go to next page
-                driver.execute_script("arguments[0].click();", next_button)
-                sleep(20)
-
-            except Exception as e:
-                print(str(e))
-                break
+            # =========== Follow next Pagination
+            next_button = driver.find_element_by_xpath(
+                self.next_button_xpath)
+            # click the button to go to next page
+            driver.execute_script("arguments[0].click();", next_button)
         driver.close()
 
     def parse_document_page(self, response: HtmlResponse):
@@ -153,7 +159,6 @@ class ScraperPagination(Spider):
             '//*[@id="container-campo-pesquisa"]/div/div[1]/div[5]/div/button')
 
         search_button.click()
-        sleep(10)
 
     def get_current_page_response(self, driver: WebDriver):
         return HtmlResponse(
