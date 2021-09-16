@@ -7,7 +7,7 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-LOG_LEVEL = 'INFO'
+# LOG_LEVEL = 'INFO'
 
 BOT_NAME = 'pcts_scrapers'
 
@@ -61,7 +61,7 @@ SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which(f'{getcwd()}/chromedriver')
 SELENIUM_DRIVER_ARGUMENTS=[
   # '-headless',
-  'user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"'
+  'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
 ]
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'

@@ -26,7 +26,6 @@ def run_scraper():
     #         },
     #     ],
     #     next_button_xpath='//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
-    #     called_by_python_script=True,
     #     allow_domains=['pesquisa.apps.tcu.gov.br'],
     #     allow=['#/documento'],
     #     pagination_retries=3,
@@ -34,26 +33,59 @@ def run_scraper():
     # )
 
     # Senado Example
+    # crawler.crawl(
+    #     ScraperPagination,
+    #     root='https://www6g.senado.leg.br/busca',
+    #     site_name='senado',
+    #     search_steps=[
+    #         {
+    #             "elem_type": "input",
+    #             "xpath": '//*[@id="busca-query"]',
+    #             "action": {"write": "Povos e Comunidades Tradicionais"}
+    #         },
+    #         {
+    #             "elem_type": "btn",
+    #             "xpath": '//*[@id="search-addon"]/button',
+    #             "action": {"click": True}
+    #         },
+    #     ],
+    #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
+    #     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
+    #     allow=['noticias'],
+    #     pagination_retries=3,
+    #     pagination_delay=5,
+    # )
+
+    # Diario Oficial
     crawler.crawl(
         ScraperPagination,
-        root='https://www6g.senado.leg.br/busca/?q=comunidades+tradicionais&colecao=Not%C3%ADcias&p=45',
-        site_name='senado',
+        root='https://www.in.gov.br/consulta/-/buscar/',
+        site_name='diario_oficial',
         search_steps=[
             {
                 "elem_type": "input",
-                "xpath": '//*[@id="busca-query"]',
+                "xpath": '//*[@id="search-bar"]',
                 "action": {"write": "Povos e Comunidades Tradicionais"}
             },
             {
                 "elem_type": "btn",
-                "xpath": '//*[@id="search-addon"]/button',
+                "xpath": '//*[@id="toggle-search-advanced"]',
+                "action": {"click": True}
+            },
+            {
+                "elem_type": "btn",
+                "xpath": '//*[@id="search-advanced"]/div[1]/div[1]/div[1]/div[2]/label',
+                "action": {"click": True}
+            },
+            {
+                "elem_type": "btn",
+                "xpath": '//*[@id="div-search-bar"]/div/div/div/i',
                 "action": {"click": True}
             },
         ],
-        next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-        called_by_python_script=True,
-        allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-        allow=['noticias'],
+        next_button_xpath='//*[@id="rightArrow"]',
+        allow_domains=['www.in.gov.br'],
+        allow=['web/dou'],
         pagination_retries=3,
         pagination_delay=5,
     )

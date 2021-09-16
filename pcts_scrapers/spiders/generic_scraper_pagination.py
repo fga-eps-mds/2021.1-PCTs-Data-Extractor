@@ -22,6 +22,7 @@ from scrapy_splash import SplashRequest
 
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
+
 class PaginationException(Exception):
     pass
 
@@ -86,6 +87,9 @@ class ScraperPagination(Spider):
         yield SeleniumRequest(
             url=self.source,
             callback=self.parse_home_pagination,
+            # wait_time=5,
+            # wait_until=EC.visibility_of_all_elements_located(
+            #     (By.XPATH, self.search_steps[0]["xpath"])),
         )
 
     def parse_home_pagination(self, response: HtmlResponse):
@@ -112,7 +116,8 @@ class ScraperPagination(Spider):
 
                     # Pagination stop condition
                     if found_urls == old_found_urls:
-                        raise PaginationException("Old and new urls are the same")
+                        raise PaginationException(
+                            "Old and new urls are the same")
 
                     if len(found_urls) > 0:
                         for url in found_urls:
@@ -133,7 +138,7 @@ class ScraperPagination(Spider):
                 except PaginationException as e:
                     print(str(e))
                     # break
-            
+
             if not pagination_content_retrieved:
                 raise Exception("End of Pagination")
 
@@ -173,7 +178,7 @@ class ScraperPagination(Spider):
         }
 
         for search_step in self.search_steps:
-            elem =  driver.find_element_by_xpath(search_step["xpath"])
+            elem = driver.find_element_by_xpath(search_step["xpath"])
 
             action_type = ACTION_TYPES[search_step["elem_type"]]
 
@@ -186,6 +191,7 @@ class ScraperPagination(Spider):
                 action = action.replace("${VALUE}", search_step_value)
 
             driver.execute_script(action, elem)
+            print("STEP")
 
             sleep(1)
 
@@ -246,3 +252,10 @@ class ScraperPagination(Spider):
             "\w+",
             normalized_text.decode('ascii'))
         )
+
+    def save_body_page(self, driver: WebDriver):
+        body_page = driver.find_element_by_xpath(
+                '//*').get_attribute("outerHTML")
+
+        with open("page_crawled.html", "w") as f:
+            f.write(body_page)
