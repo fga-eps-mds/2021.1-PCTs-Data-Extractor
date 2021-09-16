@@ -22,6 +22,9 @@ from scrapy_splash import SplashRequest
 
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
+class PaginationException(Exception):
+    pass
+
 
 class ScraperPagination(Spider):
     """ Generic Scraper for use on paginated item listing page of the target website
@@ -33,7 +36,7 @@ class ScraperPagination(Spider):
     start_urls = []
 
     def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None,
-                 pagination_retries=1, *args, **kwargs):
+                 pagination_retries=1, pagination_delay=1, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
@@ -51,6 +54,7 @@ class ScraperPagination(Spider):
         self.search_steps = search_steps
         self.next_button_xpath = next_button_xpath
         self.pagination_retries = pagination_retries
+        self.pagination_delay = pagination_delay
         self.options = kwargs
 
         ScraperPagination.start_urls.append(root)
@@ -100,7 +104,7 @@ class ScraperPagination(Spider):
             for retry in range(self.pagination_retries):
                 try:
                     print(f"Page: {page},\tRetry: {retry + 1}")
-                    sleep(10)
+                    sleep(self.pagination_delay)
                     response = self.get_current_page_response(driver)
                     # Get links and call inner pages
                     old_found_urls = found_urls
@@ -108,7 +112,7 @@ class ScraperPagination(Spider):
 
                     # Pagination stop condition
                     if found_urls == old_found_urls:
-                        raise Exception("Old and new urls are the same")
+                        raise PaginationException("Old and new urls are the same")
 
                     if len(found_urls) > 0:
                         for url in found_urls:
@@ -126,7 +130,7 @@ class ScraperPagination(Spider):
                             sleep(0.1)
                     pagination_content_retrieved = True
                     break
-                except Exception as e:
+                except PaginationException as e:
                     print(str(e))
                     # break
             
@@ -151,14 +155,52 @@ class ScraperPagination(Spider):
         self.save_page_content(page_title, page_content)
 
     def execute_search_steps(self, driver: WebDriver):
-        search_input = driver.find_element_by_xpath('//*[@id="termo"]')
+        INPUT_ACTION = {
+            "need_value": True,
+            "type": "write",
+            "action": "arguments[0].value = '${VALUE}';",
+        }
 
-        search_input.send_keys('Povos e Comunidades Tradicionais')
+        BTN_ACTION = {
+            "need_value": False,
+            "type": "click",
+            "action": "arguments[0].click();",
+        }
 
-        search_button = driver.find_element_by_xpath(
-            '//*[@id="container-campo-pesquisa"]/div/div[1]/div[5]/div/button')
+        ACTION_TYPES = {
+            "input": INPUT_ACTION,
+            "btn": BTN_ACTION,
+        }
 
-        search_button.click()
+        for search_step in self.search_steps:
+            elem =  driver.find_element_by_xpath(search_step["xpath"])
+
+            action_type = ACTION_TYPES[search_step["elem_type"]]
+
+            search_step_value = search_step["action"][action_type["type"]]
+
+            action = action_type["action"]
+
+            # Substitui valor
+            if action_type["need_value"]:
+                action = action.replace("${VALUE}", search_step_value)
+
+            driver.execute_script(action, elem)
+
+            sleep(1)
+
+        # =============== Example of a plain list of steps
+
+        # search_input = driver.find_element_by_xpath('//*[@id="termo"]')
+
+        # driver.execute_script("arguments[0].value = 'Povos e Comunidades Tradicionais';", search_input)
+        # # search_input.send_keys('Povos e Comunidades Tradicionais')
+
+        # search_button = driver.find_element_by_xpath(
+        #     '//*[@id="container-campo-pesquisa"]/div/div[1]/div[5]/div/button')
+
+        # driver.execute_script("arguments[0].click();", search_button)
+        # search_button.click()
 
     def get_current_page_response(self, driver: WebDriver):
         return HtmlResponse(
