@@ -32,11 +32,13 @@ class ScraperPagination(Spider):
     scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, next_button_xpath=None, *args, **kwargs):
+    def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
             root(str): root page url
+            site_name(str): site name
+            search_steps(list<dict>): steps to generate the documents result list
             next_button_xpath(str): XPATH of "Next" button of the listing page
             *args: Extra arguments
             **kwargs: Extra named arguments
@@ -45,13 +47,9 @@ class ScraperPagination(Spider):
                          root, kwargs)
         self.source = root
         self.site_name = site_name
-        self.output_folder_path = os.path.join(
-            self.root_output_data_folder,
-            self.site_name,
-            self.scraper_start_datetime,
-        )
-        self.options = kwargs
+        self.search_steps = search_steps
         self.next_button_xpath = next_button_xpath
+        self.options = kwargs
 
         ScraperPagination.start_urls.append(root)
         ScraperPagination.allowed_domains = self.options.get('allow_domains')
@@ -69,7 +67,13 @@ class ScraperPagination(Spider):
             strip=True,
         )
 
+        self.output_folder_path = os.path.join(
+            self.root_output_data_folder,
+            self.site_name,
+            self.scraper_start_datetime,
+        )
         self.create_directory_structure()
+
         super(ScraperPagination, self).__init__(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
@@ -81,11 +85,15 @@ class ScraperPagination(Spider):
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
 
+        self.execute_search_steps(driver)
+
+        # Parse result list page
         found_urls = []
         old_found_urls = []
 
         while True:
             try:
+                response = self.get_current_page_response(driver)
                 # Get links and call inner pages
                 old_found_urls = found_urls
                 found_urls = self.get_page_links(response)
@@ -102,7 +110,7 @@ class ScraperPagination(Spider):
                         )
                         yield SplashRequest(
                             url=url,
-                            callback=self.parse_article_page,
+                            callback=self.parse_document_page,
                             endpoint='render.html',
                             args={'wait': 1},
                         )
@@ -120,22 +128,42 @@ class ScraperPagination(Spider):
                 driver.execute_script("arguments[0].click();", next_button)
                 print(("RESUMO", f"CURRENT URL:{driver.current_url} == {old_url}",
                       f"\n\n\nFOUND_URLS: OLD_URLS >> {old_found_urls} \n==\n NEW_URLS: >> {found_urls}"))
-                sleep(2)
+                sleep(20)
 
             except Exception as e:
                 print(str(e))
                 break
         driver.close()
 
-    def parse_article_page(self, response: HtmlResponse):
+    def parse_document_page(self, response: HtmlResponse):
         page_content = dict(url=response.url)
         page_content['content'] = response.body.decode("utf-8")
         page_content['extracted_at'] = int(datetime.now().timestamp())
 
         page_title = response.xpath("/html/head/title/text()").extract_first()
-        print("Pagina Carregada:", page_content)
+        print("Pagina Carregada:", response.url)
+        # print("Pagina Carregada:", page_content)
 
         self.save_page_content(page_title, page_content)
+
+    def execute_search_steps(self, driver: WebDriver):
+        search_input = driver.find_element_by_xpath('//*[@id="termo"]')
+
+        search_input.send_keys('Povos e Comunidades Tradicionais')
+
+        search_button = driver.find_element_by_xpath(
+            '//*[@id="container-campo-pesquisa"]/div/div[1]/div[5]/div/button')
+
+        search_button.click()
+        sleep(10)
+
+    def get_current_page_response(self, driver: WebDriver):
+        return HtmlResponse(
+            url=driver.current_url,
+            body=driver.find_element_by_xpath(
+                '//*').get_attribute("outerHTML"),
+            encoding='utf-8'
+        )
 
     def get_page_links(self, response):
         links = self.link_pages_extractor.extract_links(response)

@@ -10,7 +10,7 @@ def run_scraper():
     # TCU Example
     crawler.crawl(
         ScraperPagination,
-        root='https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases/quilombolas?ts=1631452168640&pb=jurisprudencia-selecionada',
+        root='https://pesquisa.apps.tcu.gov.br',
         site_name='tcu',
         next_button_xpath='//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
         called_by_python_script=True,
