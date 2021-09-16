@@ -1,4 +1,4 @@
-# Scrapy settings for generic_scraper project
+# Scrapy settings for pcts_scrapers project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,14 +7,14 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'generic_scraper'
+BOT_NAME = 'pcts_scrapers'
 
-SPIDER_MODULES = ['generic_scraper.spiders']
-NEWSPIDER_MODULE = 'generic_scraper.spiders'
+SPIDER_MODULES = ['pcts_scrapers.spiders']
+NEWSPIDER_MODULE = 'pcts_scrapers.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'generic_scraper (+http://www.yourdomain.com)'
+#USER_AGENT = 'pcts_scrapers (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
 # ROBOTSTXT_OBEY = True
@@ -47,7 +47,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'generic_scraper.middlewares.GenericCrawlerSpiderMiddleware': 543,
+#    'pcts_scrapers.middlewares.GenericCrawlerSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
@@ -70,7 +70,7 @@ DOWNLOADER_MIDDLEWARES = {
   'scrapy_splash.SplashCookiesMiddleware': 723, 
   'scrapy_splash.SplashMiddleware': 725, 
   'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-  # 'generic_scraper.middlewares.GenericCrawlerDownloaderMiddleware': 543,
+  # 'pcts_scrapers.middlewares.GenericCrawlerDownloaderMiddleware': 543,
 }
 
 SPIDER_MIDDLEWARES = { 
@@ -86,7 +86,7 @@ SPIDER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'generic_scraper.pipelines.GenericCrawlerPipeline': 300,
+#    'pcts_scrapers.pipelines.GenericCrawlerPipeline': 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)

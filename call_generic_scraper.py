@@ -1,23 +1,23 @@
 import scrapy
 from scrapy.crawler import Crawler, CrawlerRunner, CrawlerProcess
 
-from generic_scraper.spiders.generic_scraper_pagination import ScraperPagination
+from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
 
-from generic_scraper.settings import BOT_NAME
-from generic_scraper.settings import SPIDER_MODULES
-from generic_scraper.settings import NEWSPIDER_MODULE
-from generic_scraper.settings import DEFAULT_REQUEST_HEADERS
-from generic_scraper.settings import ROBOTSTXT_OBEY
+from pcts_scrapers.settings import BOT_NAME
+from pcts_scrapers.settings import SPIDER_MODULES
+from pcts_scrapers.settings import NEWSPIDER_MODULE
+from pcts_scrapers.settings import DEFAULT_REQUEST_HEADERS
+from pcts_scrapers.settings import ROBOTSTXT_OBEY
 
-from generic_scraper.settings import SELENIUM_DRIVER_NAME
-from generic_scraper.settings import SELENIUM_DRIVER_EXECUTABLE_PATH
-from generic_scraper.settings import SELENIUM_DRIVER_ARGUMENTS
+from pcts_scrapers.settings import SELENIUM_DRIVER_NAME
+from pcts_scrapers.settings import SELENIUM_DRIVER_EXECUTABLE_PATH
+from pcts_scrapers.settings import SELENIUM_DRIVER_ARGUMENTS
 
-from generic_scraper.settings import DUPEFILTER_CLASS
-from generic_scraper.settings import HTTPCACHE_STORAGE
-from generic_scraper.settings import SPLASH_URL
-from generic_scraper.settings import DOWNLOADER_MIDDLEWARES
-from generic_scraper.settings import SPIDER_MIDDLEWARES
+from pcts_scrapers.settings import DUPEFILTER_CLASS
+from pcts_scrapers.settings import HTTPCACHE_STORAGE
+from pcts_scrapers.settings import SPLASH_URL
+from pcts_scrapers.settings import DOWNLOADER_MIDDLEWARES
+from pcts_scrapers.settings import SPIDER_MIDDLEWARES
 
 from scrapy.utils.project import get_project_settings
 
