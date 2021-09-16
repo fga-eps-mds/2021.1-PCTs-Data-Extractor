@@ -90,6 +90,7 @@ class ScraperPagination(Spider):
         # Parse result list page
         found_urls = []
         old_found_urls = []
+        page = 0
 
         while True:
             try:
@@ -120,14 +121,12 @@ class ScraperPagination(Spider):
                 # Follow next Pagination
                 next_button = driver.find_element_by_xpath(
                     self.next_button_xpath)
-                print("Next Page")
-                print(next_button)
+                page += 1
+                print("Page:", page)
                 old_url = driver.current_url
 
                 # click the button to go to next page
                 driver.execute_script("arguments[0].click();", next_button)
-                print(("RESUMO", f"CURRENT URL:{driver.current_url} == {old_url}",
-                      f"\n\n\nFOUND_URLS: OLD_URLS >> {old_found_urls} \n==\n NEW_URLS: >> {found_urls}"))
                 sleep(20)
 
             except Exception as e:
@@ -142,7 +141,6 @@ class ScraperPagination(Spider):
 
         page_title = response.xpath("/html/head/title/text()").extract_first()
         print("Pagina Carregada:", response.url)
-        # print("Pagina Carregada:", page_content)
 
         self.save_page_content(page_title, page_content)
 
