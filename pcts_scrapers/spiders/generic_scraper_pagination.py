@@ -32,18 +32,12 @@ class ScraperPagination(Spider):
     scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, next_button_xpath=None,
-                 called_by_python_script=False, *args, **kwargs):
+    def __init__(self, root=None, site_name=None, next_button_xpath=None, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
             root(str): root page url
             next_button_xpath(str): XPATH of "Next" button of the listing page
-            called_by_python_script(bool): Sinalize if the spider was called by a python script
-                True - The extra named arguments can be normal types (string, integer, list)
-                False - The extra named arguments can be only strings.
-                    In this case is called self.format_shell_options() to format some string
-                    arguments to list
             *args: Extra arguments
             **kwargs: Extra named arguments
         """
@@ -58,9 +52,6 @@ class ScraperPagination(Spider):
         )
         self.options = kwargs
         self.next_button_xpath = next_button_xpath
-
-        if not called_by_python_script:
-            self.format_shell_options()
 
         ScraperPagination.start_urls.append(root)
         ScraperPagination.allowed_domains = self.options.get('allow_domains')
@@ -152,22 +143,6 @@ class ScraperPagination(Spider):
         for link in links:
             str_links.append(link.url)
         return str_links
-
-    def format_shell_options(self):
-        allowed_options = [
-            'allow',
-            'deny',
-            'allow_domains',
-            'deny_domains',
-            'restrict_xpaths',
-            'restrict_css',
-            'items_xpath',
-        ]
-        for key in allowed_options:
-            if self.options.get(key, None) is None:
-                self.options[key] = []
-            else:
-                self.options[key] = self.options.get(key).split(',')
 
     def create_directory_structure(self):
         if not os.path.exists(self.output_folder_path):

@@ -1,50 +1,13 @@
 import scrapy
-from scrapy.crawler import Crawler, CrawlerRunner, CrawlerProcess
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
 
 from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
 
-from pcts_scrapers.settings import BOT_NAME
-from pcts_scrapers.settings import SPIDER_MODULES
-from pcts_scrapers.settings import NEWSPIDER_MODULE
-from pcts_scrapers.settings import DEFAULT_REQUEST_HEADERS
-from pcts_scrapers.settings import ROBOTSTXT_OBEY
-
-from pcts_scrapers.settings import SELENIUM_DRIVER_NAME
-from pcts_scrapers.settings import SELENIUM_DRIVER_EXECUTABLE_PATH
-from pcts_scrapers.settings import SELENIUM_DRIVER_ARGUMENTS
-
-from pcts_scrapers.settings import DUPEFILTER_CLASS
-from pcts_scrapers.settings import HTTPCACHE_STORAGE
-from pcts_scrapers.settings import SPLASH_URL
-from pcts_scrapers.settings import DOWNLOADER_MIDDLEWARES
-from pcts_scrapers.settings import SPIDER_MIDDLEWARES
-
-from scrapy.utils.project import get_project_settings
-
-
-# Settings to call spider by python script
-CUSTOM_SETTINGS = {
-  'BOT_NAME': BOT_NAME,
-  'SPIDER_MODULES': SPIDER_MODULES,
-  'NEWSPIDER_MODULE': NEWSPIDER_MODULE,
-  'DEFAULT_REQUEST_HEADERS': DEFAULT_REQUEST_HEADERS,
-  'ROBOTSTXT_OBEY': ROBOTSTXT_OBEY,
-  'SELENIUM_DRIVER_NAME': SELENIUM_DRIVER_NAME,
-  'SELENIUM_DRIVER_EXECUTABLE_PATH': SELENIUM_DRIVER_EXECUTABLE_PATH,
-  'SELENIUM_DRIVER_ARGUMENTS': SELENIUM_DRIVER_ARGUMENTS,
-  'DUPEFILTER_CLASS': DUPEFILTER_CLASS,
-  'HTTPCACHE_STORAGE': HTTPCACHE_STORAGE,
-  'SPLASH_URL': SPLASH_URL,
-  'DOWNLOADER_MIDDLEWARES': DOWNLOADER_MIDDLEWARES,
-  'SPIDER_MIDDLEWARES': SPIDER_MIDDLEWARES,
-}
-
-from shutil import which
-from os import getcwd
-
-def main():
+def run_scraper():
     crawler = CrawlerProcess(get_project_settings())
 
+    # TCU Example
     crawler.crawl(
         ScraperPagination,
         root='https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases/quilombolas?ts=1631452168640&pb=jurisprudencia-selecionada',
@@ -54,8 +17,20 @@ def main():
         allow_domains=['pesquisa.apps.tcu.gov.br'],
         allow=['#/documento'],
     )
+
+    # # Senado Example
+    # crawler.crawl(
+    #     ScraperPagination,
+    #     root='https://www6g.senado.leg.br/busca/?q=comunidades+tradicionais&colecao=Not%C3%ADcias&p=45',
+    #     site_name='senado',
+    #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
+    #     called_by_python_script=True,
+    #     allow_domains=['www12.senado.leg.br','www25.senado.leg.br'],
+    #     allow=['noticias'],
+    # )
+
     crawler.join()
     crawler.start(stop_after_crawl=True)
 
 if __name__ == '__main__':
-    main()
+    run_scraper()
