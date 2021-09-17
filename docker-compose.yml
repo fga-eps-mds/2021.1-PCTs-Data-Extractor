@@ -6,13 +6,15 @@ services:
     ports:
       - 8050:8050
     command: "--disable-private-mode"
-  pcts-scraper:
-    container_name: pcts-scraper
+  pcts-scrapers-api:
+    container_name: pcts-scrapers-api
     # restart: unless-stopped
     build: .
-    image: pcts-scraper
+    image: pcts-scrapers-api
     # env_file: dev-env
-    command: "echo 'Hello World'"
+    ports:
+      - 8002:8002
+    command: ["sh", "scripts/start_dev.sh"]
     networks:
       - pcts-network
     volumes:
@@ -21,7 +23,7 @@ services:
 
 volumes:
   pip-cache:
-    name: pcts-scraper-pip-cache
+    name: pcts-scrapers-api-pip-cache
 
 networks:
   pcts-network:
