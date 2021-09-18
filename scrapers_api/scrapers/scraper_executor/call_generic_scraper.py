@@ -1,5 +1,6 @@
 import os
 import gc
+import logging
 
 import scrapy
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
@@ -7,10 +8,13 @@ from scrapy.utils.project import get_project_settings
 
 from twisted.internet import reactor
 
-from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
+if os.environ.get('PROJECT_ENV_EXECUTOR') == 'DOCKER':
+    from .pcts_scrapers.spiders import generic_scraper_pagination
+else:
+    from pcts_scrapers.spiders import generic_scraper_pagination
 
 
-def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True):
+def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True, logging=logging.basicConfig()):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
@@ -18,9 +22,13 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         custom_project_settings(str):   Customm Attributes settings to update default project settings.
             Example: {"SPIDER_MODULES": ['path.to.file.spiders']}
     """
+
+    logging.info("EXECUTAR SCRAPER")
     os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
 
     projects_settings = get_project_settings()
+
+    logging.info(f"CONFIGURACOES PROJETO: {str(projects_settings)}")
 
     projects_settings.update(custom_project_settings)
 
@@ -28,10 +36,11 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         crawler = CrawlerProcess(projects_settings)
     else:
         crawler = CrawlerRunner(projects_settings)
+        logging.info("EXECUTANDO RUNNER")
 
     # TCU Example
     running_process = crawler.crawl(
-        ScraperPagination,
+        generic_scraper_pagination.ScraperPagination,
         root='https://pesquisa.apps.tcu.gov.br',
         site_name='tcu',
         search_steps=[
@@ -122,6 +131,6 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
 
 if __name__ == '__main__':
     try:
-        run_scraper()
+        run_scraper(logging=logging)
     finally:
         gc.collect()

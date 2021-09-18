@@ -15,6 +15,8 @@ services:
     build: .
     image: pcts-scrapers-api
     # env_file: dev-env
+    environment:
+      PROJECT_ENV_EXECUTOR: "DOCKER"
     ports:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
