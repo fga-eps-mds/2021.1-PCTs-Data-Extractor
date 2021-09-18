@@ -10,6 +10,9 @@ from rest_framework import viewsets
 from rest_framework import mixins
 
 
+from .utils.call_generic_scraper import run_scraper
+
+
 class ScraperViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows scrapers to be viewed or edited.
@@ -24,6 +27,7 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
 
     @api_view(['GET'])
     def start(self, *args, **kwargs):
+        run_scraper()
         return Response({
             "message": "Hello World"
         })
