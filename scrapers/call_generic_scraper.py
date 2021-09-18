@@ -117,7 +117,7 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         crawler.start(stop_after_crawl=True)
     else:
         running_process.addBoth(lambda _: reactor.stop())
-        reactor.run()
+        reactor.run(0)
 
 
 if __name__ == '__main__':

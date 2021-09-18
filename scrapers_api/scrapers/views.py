@@ -1,3 +1,7 @@
+import os
+import logging
+from django.conf import settings
+
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -10,8 +14,11 @@ from rest_framework import viewsets
 from rest_framework import mixins
 
 
-from .utils.call_generic_scraper import run_scraper
+from .utils import call_generic_scraper
+import importlib.machinery
 
+# call_generic_scraper = importlib.machinery.SourceFileLoader('modulename','/app/scrapers/call_generic_scraper.py').load_module()
+# call_generic_scraper = importlib.machinery.SourceFileLoader('modulename','/app/scrapers/call_generic_scraper.py').load_module()
 
 class ScraperViewSet(viewsets.ModelViewSet):
     """
@@ -27,7 +34,21 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
 
     @api_view(['GET'])
     def start(self, *args, **kwargs):
-        run_scraper()
+        logger = logging.getLogger(__name__)
+
+        logger.info("COM LOGGER")
+        call_generic_scraper.run_scraper(
+            settings_file_path="scrapers.utils.pcts_scrapers.settings",
+            custom_project_settings={
+                'SPLASH_URL': 'http://pcts-scrapers-splash:8050',
+                'SPIDER_MODULES': ['scrapers.utils.pcts_scrapers.spiders'],
+                'NEWSPIDER_MODULE': 'scrapers.utils.pcts_scrapers.spiders',
+                'SELENIUM_DRIVER_EXECUTABLE_PATH': f"{os.getcwd()}/scrapers/utils/chromedriver"
+            },
+            crawler_process=False,
+            logging=logger
+        )
+
         return Response({
-            "message": "Hello World"
+            "message": "Website scraped successfully!"
         })
