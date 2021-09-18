@@ -1,11 +1,14 @@
 version: "3.5"
 services:
-  splash:
+  pcts-scrapers-splash:
+    hostname: pcts-scrapers-splash
     image: scrapinghub/splash
-    container_name: pcts-scraper-splash
+    container_name: pcts-scrapers-splash
     ports:
       - 8050:8050
     command: "--disable-private-mode"
+    networks:
+      - pcts-network
   pcts-scrapers-api:
     container_name: pcts-scrapers-api
     # restart: unless-stopped

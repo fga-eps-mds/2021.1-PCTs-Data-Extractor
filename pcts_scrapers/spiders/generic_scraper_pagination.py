@@ -191,7 +191,6 @@ class ScraperPagination(Spider):
                 action = action.replace("${VALUE}", search_step_value)
 
             driver.execute_script(action, elem)
-            print("STEP")
 
             sleep(1)
 
