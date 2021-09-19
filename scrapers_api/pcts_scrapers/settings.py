@@ -143,10 +143,13 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            # 'level': 'DEBUG',
+
         },
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            # 'level': 'INFO',
+            'level': 'DEBUG',
         },
     },
 }

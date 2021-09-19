@@ -20,6 +20,8 @@ from selenium.webdriver.common.by import By
 
 from scrapy_splash import SplashRequest
 
+from ..items import GenericScraperPaginationItem
+
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
 
@@ -79,7 +81,6 @@ class ScraperPagination(Spider):
             self.site_name,
             self.scraper_start_datetime,
         )
-        self.create_directory_structure()
 
         super(ScraperPagination, self).__init__(*args, **kwargs)
 
@@ -121,10 +122,10 @@ class ScraperPagination(Spider):
 
                     if len(found_urls) > 0:
                         for url in found_urls:
-                            yield dict(
-                                link=url,
-                                meta=dict(source=self.source)
-                            )
+                            print({
+                                "link": url,
+                                "source": dict(source=self.source)
+                            })
                             yield SplashRequest(
                                 url=url,
                                 callback=self.parse_document_page,
@@ -150,14 +151,16 @@ class ScraperPagination(Spider):
         driver.close()
 
     def parse_document_page(self, response: HtmlResponse):
-        page_content = dict(url=response.url)
+        page_content = GenericScraperPaginationItem()
+
+        page_content['url'] = response.url
+        page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
         page_content['content'] = response.body.decode("utf-8")
         page_content['extracted_at'] = int(datetime.now().timestamp())
 
-        page_title = response.xpath("/html/head/title/text()").extract_first()
         print("Pagina Carregada:", response.url)
 
-        self.save_page_content(page_title, page_content)
+        yield page_content
 
     def execute_search_steps(self, driver: WebDriver):
         INPUT_ACTION = {
@@ -222,39 +225,9 @@ class ScraperPagination(Spider):
             str_links.append(link.url)
         return str_links
 
-    def create_directory_structure(self):
-        if not os.path.exists(self.output_folder_path):
-            os.makedirs(self.output_folder_path)
-
-    def save_page_content(self, page_title, content):
-        current_time = datetime.now().strftime("%H%M%S_%f")
-        page_title = self.clean_text(page_title)
-        file_path = os.path.join(
-            self.output_folder_path,
-            f"{page_title}_{current_time}.json"
-        )
-
-        try:
-            with open(file_path, "w") as page_content_f:
-                page_content_f.write(json.dumps(content))
-        except Exception as e:
-            self.logger.error(
-                "Falha ao Carregar Arquivo de Saida: %s",
-                page_title
-            )
-            self.logger.error("Erro:", str(e))
-
-    def clean_text(self, text):
-        normalized_text = unicodedata.normalize('NFKD', text.lower())\
-            .encode('ascii', 'ignore')
-        return "_".join(re.findall(
-            "\w+",
-            normalized_text.decode('ascii'))
-        )
-
     def save_body_page(self, driver: WebDriver):
         body_page = driver.find_element_by_xpath(
-                '//*').get_attribute("outerHTML")
+            '//*').get_attribute("outerHTML")
 
         with open("page_crawled.html", "w") as f:
             f.write(body_page)

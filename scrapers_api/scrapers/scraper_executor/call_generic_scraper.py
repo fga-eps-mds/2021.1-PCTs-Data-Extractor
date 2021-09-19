@@ -129,8 +129,9 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         reactor.run(0)
 
 
-if __name__ == '__main__':
-    try:
-        run_scraper(logging=logging)
-    finally:
-        gc.collect()
+if os.environ.get('PROJECT_ENV_EXECUTOR') != 'DOCKER':
+    if __name__ == '__main__':
+        try:
+            run_scraper(logging=logging)
+        finally:
+            gc.collect()

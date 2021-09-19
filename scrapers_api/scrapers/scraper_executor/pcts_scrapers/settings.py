@@ -96,9 +96,9 @@ SPIDER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'pcts_scrapers.pipelines.GenericCrawlerPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'pcts_scrapers.pipelines.SaveGenericPagePipeline': 100,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
