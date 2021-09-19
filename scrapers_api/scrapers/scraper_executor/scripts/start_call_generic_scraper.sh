@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export PCTS_SCRAPERS_RAW_DOCUMENTS_HOST_DB=127.0.0.1:27017
+export PCTS_SCRAPERS_RAW_DOCUMENTS_DB=pcts_raw_documents
+export PCTS_SCRAPERS_RAW_DOCUMENTS_DB_USER=root
+export PCTS_SCRAPERS_RAW_DOCUMENTS_DB_PASS=pass12345
+
+python call_generic_scraper.py

@@ -9,6 +9,52 @@ services:
     command: "--disable-private-mode"
     networks:
       - pcts-network
+
+  pcts-scrapers-mongodb:
+    image: mongo
+    container_name: pcts-scrapers-mongodb
+    hostname: pcts-scrapers-mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass12345
+    volumes:
+      - pcts-scrapers-mongodb-data:/data/db
+    networks:
+      - pcts-network
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo 10.10.10.60:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  pcts-scrapers-mongo-express:
+    image: mongo-express
+    container_name: pcts-scrapers-mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=pcts-scrapers-mongodb
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass12345
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    volumes:
+      - pcts-scrapers-mongodb-data
+    depends_on:
+      - pcts-scrapers-mongodb
+    networks:
+      - pcts-network
+    ports:
+      - 8081:8081
+    healthcheck:
+      test: wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
   pcts-scrapers-api:
     container_name: pcts-scrapers-api
     # restart: unless-stopped
@@ -17,6 +63,10 @@ services:
     # env_file: dev-env
     environment:
       PROJECT_ENV_EXECUTOR: "DOCKER"
+      PCTS_SCRAPERS_RAW_DOCUMENTS_HOST_DB: pcts-scrapers-mongodb:27017
+      PCTS_SCRAPERS_RAW_DOCUMENTS_DB: pcts_raw_documents
+      PCTS_SCRAPERS_RAW_DOCUMENTS_DB_USER: root
+      PCTS_SCRAPERS_RAW_DOCUMENTS_DB_PASS: pass12345
     ports:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
@@ -27,8 +77,10 @@ services:
       - pip-cache:/usr/local/lib/python3.8/site-packages
 
 volumes:
+  pcts-scrapers-mongodb-data:
+    name: pcts-scrapers-mongodb-data
   pip-cache:
-    name: pcts-scrapers-api-pip-cache
+    name: pip-cache
 
 networks:
   pcts-network:

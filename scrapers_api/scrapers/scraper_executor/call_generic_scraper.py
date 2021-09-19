@@ -60,6 +60,7 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         allow=['#/documento'],
         pagination_retries=3,
         pagination_delay=10,
+        keyword="Povos e Comunidades Tradicionais",
     )
 
     # Senado Example
@@ -84,6 +85,7 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
     #     allow=['noticias'],
     #     pagination_retries=3,
     #     pagination_delay=5,
+    #     keyword="Povos e Comunidades Tradicionais",
     # )
 
     # Diario Oficial
@@ -118,6 +120,7 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
     #     allow=['web/dou'],
     #     pagination_retries=3,
     #     pagination_delay=5,
+    #     keyword="Povos e Comunidades Tradicionais",
     # )
 
     crawler.join()

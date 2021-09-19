@@ -15,59 +15,54 @@ from itemadapter import ItemAdapter
 from scrapy.spiders import Spider
 from scrapy.item import Item
 
+from .utils.database_manager import DatabaseManager
+
+DATABASE_HOST = os.environ.get('PCTS_SCRAPERS_RAW_DOCUMENTS_HOST_DB')
+DATABASE_NAME = os.environ.get('PCTS_SCRAPERS_RAW_DOCUMENTS_DB')
+DATABASE_USER = os.environ.get('PCTS_SCRAPERS_RAW_DOCUMENTS_DB_USER')
+DATABASE_PASSWORD = os.environ.get('PCTS_SCRAPERS_RAW_DOCUMENTS_DB_PASS')
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
 
 class SaveGenericPagePipeline:
 
     def open_spider(self, spider: Spider):
-        print("NOME DO SITE:", spider.site_name)
         self.site_name = spider.site_name
+        self.keyword = spider.keyword
         self.logger = spider.logger
         self.root_output_data_folder = DEFAULT_ROOT_OUTPUT_DATA_FOLDER
         self.scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
 
-        self.output_folder_path = os.path.join(
-            self.root_output_data_folder,
-            self.site_name,
-            self.scraper_start_datetime,
-        )
-
-        self.create_directory_structure()
+        try:
+            self.db = DatabaseManager(
+                DATABASE_HOST,
+                DATABASE_NAME,
+                credentials={
+                    "user": DATABASE_USER,
+                    "password": DATABASE_PASSWORD,
+                }
+            )
+        except Exception as e:
+            self.logger.error("Error on start DB Client")
+            raise e
 
     def process_item(self, item: Item, spider):
         self.save_page_content(item)
 
         return item
 
-    def create_directory_structure(self):
-        if not os.path.exists(self.output_folder_path):
-            os.makedirs(self.output_folder_path)
-
     def save_page_content(self, item: Item):
-        current_time = datetime.now().strftime("%H%M%S_%f")
-        page_title = self.clean_text(item['title'])
-        file_path = os.path.join(
-            self.output_folder_path,
-            f"{page_title}_{current_time}.json"
+        self.db.save(
+            self.site_name,
+            {
+                "url": item["url"],
+                "slug": self.clean_text(item['title']),
+                "title": item["title"],
+                "content": item["content"],
+                "keyword": self.keyword,
+            },
+            verification_fields={"url"}
         )
-        
-        item.__dict__
-        try:
-            with open(file_path, "w") as page_content_f:
-                content = {
-                    "url": item["url"],
-                    "title": item["title"],
-                    "content": item["content"],
-                    "extracted_at": item["extracted_at"],
-                }
-                page_content_f.write(json.dumps(content))
-        except Exception as e:
-            self.logger.error(
-                "Falha ao Carregar Arquivo de Saida: %s",
-                page_title
-            )
-            self.logger.error("Erro:", str(e))
 
     def clean_text(self, text):
         normalized_text = unicodedata.normalize('NFKD', text.lower())\
