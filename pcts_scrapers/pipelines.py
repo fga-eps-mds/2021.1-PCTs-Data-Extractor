@@ -54,14 +54,14 @@ class SaveGenericPagePipeline:
         
         item.__dict__
         try:
-            with open(file_path, "w") as page_content_f:
+            with open(file_path, "w", encoding="utf-8") as page_content_f:
                 content = {
                     "url": item["url"],
                     "title": item["title"],
                     "content": item["content"],
                     "updated_at": int(datetime.now().timestamp()),
                 }
-                page_content_f.write(json.dumps(content))
+                page_content_f.write(json.dumps(content, ensure_ascii=False))
         except Exception as e:
             self.logger.error(
                 "Falha ao Carregar Arquivo de Saida: %s",
