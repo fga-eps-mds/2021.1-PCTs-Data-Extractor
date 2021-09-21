@@ -159,8 +159,9 @@ class ScraperPagination(Spider):
 
         # Extracao de conteudo baseado no mapeamento passado em content_xpath
         for content_key in self.content_xpath:
-            res = response.xpath(self.content_xpath[content_key]).extract()
-            page_content[content_key] = '\n'.join(elem for elem in res).strip()
+            if self.content_xpath[content_key]:
+                res = response.xpath(self.content_xpath[content_key]).extract()
+                page_content[content_key] = '\n'.join(elem for elem in res).strip()
         # Exemplo manual
         # page_content['content'] = response.body.decode("utf-8")
 
