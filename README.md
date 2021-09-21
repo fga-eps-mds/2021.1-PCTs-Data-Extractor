@@ -6,6 +6,34 @@
 
 Repositório com o serviço de extração de dados
 
+# Como testar
+
+Atualmente como não há uma API para iniciar um scraper a partir dela, temos apenas o arquivo "call_generic_scraper.py" para realizar a chamada para o Scraper em generic_scraper_pagination.py.
+
+Importante 1: Como o spider (caminho pcts_scrapers/spiders/generic_scraper_pagination.py) utiliza o Splash em um container docker para processar as paginas de maneira assincrona, é preciso iniciar o container splash antes de executar "call_generic_scraper.py".
+
+Importante 2: Como no momento o scraper ainda não executado em docker, é necessário instalar as dependências diretamente em seu PC, ou ambiente virtualenv
+
+```shell
+virtualenv -p python3 venv
+source ven/bin/activate
+pip install -r requirements
+
+```
+
+Exemplo debugando o container splash:
+
+Terminal 1:
+```shell
+docker-compose up pcts-scrapers-splash
+```
+
+Terminal 2:
+Como no momen
+```shell
+python call_generic_scraper.py
+```
+
 ## Contribuição
 
 1. Clone io repositório
