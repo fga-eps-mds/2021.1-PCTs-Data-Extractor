@@ -1,3 +1,4 @@
+# Scrapers
 scrapy==2.5.0
 splash
 scrapy-splash
@@ -5,3 +6,12 @@ scrapyjs
 selenium
 scrapy-selenium
 avro-python3
+
+# API
+django
+djangorestframework==3.12.*
+django-cors-headers
+django-environ==0.4.*
+psycopg2-binary>=2.8
+pycodestyle
+coverage
