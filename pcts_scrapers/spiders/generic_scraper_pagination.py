@@ -39,7 +39,7 @@ class ScraperPagination(Spider):
     start_urls = []
 
     def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None,
-                 pagination_retries=1, pagination_delay=1, *args, **kwargs):
+                 content_xpath=None, pagination_retries=1, pagination_delay=1, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
@@ -56,6 +56,7 @@ class ScraperPagination(Spider):
         self.site_name = site_name
         self.search_steps = search_steps
         self.next_button_xpath = next_button_xpath
+        self.content_xpath = content_xpath
         self.pagination_retries = pagination_retries
         self.pagination_delay = pagination_delay
         self.options = kwargs
@@ -155,8 +156,13 @@ class ScraperPagination(Spider):
 
         page_content['url'] = response.url
         page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
-        page_content['content'] = response.body.decode("utf-8")
-        page_content['extracted_at'] = int(datetime.now().timestamp())
+
+        # Extracao de conteudo baseado no mapeamento passado em content_xpath
+        for content_key in self.content_xpath:
+            res = response.xpath(self.content_xpath[content_key]).extract()
+            page_content[content_key] = '\n'.join(elem for elem in res).strip()
+        # Exemplo manual
+        # page_content['content'] = response.body.decode("utf-8")
 
         print("Pagina Carregada:", response.url)
 

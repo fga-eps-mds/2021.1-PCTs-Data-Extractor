@@ -59,7 +59,7 @@ class SaveGenericPagePipeline:
                     "url": item["url"],
                     "title": item["title"],
                     "content": item["content"],
-                    "extracted_at": item["extracted_at"],
+                    "updated_at": int(datetime.now().timestamp()),
                 }
                 page_content_f.write(json.dumps(content))
         except Exception as e:
