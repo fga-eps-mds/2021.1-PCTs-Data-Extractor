@@ -6,13 +6,24 @@
 
 Repositório com o serviço de extração de dados
 
-# Como testar
+# Como executar (Docker)
+
+Com esse comando, o container do splash será iniciado, como uma API, por outro lado, o container do scraper irá executar sua rotina e depois parar.
+Esse método atualmente está sendo utilizado sem uma API para o Scraper, portanto o container do scraper não irá se manter ativo para receber requisições.
+
+__Importante:__ Esse método apenas foi adicionado para facilitar a execução por parte dos integrantes ainda não familiarizados com o framework Scrapy. Futuramente, toda execução será realizada por uma API com um cronjob.
+
+```shell
+docker-compose up
+```
+
+# Como executar (Direto na máquina)
 
 Atualmente como não há uma API para iniciar um scraper a partir dela, temos apenas o arquivo "call_generic_scraper.py" para realizar a chamada para o Scraper em generic_scraper_pagination.py.
 
 Importante 1: Como o spider (caminho pcts_scrapers/spiders/generic_scraper_pagination.py) utiliza o Splash em um container docker para processar as paginas de maneira assincrona, é preciso iniciar o container splash antes de executar "call_generic_scraper.py".
 
-Importante 2: Como no momento o scraper ainda não executado em docker, é necessário instalar as dependências diretamente em seu PC, ou ambiente virtualenv
+Importante 2: Como a execução do scraper não será executado em docker, é necessário instalar as dependências diretamente em seu PC, ou ambiente virtualenv
 
 ```shell
 virtualenv -p python3 venv
@@ -29,7 +40,6 @@ docker-compose up pcts-scrapers-splash
 ```
 
 Terminal 2:
-Como no momen
 ```shell
 python call_generic_scraper.py
 ```

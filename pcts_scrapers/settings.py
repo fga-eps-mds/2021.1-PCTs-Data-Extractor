@@ -1,10 +1,7 @@
-import environ
+import os
 
 from shutil import which
 from os import getcwd
-
-# env = environ.Env()
-# env.read_env('dev-env')
 
 # Scrapy settings for pcts_scrapers project
 #
@@ -74,7 +71,8 @@ SELENIUM_DRIVER_ARGUMENTS=[
 ]
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
-SPLASH_URL = 'http://localhost:8050'
+
+SPLASH_URL = f'http://{os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")}:8050'
 
 DOWNLOADER_MIDDLEWARES = {
   'scrapy_selenium.SeleniumMiddleware': 800,

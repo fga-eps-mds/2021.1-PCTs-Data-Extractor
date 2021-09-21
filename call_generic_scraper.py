@@ -8,10 +8,7 @@ from scrapy.utils.project import get_project_settings
 
 from twisted.internet import reactor
 
-if os.environ.get('PROJECT_ENV_EXECUTOR') == 'DOCKER':
-    from .pcts_scrapers.spiders import generic_scraper_pagination
-else:
-    from pcts_scrapers.spiders import generic_scraper_pagination
+from pcts_scrapers.spiders import generic_scraper_pagination
 
 
 def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True, logging=logging.basicConfig()):
@@ -74,9 +71,8 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         reactor.run(0)
 
 
-if os.environ.get('PROJECT_ENV_EXECUTOR') != 'DOCKER':
-    if __name__ == '__main__':
-        try:
-            run_scraper(logging=logging)
-        finally:
-            gc.collect()
+if __name__ == '__main__':
+    try:
+        run_scraper(logging=logging)
+    finally:
+        gc.collect()

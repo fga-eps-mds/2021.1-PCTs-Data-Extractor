@@ -6,9 +6,13 @@ services:
     container_name: pcts-scrapers-splash
     ports:
       - 8050:8050
-    command: "--disable-private-mode"
     networks:
       - pcts-network
+    command: "--disable-private-mode"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050"]
+      interval: 30s
+      retries: 5
   pcts-scrapers-api:
     container_name: pcts-scrapers-api
     # restart: unless-stopped
@@ -17,11 +21,16 @@ services:
     # env_file: dev-env
     environment:
       PROJECT_ENV_EXECUTOR: "DOCKER"
+      PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
     ports:
       - 8002:8002
-    command: ["sh", "scripts/start_dev.sh"]
     networks:
       - pcts-network
+    # command: ["sh", "scripts/start_dev.sh"]
+    command: ["python", "call_generic_scraper.py"]
+    depends_on:
+      pcts-scrapers-splash:
+        condition: service_healthy
     volumes:
       - .:/app
       - pip-cache:/usr/local/lib/python3.8/site-packages
