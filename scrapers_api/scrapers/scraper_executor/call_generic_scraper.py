@@ -58,6 +58,9 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         next_button_xpath='//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
         allow_domains=['pesquisa.apps.tcu.gov.br'],
         allow=['#/documento'],
+        content_xpath={
+            "content": "//*"
+        },
         pagination_retries=3,
         pagination_delay=10,
         keyword="Povos e Comunidades Tradicionais",
