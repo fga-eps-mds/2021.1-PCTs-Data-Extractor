@@ -2,7 +2,7 @@ import os
 import logging
 from django.conf import settings
 
-from django.contrib.auth.models import User, Group
+from .models import Scraper
 from rest_framework import viewsets
 from rest_framework import permissions
 from scrapers.serializers import ScraperSerializer
@@ -23,7 +23,7 @@ class ScraperViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows scrapers to be viewed or edited.
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = Scraper.objects.all().order_by('site_name')
     serializer_class = ScraperSerializer
 
 
