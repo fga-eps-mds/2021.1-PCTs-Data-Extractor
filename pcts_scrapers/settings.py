@@ -2,6 +2,7 @@ import os
 
 from shutil import which
 from os import getcwd
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Scrapy settings for pcts_scrapers project
 #
@@ -62,7 +63,8 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 
 SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which(f'{getcwd()}/chromedriver')
+SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
+
 SELENIUM_DRIVER_ARGUMENTS=[
   '-headless',
   '--no-sandbox',
@@ -72,7 +74,9 @@ SELENIUM_DRIVER_ARGUMENTS=[
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 
-SPLASH_URL = f'http://{os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")}:8050'
+splash_host = os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")
+
+SPLASH_URL = f'http://{splash_host if splash_host else "localhost"}:8050'
 
 DOWNLOADER_MIDDLEWARES = {
   'scrapy_selenium.SeleniumMiddleware': 800,
