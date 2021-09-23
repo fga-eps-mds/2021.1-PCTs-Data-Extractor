@@ -8,7 +8,7 @@ from scrapy.utils.project import get_project_settings
 
 from twisted.internet import reactor
 
-from pcts_scrapers.spiders import generic_scraper_pagination
+from pcts_scrapers.spiders import generic_scraper_pagination, mpf_scraper
 
 
 def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True, logging=logging.basicConfig()):
@@ -36,25 +36,57 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         logging.info("EXECUTANDO RUNNER")
 
     # Senado Example
-    crawler.crawl(
+    # crawler.crawl(
+    #     generic_scraper_pagination.ScraperPagination,
+    #     root='https://www6g.senado.leg.br/busca',
+    #     site_name='senado',
+    #     search_steps=[
+    #         {
+    #             "elem_type": "input",
+    #             "xpath": '//*[@id="busca-query"]',
+    #             "action": {"write": "Povos e Comunidades Tradicionais"}
+    #         },
+    #         {
+    #             "elem_type": "btn",
+    #             "xpath": '//*[@id="search-addon"]/button',
+    #             "action": {"click": True}
+    #         },
+    #     ],
+    #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
+    #     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
+    #     allow=['noticias'],
+    #     content_xpath={
+    #         "content": "//*"
+    #     },
+    #     pagination_retries=3,
+    #     pagination_delay=5,
+    # )
+
+    # running_process = crawler.crawl(
+    #     mpf_scraper.MpfScraperSpider,
+    #     keyword = "comunidades tradicionais"
+    # )
+
+    running_process = crawler.crawl(
         generic_scraper_pagination.ScraperPagination,
-        root='https://www6g.senado.leg.br/busca',
-        site_name='senado',
+        root='http://www.mpf.mp.br/@@search',
+        site_name='mpf',
         search_steps=[
             {
                 "elem_type": "input",
-                "xpath": '//*[@id="busca-query"]',
+                "xpath": '//*[@id="search-field"]/input[1]',
                 "action": {"write": "Povos e Comunidades Tradicionais"}
             },
             {
                 "elem_type": "btn",
-                "xpath": '//*[@id="search-addon"]/button',
+                "xpath": '//*[@id="search-field"]/input[2]',
                 "action": {"click": True}
             },
         ],
-        next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-        allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-        allow=['noticias'],
+        next_button_xpath='//*[@id="search-results"]/div/span[2]/a',
+        allow_domains=['www.mpf.mp.br'],
+        restrict_xpaths='//*[@id="search-results"]/dl',
+        allow=['pgr/noticias-pgr'],
         content_xpath={
             "content": "//*"
         },
