@@ -25,42 +25,13 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
 
     projects_settings = get_project_settings()
 
-    logging.info(f"CONFIGURACOES PROJETO: {str(projects_settings)}")
-
     projects_settings.update(custom_project_settings)
 
     if crawler_process:
         crawler = CrawlerProcess(projects_settings)
     else:
         crawler = CrawlerRunner(projects_settings)
-        logging.info("EXECUTANDO RUNNER")
-
-    # Senado Example
-    # crawler.crawl(
-    #     generic_scraper_pagination.ScraperPagination,
-    #     root='https://www6g.senado.leg.br/busca',
-    #     site_name='senado',
-    #     search_steps=[
-    #         {
-    #             "elem_type": "input",
-    #             "xpath": '//*[@id="busca-query"]',
-    #             "action": {"write": "Povos e Comunidades Tradicionais"}
-    #         },
-    #         {
-    #             "elem_type": "btn",
-    #             "xpath": '//*[@id="search-addon"]/button',
-    #             "action": {"click": True}
-    #         },
-    #     ],
-    #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-    #     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-    #     allow=['noticias'],
-    #     content_xpath={
-    #         "content": "//*"
-    #     },
-    #     pagination_retries=3,
-    #     pagination_delay=5,
-    # )
+        logging.info("Crawler RUNNER")
 
     # running_process = crawler.crawl(
     #     mpf_scraper.MpfScraperSpider,
@@ -69,27 +40,28 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
 
     running_process = crawler.crawl(
         generic_scraper_pagination.ScraperPagination,
-        root='http://www.mpf.mp.br/',
-        site_name='mpf',
+        root='https://www.gov.br/incra/pt-br/search?SearchableText=quilombolas',
+        site_name='incra',
         search_steps=[
             {
                 "elem_type": "input",
-                "xpath": '//*[@id="SearchableText"]',
-                "action": {"write": "Povos e Comunidades Tradicionais"}
+                "xpath": '//*[@id="searchtext-input"]',
+                "action": {"write": "quilombolas"}
             },
             {
                 "elem_type": "btn",
-                "xpath": '/html/body/div[3]/header/div[3]/div[3]/form/input[2]',
+                "xpath": '//*[@id="searchtext-label"]/button',
                 "action": {"click": True}
             },
         ],
-        next_button_xpath='//*[@id="search-results"]/div/span[1]/a',
-        allow_domains=['www.mpf.mp.br'],
-        restrict_xpaths='//*[@id="search-results"]/dl',
-        allow=['pgr/noticias-pgr', 'atuacao-tematica'],
-        # content_xpath={
-        #     "content": "//*"
-        # },
+        next_button_xpath='//*[@id="search-results"]/div[4]/div[2]/span[2]/ul[2]/li[3]/a',
+        allow_domains=['www.gov.br'],
+        allow_path=['incra/pt-br/assuntos/noticias'],
+        restrict_xpaths='//*[@id="search-results"]/div[4]/div[2]/span[2]/ul[1]/li',
+        content_xpath={
+            "content": '//body//*//text()',
+            # "content": '//*[@id="parent-fieldname-text"]/div/*/text()',
+        },
         pagination_retries=3,
         pagination_delay=5,
     )

@@ -54,7 +54,7 @@ class ScraperPagination(Spider):
             **kwargs: Extra named arguments
         """
         configure_logging(install_root_handler=True)
-        logging.disable(50)  # CRITICAL = 50
+        logging.disable(20)  # CRITICAL = 50
         self.logger.info("[Scraper Pagination] Source: %s Kwargs: %s",
                          root, kwargs)
         self.source = root
@@ -69,7 +69,7 @@ class ScraperPagination(Spider):
         ScraperPagination.start_urls.append(root)
         ScraperPagination.allowed_domains = self.options.get('allow_domains')
         self.link_pages_extractor = LinkExtractor(
-            allow=self.options.get('allow'),
+            allow=self.options.get('allow_path'),
             deny=self.options.get('deny'),
             allow_domains=self.options.get('allow_domains'),
             deny_domains=self.options.get('deny_domains'),
@@ -94,7 +94,8 @@ class ScraperPagination(Spider):
         yield SeleniumRequest(
             url=self.source,
             callback=self.parse_home_pagination,
-            # wait_time=5,
+            meta={'donwload_timeout': self.pagination_delay}
+            # wait_time=self.pagination_delay,
             # wait_until=EC.visibility_of_all_elements_located(
             #     (By.XPATH, self.search_steps[0]["xpath"])),
         )
@@ -161,12 +162,12 @@ class ScraperPagination(Spider):
         page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
 
         # Extracao de conteudo baseado no mapeamento passado em content_xpath
-        # for content_key in self.content_xpath:
-        #     if self.content_xpath[content_key]:
-        #         res = response.xpath(self.content_xpath[content_key]).extract()
-        #         page_content[content_key] = '\n'.join(elem for elem in res).strip()
+        for content_key in self.content_xpath:
+            if self.content_xpath[content_key]:
+                res = response.xpath(self.content_xpath[content_key]).extract()
+                page_content[content_key] = '\n'.join(elem for elem in res).strip()
         # Exemplo manual
-        page_content['content'] = response.body.decode("utf-8")
+        # page_content['content'] = response.body.decode("utf-8")
 
         print("Pagina Carregada:", response.url)
 
