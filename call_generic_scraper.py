@@ -69,27 +69,27 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
 
     running_process = crawler.crawl(
         generic_scraper_pagination.ScraperPagination,
-        root='http://www.mpf.mp.br/@@search',
+        root='http://www.mpf.mp.br/',
         site_name='mpf',
         search_steps=[
             {
                 "elem_type": "input",
-                "xpath": '//*[@id="search-field"]/input[1]',
+                "xpath": '//*[@id="SearchableText"]',
                 "action": {"write": "Povos e Comunidades Tradicionais"}
             },
             {
                 "elem_type": "btn",
-                "xpath": '//*[@id="search-field"]/input[2]',
+                "xpath": '/html/body/div[3]/header/div[3]/div[3]/form/input[2]',
                 "action": {"click": True}
             },
         ],
-        next_button_xpath='//*[@id="search-results"]/div/span[2]/a',
+        next_button_xpath='//*[@id="search-results"]/div/span[1]/a',
         allow_domains=['www.mpf.mp.br'],
         restrict_xpaths='//*[@id="search-results"]/dl',
-        allow=['pgr/noticias-pgr'],
-        content_xpath={
-            "content": "//*"
-        },
+        allow=['pgr/noticias-pgr', 'atuacao-tematica'],
+        # content_xpath={
+        #     "content": "//*"
+        # },
         pagination_retries=3,
         pagination_delay=5,
     )

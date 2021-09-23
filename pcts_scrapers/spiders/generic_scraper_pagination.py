@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import re
 import unicodedata
+import logging
 
 from scrapy.spiders import CrawlSpider, Rule, Spider
 from scrapy import Request
@@ -21,6 +22,8 @@ from selenium.webdriver.common.by import By
 from scrapy_splash import SplashRequest
 
 from ..items import GenericScraperPaginationItem
+from scrapy.utils.log import configure_logging
+
 
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
@@ -50,6 +53,8 @@ class ScraperPagination(Spider):
             *args: Extra arguments
             **kwargs: Extra named arguments
         """
+        configure_logging(install_root_handler=True)
+        logging.disable(50)  # CRITICAL = 50
         self.logger.info("[Scraper Pagination] Source: %s Kwargs: %s",
                          root, kwargs)
         self.source = root
@@ -68,7 +73,7 @@ class ScraperPagination(Spider):
             deny=self.options.get('deny'),
             allow_domains=self.options.get('allow_domains'),
             deny_domains=self.options.get('deny_domains'),
-            restrict_xpaths=self.options.get('items_xpath'),
+            restrict_xpaths=self.options.get('restrict_xpaths'),
             canonicalize=False,
             unique=True,
             process_value=None,
@@ -123,10 +128,8 @@ class ScraperPagination(Spider):
 
                     if len(found_urls) > 0:
                         for url in found_urls:
-                            print({
-                                "link": url,
-                                "source": dict(source=self.source)
-                            })
+                            print("Pagina Encontrada:", url)
+
                             yield SplashRequest(
                                 url=url,
                                 callback=self.parse_document_page,
@@ -158,12 +161,12 @@ class ScraperPagination(Spider):
         page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
 
         # Extracao de conteudo baseado no mapeamento passado em content_xpath
-        for content_key in self.content_xpath:
-            if self.content_xpath[content_key]:
-                res = response.xpath(self.content_xpath[content_key]).extract()
-                page_content[content_key] = '\n'.join(elem for elem in res).strip()
+        # for content_key in self.content_xpath:
+        #     if self.content_xpath[content_key]:
+        #         res = response.xpath(self.content_xpath[content_key]).extract()
+        #         page_content[content_key] = '\n'.join(elem for elem in res).strip()
         # Exemplo manual
-        # page_content['content'] = response.body.decode("utf-8")
+        page_content['content'] = response.body.decode("utf-8")
 
         print("Pagina Carregada:", response.url)
 

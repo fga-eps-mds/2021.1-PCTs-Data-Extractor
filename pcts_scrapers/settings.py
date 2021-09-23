@@ -14,6 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 # LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'ERROR'
 
 BOT_NAME = 'pcts_scrapers'
 
