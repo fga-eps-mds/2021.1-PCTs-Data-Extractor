@@ -56,6 +56,7 @@ class SaveGenericPagePipeline:
         try:
             with open(file_path, "w", encoding="utf-8") as page_content_f:
                 content = {
+                    "source": item["source"],
                     "url": item["url"],
                     "title": item["title"],
                     "content": item["content"],

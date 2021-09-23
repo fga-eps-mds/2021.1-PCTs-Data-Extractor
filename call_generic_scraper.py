@@ -40,20 +40,26 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
 
     running_process = crawler.crawl(
         generic_scraper_pagination.ScraperPagination,
-        root='https://www.gov.br/incra/pt-br/search?SearchableText=quilombolas',
+        root='https://www.gov.br/incra/pt-br/search',
         site_name='incra',
-        search_steps=[
+        query_string_params=[
             {
-                "elem_type": "input",
-                "xpath": '//*[@id="searchtext-input"]',
-                "action": {"write": "quilombolas"}
-            },
-            {
-                "elem_type": "btn",
-                "xpath": '//*[@id="searchtext-label"]/button',
-                "action": {"click": True}
-            },
+                "param": "SearchableText",
+                "value": "quilombolas"
+            }
         ],
+        # js_search_steps=[
+        #     {
+        #         "elem_type": "input",
+        #         "xpath": '//*[@id="searchtext-input"]',
+        #         "action": {"write": "quilombolas"}
+        #     },
+        #     {
+        #         "elem_type": "btn",
+        #         "xpath": '//*[@id="searchtext-label"]/button',
+        #         "action": {"click": True}
+        #     },
+        # ],
         next_button_xpath='//*[@id="search-results"]/div[4]/div[2]/span[2]/ul[2]/li[3]/a',
         allow_domains=['www.gov.br'],
         allow_path=['incra/pt-br/assuntos/noticias'],

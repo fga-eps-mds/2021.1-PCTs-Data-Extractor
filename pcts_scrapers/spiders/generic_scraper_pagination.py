@@ -41,14 +41,14 @@ class ScraperPagination(Spider):
     scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, search_steps=None, next_button_xpath=None,
+    def __init__(self, root=None, site_name=None, query_string_params=None, js_search_steps=None, next_button_xpath=None,
                  content_xpath=None, pagination_retries=1, pagination_delay=1, *args, **kwargs):
         """ Initializes ScraperPagination
 
         Args:
             root(str): root page url
             site_name(str): site name
-            search_steps(list<dict>): steps to generate the documents result list
+            js_search_steps(list<dict>): steps to generate the documents result list
             next_button_xpath(str): XPATH of "Next" button of the listing page
             *args: Extra arguments
             **kwargs: Extra named arguments
@@ -57,14 +57,17 @@ class ScraperPagination(Spider):
         logging.disable(20)  # CRITICAL = 50
         self.logger.info("[Scraper Pagination] Source: %s Kwargs: %s",
                          root, kwargs)
-        self.source = root
+        self.source_url = root
         self.site_name = site_name
-        self.search_steps = search_steps
+        self.query_string_params = query_string_params
+        self.js_search_steps = js_search_steps
         self.next_button_xpath = next_button_xpath
         self.content_xpath = content_xpath
         self.pagination_retries = pagination_retries
         self.pagination_delay = pagination_delay
         self.options = kwargs
+
+        self.search_by_url = True if query_string_params else False
 
         ScraperPagination.start_urls.append(root)
         ScraperPagination.allowed_domains = self.options.get('allow_domains')
@@ -91,19 +94,25 @@ class ScraperPagination(Spider):
         super(ScraperPagination, self).__init__(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
+        if self.search_by_url:
+            home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(param["value"]) for param in self.query_string_params)}'
+        else:
+            home_url = self.source_url
+
         yield SeleniumRequest(
-            url=self.source,
+            url=home_url,
             callback=self.parse_home_pagination,
             meta={'donwload_timeout': self.pagination_delay}
             # wait_time=self.pagination_delay,
             # wait_until=EC.visibility_of_all_elements_located(
-            #     (By.XPATH, self.search_steps[0]["xpath"])),
+            #     (By.XPATH, self.js_search_steps[0]["xpath"])),
         )
 
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
 
-        self.execute_search_steps(driver)
+        if not self.search_by_url:
+            self.execute_js_search_steps(driver)
 
         # Parse result list page
         found_urls = []
@@ -158,6 +167,7 @@ class ScraperPagination(Spider):
     def parse_document_page(self, response: HtmlResponse):
         page_content = GenericScraperPaginationItem()
 
+        page_content['source'] = self.site_name
         page_content['url'] = response.url
         page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
 
@@ -166,6 +176,7 @@ class ScraperPagination(Spider):
             if self.content_xpath[content_key]:
                 res = response.xpath(self.content_xpath[content_key]).extract()
                 page_content[content_key] = '\n'.join(elem for elem in res).strip()
+
         # Exemplo manual
         # page_content['content'] = response.body.decode("utf-8")
 
@@ -173,7 +184,7 @@ class ScraperPagination(Spider):
 
         yield page_content
 
-    def execute_search_steps(self, driver: WebDriver):
+    def execute_js_search_steps(self, driver: WebDriver):
         INPUT_ACTION = {
             "need_value": True,
             "type": "write",
@@ -191,7 +202,7 @@ class ScraperPagination(Spider):
             "btn": BTN_ACTION,
         }
 
-        for search_step in self.search_steps:
+        for search_step in self.js_search_steps:
             elem = driver.find_element_by_xpath(search_step["xpath"])
 
             action_type = ACTION_TYPES[search_step["elem_type"]]
