@@ -55,6 +55,7 @@ class SaveGenericPagePipeline:
         self.db.save(
             self.site_name,
             {
+                "source": item["source"],
                 "url": item["url"],
                 "slug": self.clean_text(item['title']),
                 "title": item["title"],

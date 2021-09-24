@@ -43,7 +43,7 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         generic_scraper_pagination.ScraperPagination,
         root='https://pesquisa.apps.tcu.gov.br',
         site_name='tcu',
-        search_steps=[
+        js_search_steps=[
             {
                 "elem_type": "input",
                 "xpath": '//*[@id="termo"]',
@@ -57,9 +57,9 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         ],
         next_button_xpath='//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
         allow_domains=['pesquisa.apps.tcu.gov.br'],
-        allow=['#/documento'],
+        allow_path=['#/documento'],
         content_xpath={
-            "content": "//*"
+            "content": '//body//*//text()',
         },
         pagination_retries=3,
         pagination_delay=10,
@@ -67,11 +67,11 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
     )
 
     # Senado Example
-    # crawler.crawl(
+    # running_process = crawler.crawl(
     #     ScraperPagination,
     #     root='https://www6g.senado.leg.br/busca',
     #     site_name='senado',
-    #     search_steps=[
+    #     js_search_steps=[
     #         {
     #             "elem_type": "input",
     #             "xpath": '//*[@id="busca-query"]',
@@ -85,18 +85,21 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
     #     ],
     #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
     #     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-    #     allow=['noticias'],
+    #     allow_path=['noticias'],
+    #     content_xpath={
+    #         "content": '//body//*//text()',
+    #     },
     #     pagination_retries=3,
     #     pagination_delay=5,
     #     keyword="Povos e Comunidades Tradicionais",
     # )
 
     # Diario Oficial
-    # crawler.crawl(
+    # running_process = crawler.crawl(
     #     ScraperPagination,
     #     root='https://www.in.gov.br/consulta/-/buscar/',
     #     site_name='diario_oficial',
-    #     search_steps=[
+    #     js_search_steps=[
     #         {
     #             "elem_type": "input",
     #             "xpath": '//*[@id="search-bar"]',
@@ -120,7 +123,10 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
     #     ],
     #     next_button_xpath='//*[@id="rightArrow"]',
     #     allow_domains=['www.in.gov.br'],
-    #     allow=['web/dou'],
+    #     allow_path=['web/dou'],
+    #     content_xpath={
+    #         "content": '//body//*//text()',
+    #     },
     #     pagination_retries=3,
     #     pagination_delay=5,
     #     keyword="Povos e Comunidades Tradicionais",

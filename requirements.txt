@@ -6,6 +6,7 @@ scrapyjs
 selenium
 scrapy-selenium
 avro-python3
+pymongo
 
 # API
 django

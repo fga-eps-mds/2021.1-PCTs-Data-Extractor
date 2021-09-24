@@ -1,10 +1,8 @@
-import environ
+import os
 
 from shutil import which
 from os import getcwd
-
-# env = environ.Env()
-# env.read_env('dev-env')
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Scrapy settings for pcts_scrapers project
 #
@@ -16,6 +14,7 @@ from os import getcwd
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 # LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'ERROR'
 
 BOT_NAME = 'pcts_scrapers'
 
@@ -25,7 +24,7 @@ NEWSPIDER_MODULE = 'pcts_scrapers.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'pcts_scrapers (+http://www.yourdomain.com)'
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"
 
 # Obey robots.txt rules
 # ROBOTSTXT_OBEY = True
@@ -65,16 +64,21 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 
 SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which(f'{getcwd()}/chromedriver')
+SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
+
 SELENIUM_DRIVER_ARGUMENTS=[
-  '-headless',
+  # '-headless',
   '--no-sandbox',
   '--disable-gpu',
+  '--javascript.enabled=False',
   'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
 ]
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
-SPLASH_URL = 'http://localhost:8050'
+
+splash_host = os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")
+
+SPLASH_URL = f'http://{splash_host if splash_host else "localhost"}:8050'
 
 DOWNLOADER_MIDDLEWARES = {
   'scrapy_selenium.SeleniumMiddleware': 800,
