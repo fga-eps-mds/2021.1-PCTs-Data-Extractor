@@ -1,43 +1,145 @@
+import os
+import re
+
+from datetime import datetime
+from scrapy.http import request
+from pcts_scrapers.items import GenericScraperPaginationItem
+from time import sleep
+from scrapy_selenium.http import SeleniumRequest
+from scrapy_splash.request import SplashRequest
+from selenium.webdriver.chrome.webdriver import WebDriver
+from scrapy.linkextractors import LinkExtractor
+from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
+from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
-import scrapy
-from scrapy.http import response
-from scrapy import Request
+
+
+class PaginationException(Exception):
+    pass
 
 
 class MpfScraperSpider(Spider):
     name = 'mpf_scraper'
-    site_name = "mpf"
-    content_start = 0
+    site_name = 'mpf'
     allowed_domains = ['www.mpf.mp.br']
-    start_urls = [
-        'http://www.mpf.mp.br/@@search?SearchableText=comunidades+tradicionais&path=']
+    allow = ['pgr/noticias-pgr', 'pgr/documentos', 'atuacao-tematica']
+    restrict_xpaths = ('//*[@id="search-results"]/dl', )
+    base_url = 'http://www.mpf.mp.br/@@search?SearchableText='
+    content_xpath = '//*[@id="content"]'
 
-    def __init__(self, keyword=None):
-        self.source = 'http://www.mpf.mp.br/@@search?SearchableText='
-        self.keyword = keyword
+    page_steps = 10
+    pagination_retries = 4
+    pagination_delay = 5
+    root_output_data_folder = f"{os.getcwd()}/output_data/"
+    scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
+
+    def __init__(self, keyword=None, *args, **kwargs):
+        self.source = self.base_url + keyword
+
+        ScraperPagination.start_urls.append(self.source)
+        ScraperPagination.allowed_domains = self.allowed_domains
+
+        self.link_pages_extractor = LinkExtractor(allow=(self.allow),
+                                                  allow_domains=(
+                                                      self.allowed_domains),
+                                                  restrict_xpaths=(
+                                                      self.restrict_xpaths),
+                                                  canonicalize=False,
+                                                  unique=True,
+                                                  process_value=None,
+                                                  deny_extensions=None,
+                                                  strip=True)
+        self.output_folder_path = os.path.join(
+            self.root_output_data_folder, self.site_name, self.scraper_start_datetime)
+
+        (super(MpfScraperSpider, self).__init__)(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
-        yield Request(
-            url=self.source + self.keyword + "&b_start:int=" + self.content_start,
-            callback=self.parse
-        )
+        yield SeleniumRequest(url=(self.source),
+                              callback=(self.parse_home_pagination),
+                              meta={'donwload_timeout': self.pagination_delay})
 
-    def parse(self, response):
-        site_response = {
-            "source": self.site_name,
-            "url": response.url,
-            "title": response.xpath("/html/head/title/text()").extract_first(),
-            "content": response.body.decode("utf-8")
-        }
-        print(
-            "----------------------------------------------------------------------------")
-        print(site_response["url"])
-        print(
-            "----------------------------------------------------------------------------")
-        print(site_response["title"])
-        print(
-            "----------------------------------------------------------------------------")
-        print(site_response["content"])
-        print(
-            "----------------------------------------------------------------------------")
-        yield site_response
+    def parse_home_pagination(self, response: HtmlResponse):
+        driver: WebDriver = response.request.meta['driver']
+
+        # Parse result list page
+        found_urls = []
+        old_found_urls = []
+        page = 0
+
+        while True:
+            page += 1
+            pagination_content_retrieved = False
+            for retry in range(self.pagination_retries):
+                try:
+                    print(f"Page: {page},\tRetry: {retry + 1}")
+                    sleep(self.pagination_delay)
+                    response = self.get_current_page_response(driver)
+                    # Get links and call inner pages
+                    old_found_urls = found_urls
+                    found_urls = self.get_page_links(response)
+
+                    # Pagination stop condition
+                    if found_urls == old_found_urls:
+                        raise PaginationException(
+                            "Old and new urls are the same")
+
+                    if len(found_urls) > 0:
+                        for url in found_urls:
+                            print("Pagina Encontrada:", url)
+
+                            yield SplashRequest(
+                                url=url,
+                                callback=self.parse_document_page,
+                                endpoint='render.html',
+                                args={'wait': 1},
+                            )
+
+                            sleep(0.1)
+                    pagination_content_retrieved = True
+                    break
+                except PaginationException as e:
+                    print(str(e))
+                    # break
+
+            if not pagination_content_retrieved:
+                raise Exception("End of Pagination")
+                
+            # =========== Follow next Pagination
+            # b_start:int=10
+            if page == 1:
+                next_button = driver.find_element_by_xpath('//*[@id="search-results"]/div/span[1]/a')
+            else:
+                next_button = driver.find_element_by_xpath('//*[@id="search-results"]/div/span[2]/a')
+
+            # click the button to go to next page
+            driver.execute_script("arguments[0].click();", next_button)
+        driver.close()
+
+    def parse_document_page(self, response: HtmlResponse):
+        page_content = GenericScraperPaginationItem()
+        page_content['source'] = self.site_name
+        page_content['url'] = response.url
+        page_content['title'] = response.xpath('/html/head/title/text()').extract_first()
+
+        res = response.xpath(self.content_xpath).extract()
+        page_content['content'] = '\n'.join((elem for elem in res)).strip().replace('<br>','\n')
+        page_content['content'] = re.sub(r'\<.*?\>|\\t|\s\s', '', page_content['content'])
+
+        print('Pagina Carregada:', response.url)
+
+        yield page_content
+
+    def get_current_page_response(self, driver: WebDriver):
+        return HtmlResponse(url=(driver.current_url),
+                            body=(driver.find_element_by_xpath(
+                                '//*').get_attribute('outerHTML')),
+                            encoding='utf-8')
+
+    def get_page_links(self, response):
+        links = self.link_pages_extractor.extract_links(response)
+        str_links = []
+        for link in links:
+            str_links.append(link.url)
+
+        return str_links
