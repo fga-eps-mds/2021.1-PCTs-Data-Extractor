@@ -21,6 +21,8 @@ BOT_NAME = 'pcts_scrapers'
 SPIDER_MODULES = ['pcts_scrapers.spiders']
 NEWSPIDER_MODULE = 'pcts_scrapers.spiders'
 
+DOWNLOAD_TIMEOUT = 10
+
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

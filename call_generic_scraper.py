@@ -60,13 +60,12 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         #         "action": {"click": True}
         #     },
         # ],
-        next_button_xpath='//*[@id="search-results"]/div[4]/div[2]/span[2]/ul[2]/li[3]/a',
+        next_button_xpath='//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a[contains(@class, "proximo")]',
         allow_domains=['www.gov.br'],
         allow_path=['incra/pt-br/assuntos/noticias'],
         restrict_xpaths='//*[@id="search-results"]/div[4]/div[2]/span[2]/ul[1]/li',
         content_xpath={
             "content": '//body//*//text()',
-            # "content": '//*[@id="parent-fieldname-text"]/div/*/text()',
         },
         pagination_retries=3,
         pagination_delay=5,
