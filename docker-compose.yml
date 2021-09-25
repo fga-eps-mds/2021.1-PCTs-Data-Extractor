@@ -27,7 +27,7 @@ services:
     networks:
       - pcts-network
     # command: ["sh", "scripts/start_dev.sh"]
-    command: ["python", "call_generic_scraper.py"]
+    command: ["python", "run_scrapers.py"]
     depends_on:
       pcts-scrapers-splash:
         condition: service_healthy

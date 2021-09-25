@@ -18,7 +18,7 @@ from scrapy.item import Item
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
 
-class SaveGenericPagePipeline:
+class SavePageOnFilePipeline:
 
     def open_spider(self, spider: Spider):
         print("NOME DO SITE:", spider.site_name)

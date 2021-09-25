@@ -59,7 +59,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'pcts_scrapers.middlewares.GenericCrawlerSpiderMiddleware': 543,
+#    'pcts_scrapers.middlewares.PCTsScraperSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
@@ -87,7 +87,7 @@ DOWNLOADER_MIDDLEWARES = {
   'scrapy_splash.SplashCookiesMiddleware': 723, 
   'scrapy_splash.SplashMiddleware': 725, 
   'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-  # 'pcts_scrapers.middlewares.GenericCrawlerDownloaderMiddleware': 543,
+  # 'pcts_scrapers.middlewares.PCTsDownloaderMiddleware': 543,
 }
 
 SPIDER_MIDDLEWARES = { 
@@ -103,7 +103,7 @@ SPIDER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'pcts_scrapers.pipelines.SaveGenericPagePipeline': 100,
+   'pcts_scrapers.pipelines.SavePageOnFilePipeline': 100,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

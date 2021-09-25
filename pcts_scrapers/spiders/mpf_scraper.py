@@ -4,13 +4,12 @@ import logging
 
 from datetime import datetime
 from scrapy.http import request
-from pcts_scrapers.items import GenericScraperPaginationItem
+from pcts_scrapers.items import ScraperItem
 from time import sleep
 from scrapy_selenium.http import SeleniumRequest
 from scrapy_splash.request import SplashRequest
 from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
-from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
 from scrapy.utils.log import configure_logging
@@ -42,9 +41,6 @@ class MpfScraperSpider(Spider):
         self.logger.info("[Scraper MPF] Source")
 
         self.source = self.base_url + keyword
-
-        ScraperPagination.start_urls.append(self.source)
-        ScraperPagination.allowed_domains = self.allowed_domains
 
         self.link_pages_extractor = LinkExtractor(allow=(self.allow),
                                                   allow_domains=(
@@ -124,7 +120,7 @@ class MpfScraperSpider(Spider):
         driver.close()
 
     def parse_document_page(self, response: HtmlResponse):
-        page_content = GenericScraperPaginationItem()
+        page_content = ScraperItem()
         page_content['source'] = self.site_name
         page_content['url'] = response.url
         page_content['title'] = response.xpath('/html/head/title/text()').extract_first()
