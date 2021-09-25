@@ -4,6 +4,7 @@ import logging
 
 import scrapy
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
+from scrapy.spiders import Spider
 from scrapy.utils.project import get_project_settings
 
 from twisted.internet import reactor
@@ -11,8 +12,19 @@ from twisted.internet import reactor
 from pcts_scrapers.spiders import mpf_scraper
 from pcts_scrapers.spiders import incra_scraper
 
+scrapers = [
+    mpf_scraper.MpfScraperSpider,
+    incra_scraper.IncraScraperSpider
+]
 
-def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True, logging=logging.basicConfig()):
+keywords = [
+    "povos e comunidades tradicionais",
+    "quilombolas"
+]
+
+
+def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_settings={},
+                 crawler_process=True, logging=logging.basicConfig()):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
@@ -32,31 +44,36 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         crawler = CrawlerProcess(projects_settings)
     else:
         crawler = CrawlerRunner(projects_settings)
-        logging.info("Crawler RUNNER")
 
-    # # MPF Scraper
-    # running_process = crawler.crawl(
-    #     mpf_scraper.MpfScraperSpider,
-    #     keyword="povos e comunidades tradicionais"
-    # )
+    for scraper in scrapers:
+        run_scraper(crawler, scraper, keywords, crawler_process, logging)
 
-    # INCRA Scraper
-    running_process = crawler.crawl(
-        incra_scraper.IncraScraperSpider,
-        keyword="quilombolas"
-    )
 
-    crawler.join()
+def run_scraper(crawler, scraper: Spider, keywords: [],
+                crawler_process=True, logging=logging.basicConfig()):
+    for keyword in keywords:
+        logging.info(f"=============================================")
+        logging.info(f"Scraping {scraper.name} source")
 
-    if crawler_process:
-        crawler.start(stop_after_crawl=True)
-    else:
-        running_process.addBoth(lambda _: reactor.stop())
-        reactor.run(0)
+        running_process = crawler.crawl(
+            scraper,
+            keyword=keyword
+        )
+
+        crawler.join()
+
+        if crawler_process:
+            crawler.start(stop_after_crawl=True)
+        else:
+            running_process.addBoth(lambda _: reactor.stop())
+            reactor.run(0)
+        
+        logging.info(f"Source {scraper.name} scraped")
+        logging.info(f"=============================================\n")
 
 
 if __name__ == '__main__':
     try:
-        run_scraper(logging=logging)
+        run_scrapers(logging=logging)
     finally:
         gc.collect()
