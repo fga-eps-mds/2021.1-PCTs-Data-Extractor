@@ -14,12 +14,12 @@ from pcts_scrapers.spiders import incra_scraper
 
 scrapers = [
     mpf_scraper.MpfScraperSpider,
-    incra_scraper.IncraScraperSpider
+    incra_scraper.IncraScraperSpider,
 ]
 
 keywords = [
     "povos e comunidades tradicionais",
-    "quilombolas"
+    "quilombolas",
 ]
 
 
@@ -40,20 +40,20 @@ def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_set
 
     projects_settings.update(custom_project_settings)
 
-    if crawler_process:
-        crawler = CrawlerProcess(projects_settings)
-    else:
-        crawler = CrawlerRunner(projects_settings)
-
     for scraper in scrapers:
-        run_scraper(crawler, scraper, keywords, crawler_process, logging)
+        run_scraper(projects_settings, scraper, keywords, crawler_process, logging)
 
 
-def run_scraper(crawler, scraper: Spider, keywords: [],
+def run_scraper(projects_settings, scraper: Spider, keywords: [],
                 crawler_process=True, logging=logging.basicConfig()):
     for keyword in keywords:
         logging.info(f"=============================================")
         logging.info(f"Scraping {scraper.name} source")
+
+        if crawler_process:
+            crawler = CrawlerProcess(projects_settings)
+        else:
+            crawler = CrawlerRunner(projects_settings)
 
         running_process = crawler.crawl(
             scraper,
