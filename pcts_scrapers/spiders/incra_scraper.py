@@ -78,7 +78,6 @@ class IncraScraperSpider(Spider):
             for retry in range(self.pagination_retries):
                 try:
                     print(f"Page: {page},\tRetry: {retry + 1}")
-                    sleep(self.pagination_delay)
                     response = self.get_current_page_response(driver)
                     # Get links and call inner pages
                     old_found_urls = found_urls
@@ -115,6 +114,7 @@ class IncraScraperSpider(Spider):
 
             # click the button to go to next page
             driver.execute_script("arguments[0].click();", next_button)
+            sleep(self.pagination_delay)
         driver.close()
 
     def parse_document_page(self, response: HtmlResponse):
