@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 
 from datetime import datetime
 from scrapy.http import request
@@ -12,6 +13,8 @@ from scrapy.linkextractors import LinkExtractor
 from pcts_scrapers.spiders.generic_scraper_pagination import ScraperPagination
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
+from scrapy.utils.log import configure_logging
+
 
 
 class PaginationException(Exception):
@@ -34,6 +37,10 @@ class MpfScraperSpider(Spider):
     scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
 
     def __init__(self, keyword=None, *args, **kwargs):
+        configure_logging(install_root_handler=True)
+        logging.disable(20)  # CRITICAL = 50
+        self.logger.info("[Scraper MPF] Source")
+
         self.source = self.base_url + keyword
 
         ScraperPagination.start_urls.append(self.source)
