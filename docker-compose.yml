@@ -22,11 +22,12 @@ services:
     environment:
       PROJECT_ENV_EXECUTOR: "DOCKER"
       PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
+      PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
+      PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
     ports:
       - 8002:8002
     networks:
       - pcts-network
-    # command: ["sh", "scripts/start_dev.sh"]
     command: ["python", "run_scrapers.py"]
     depends_on:
       pcts-scrapers-splash:

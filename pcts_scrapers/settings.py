@@ -24,7 +24,6 @@ NEWSPIDER_MODULE = 'pcts_scrapers.spiders'
 DOWNLOAD_TIMEOUT = 10
 
 
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"
 
@@ -51,16 +50,16 @@ ROBOTSTXT_OBEY = False
 
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-  'X-JAVASCRIPT-ENABLED': 'True'
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    #   'Accept-Language': 'en',
+    'X-JAVASCRIPT-ENABLED': 'True'
 }
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
+# SPIDER_MIDDLEWARES = {
 #    'pcts_scrapers.middlewares.PCTsScraperSpiderMiddleware': 543,
-#}
+# }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -68,14 +67,14 @@ DEFAULT_REQUEST_HEADERS = {
 SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
 
-SELENIUM_DRIVER_ARGUMENTS=[
-  # '-headless',
-  '--no-sandbox',
-  '--disable-gpu',
-  '--javascript.enabled=False',
-  'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
+SELENIUM_DRIVER_ARGUMENTS = [
+    '--headless',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--javascript.enabled=False',
+    'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
 ]
-DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter' 
+DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 
 splash_host = os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")
@@ -83,27 +82,28 @@ splash_host = os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")
 SPLASH_URL = f'http://{splash_host if splash_host else "localhost"}:8050'
 
 DOWNLOADER_MIDDLEWARES = {
-  'scrapy_selenium.SeleniumMiddleware': 800,
-  'scrapy_splash.SplashCookiesMiddleware': 723, 
-  'scrapy_splash.SplashMiddleware': 725, 
-  'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-  # 'pcts_scrapers.middlewares.PCTsDownloaderMiddleware': 543,
+    'scrapy_selenium.SeleniumMiddleware': 800,
+    'scrapy_splash.SplashCookiesMiddleware': 723,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+    # 'pcts_scrapers.middlewares.PCTsDownloaderMiddleware': 543,
 }
 
-SPIDER_MIDDLEWARES = { 
-    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100, 
+SPIDER_MIDDLEWARES = {
+    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
 }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-#EXTENSIONS = {
+# EXTENSIONS = {
 #    'scrapy.extensions.telnet.TelnetConsole': None,
-#}
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'pcts_scrapers.pipelines.SavePageOnFilePipeline': 100,
+    'pcts_scrapers.pipelines.SavePageOnDocumentsAPIPipeline': 100,
+    #  'pcts_scrapers.pipelines.SavePageOnFilePipeline': 100,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

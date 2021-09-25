@@ -15,14 +15,13 @@ from scrapy.spiders import Spider
 from scrapy.utils.log import configure_logging
 
 
-
 class PaginationException(Exception):
     pass
 
 
 class MpfScraperSpider(Spider):
     name = 'mpf_scraper'
-    site_name = 'mpf'
+    source_name = 'mpf'
     allowed_domains = ['www.mpf.mp.br']
     allow = ['pgr/noticias-pgr', 'pgr/documentos', 'atuacao-tematica']
     restrict_xpaths = ('//*[@id="search-results"]/dl', )
@@ -30,8 +29,8 @@ class MpfScraperSpider(Spider):
     content_xpath = '//*[@id="content"]'
 
     page_steps = 10
-    pagination_retries = 4
-    pagination_delay = 5
+    pagination_retries = 5
+    pagination_delay = 10
     root_output_data_folder = f"{os.getcwd()}/output_data/"
     scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
 
@@ -40,7 +39,8 @@ class MpfScraperSpider(Spider):
         logging.disable(20)  # CRITICAL = 50
         self.logger.info("[Scraper MPF] Source")
 
-        self.source = self.base_url + keyword
+        self.keyword = keyword
+        self.source_url = self.base_url + self.keyword
 
         self.link_pages_extractor = LinkExtractor(allow=(self.allow),
                                                   allow_domains=(
@@ -52,13 +52,11 @@ class MpfScraperSpider(Spider):
                                                   process_value=None,
                                                   deny_extensions=None,
                                                   strip=True)
-        self.output_folder_path = os.path.join(
-            self.root_output_data_folder, self.site_name, self.scraper_start_datetime)
 
         (super(MpfScraperSpider, self).__init__)(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
-        yield SeleniumRequest(url=(self.source),
+        yield SeleniumRequest(url=(self.source_url),
                               callback=(self.parse_home_pagination),
                               meta={'donwload_timeout': self.pagination_delay})
 
@@ -107,13 +105,15 @@ class MpfScraperSpider(Spider):
 
             if not pagination_content_retrieved:
                 raise Exception("End of Pagination")
-                
+
             # =========== Follow next Pagination
             # b_start:int=10
             if page == 1:
-                next_button = driver.find_element_by_xpath('//*[@id="search-results"]/div/span[1]/a')
+                next_button = driver.find_element_by_xpath(
+                    '//*[@id="search-results"]/div/span[1]/a')
             else:
-                next_button = driver.find_element_by_xpath('//*[@id="search-results"]/div/span[2]/a')
+                next_button = driver.find_element_by_xpath(
+                    '//*[@id="search-results"]/div/span[2]/a')
 
             # click the button to go to next page
             driver.execute_script("arguments[0].click();", next_button)
@@ -121,13 +121,16 @@ class MpfScraperSpider(Spider):
 
     def parse_document_page(self, response: HtmlResponse):
         page_content = ScraperItem()
-        page_content['source'] = self.site_name
+        page_content['source'] = self.source_name
         page_content['url'] = response.url
-        page_content['title'] = response.xpath('/html/head/title/text()').extract_first()
+        page_content['title'] = response.xpath(
+            '/html/head/title/text()').extract_first()
 
         res = response.xpath(self.content_xpath).extract()
-        page_content['content'] = '\n'.join((elem for elem in res)).strip().replace('<br>','\n')
-        page_content['content'] = re.sub(r'\<.*?\>|\\t|\s\s', '', page_content['content'])
+        page_content['content'] = '\n'.join(
+            (elem for elem in res)).strip().replace('<br>', '\n')
+        page_content['content'] = re.sub(
+            r'\<.*?\>|\\t|\s\s', '', page_content['content'])
 
         print('Pagina Carregada:', response.url)
 
