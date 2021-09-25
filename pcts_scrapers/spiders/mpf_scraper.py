@@ -23,13 +23,14 @@ class MpfScraperSpider(Spider):
     name = 'mpf_scraper'
     source_name = 'mpf'
     allowed_domains = ['www.mpf.mp.br']
-    allow = ['pgr/noticias-pgr', 'pgr/documentos', 'atuacao-tematica']
+    allowed_paths = ['pgr/noticias-pgr', 'pgr/documentos', 'atuacao-tematica']
     restrict_xpaths = ('//*[@id="search-results"]/dl', )
-    base_url = 'http://www.mpf.mp.br/@@search?SearchableText='
+    base_url = 'http://www.mpf.mp.br'
     content_xpath = '//*[@id="content"]'
 
     page_steps = 10
     pagination_retries = 5
+    load_page_delay = 2
     pagination_delay = 10
     root_output_data_folder = f"{os.getcwd()}/output_data/"
     scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
@@ -40,9 +41,9 @@ class MpfScraperSpider(Spider):
         self.logger.info("[Scraper MPF] Source")
 
         self.keyword = keyword
-        self.source_url = self.base_url + self.keyword
+        self.source_url = self.base_url + '/@@search?SearchableText=' + self.keyword
 
-        self.link_pages_extractor = LinkExtractor(allow=(self.allow),
+        self.link_pages_extractor = LinkExtractor(allow=(self.allowed_paths),
                                                   allow_domains=(
                                                       self.allowed_domains),
                                                   restrict_xpaths=(
@@ -58,7 +59,7 @@ class MpfScraperSpider(Spider):
     def start_requests(self, *args, **kwargs):
         yield SeleniumRequest(url=(self.source_url),
                               callback=(self.parse_home_pagination),
-                              meta={'donwload_timeout': self.pagination_delay})
+                              meta={'donwload_timeout': self.load_page_delay})
 
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
@@ -93,7 +94,7 @@ class MpfScraperSpider(Spider):
                                 url=url,
                                 callback=self.parse_document_page,
                                 endpoint='render.html',
-                                args={'wait': 1},
+                                args={'wait': self.load_page_delay},
                             )
 
                             sleep(0.1)
