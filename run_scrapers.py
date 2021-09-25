@@ -9,6 +9,7 @@ from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
 from pcts_scrapers.spiders import mpf_scraper
+from pcts_scrapers.spiders import incra_scraper
 
 
 def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_settings={}, crawler_process=True, logging=logging.basicConfig()):
@@ -33,9 +34,16 @@ def run_scraper(settings_file_path="pcts_scrapers.settings", custom_project_sett
         crawler = CrawlerRunner(projects_settings)
         logging.info("Crawler RUNNER")
 
+    # # MPF Scraper
+    # running_process = crawler.crawl(
+    #     mpf_scraper.MpfScraperSpider,
+    #     keyword="povos e comunidades tradicionais"
+    # )
+
+    # INCRA Scraper
     running_process = crawler.crawl(
-        mpf_scraper.MpfScraperSpider,
-        keyword="povos e comunidades tradicionais"
+        incra_scraper.IncraScraperSpider,
+        keyword="quilombolas"
     )
 
     crawler.join()
