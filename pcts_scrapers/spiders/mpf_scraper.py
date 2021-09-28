@@ -1,6 +1,5 @@
 import os
 import re
-import logging
 
 from datetime import datetime
 from scrapy.http import request
@@ -12,7 +11,6 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
-from scrapy.utils.log import configure_logging
 
 
 class PaginationException(Exception):
@@ -25,7 +23,7 @@ class MpfScraperSpider(Spider):
     allowed_domains = ['www.mpf.mp.br']
     allowed_paths = ['pgr/noticias-pgr', 'pgr/documentos', 'atuacao-tematica']
     restrict_xpaths = ('//*[@id="search-results"]/dl', )
-    base_url = 'http://www.mpf.mp.br'
+    base_url = 'http://www.mpf.mp.br'  # NOSONAR
     content_xpath = '//*[@id="content"]'
 
     page_steps = 10
@@ -36,23 +34,23 @@ class MpfScraperSpider(Spider):
     scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
 
     def __init__(self, keyword=None, *args, **kwargs):
-        configure_logging(install_root_handler=True)
-        logging.disable(20)
         self.logger.info("[Scraper MPF] Source")
 
         self.keyword = keyword
         self.source_url = self.base_url + '/@@search?SearchableText=' + self.keyword
 
-        self.link_pages_extractor = LinkExtractor(allow=(self.allowed_paths),
-                                                  allow_domains=(
-                                                      self.allowed_domains),
-                                                  restrict_xpaths=(
-                                                      self.restrict_xpaths),
-                                                  canonicalize=False,
-                                                  unique=True,
-                                                  process_value=None,
-                                                  deny_extensions=None,
-                                                  strip=True)
+        self.link_pages_extractor = LinkExtractor(
+            allow=(self.allowed_paths),
+            allow_domains=(
+                self.allowed_domains),
+            restrict_xpaths=(
+                self.restrict_xpaths),
+            canonicalize=False,
+            unique=True,
+            process_value=None,
+            deny_extensions=None,
+            strip=True
+        )
 
         (super(MpfScraperSpider, self).__init__)(*args, **kwargs)
 
@@ -74,7 +72,7 @@ class MpfScraperSpider(Spider):
             pagination_content_retrieved = False
             for retry in range(self.pagination_retries):
                 try:
-                    print(f"Page: {page},\tRetry: {retry + 1}")
+                    self.logger.info(f"Page: {page},\tRetry: {retry + 1}")
                     sleep(self.pagination_delay)
                     response = self.get_current_page_response(driver)
                     # Get links and call inner pages
@@ -88,7 +86,7 @@ class MpfScraperSpider(Spider):
 
                     if len(found_urls) > 0:
                         for url in found_urls:
-                            print("Pagina Encontrada:", url)
+                            self.logger.info("Pagina Encontrada: " + url)
 
                             yield SplashRequest(
                                 url=url,
@@ -101,8 +99,7 @@ class MpfScraperSpider(Spider):
                     pagination_content_retrieved = True
                     break
                 except PaginationException as e:
-                    print(str(e))
-                    # break
+                    self.logger.info(str(e))
 
             if not pagination_content_retrieved:
                 raise PaginationException("End of Pagination")
@@ -133,7 +130,7 @@ class MpfScraperSpider(Spider):
         page_content['content'] = re.sub(
             r'\<.*?\>|\\t|\s\s', '', page_content['content'])
 
-        print('Pagina Carregada:', response.url)
+        self.logger.info('Pagina Carregada:' + response.url)
 
         yield page_content
 

@@ -8,8 +8,11 @@ import scrapy
 
 class ScraperItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
     source = scrapy.Field()
     url = scrapy.Field()
     title = scrapy.Field()
     content = scrapy.Field()
+
+    def __str__(self):
+        """Supress logging"""
+        return ""

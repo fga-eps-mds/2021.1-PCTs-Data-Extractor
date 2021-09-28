@@ -13,8 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-# LOG_LEVEL = 'INFO'
-LOG_LEVEL = 'ERROR'
+LOG_LEVEL = 'INFO'
 
 BOT_NAME = 'pcts_scrapers'
 
@@ -100,7 +99,7 @@ SPIDER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'pcts_scrapers.pipelines.SavePageOnDocumentsAPIPipeline': 100,
-    #  'pcts_scrapers.pipelines.SavePageOnFilePipeline': 100,
+    # 'pcts_scrapers.pipelines.SavePageOnFilePipeline': 100,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -1,6 +1,5 @@
 import os
 import re
-import logging
 
 from datetime import datetime
 from scrapy.http import request
@@ -12,7 +11,6 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
 from scrapy.spiders import Spider
-from scrapy.utils.log import configure_logging
 
 
 class PaginationException(Exception):
@@ -24,8 +22,10 @@ class IncraScraperSpider(Spider):
     source_name = 'incra'
     base_url = 'https://www.gov.br/incra/pt-br'
     allowed_domains = ['www.gov.br']
-    allowed_paths = ['incra/pt-br/assuntos/noticias', 'incra/pt-br/assuntos/governanca-fundiaria']
-    restrict_xpaths = ['//*[@id="search-results"]//ul[contains(@class, "searchResults")]//a']
+    allowed_paths = ['incra/pt-br/assuntos/noticias',
+                     'incra/pt-br/assuntos/governanca-fundiaria']
+    restrict_xpaths = [
+        '//*[@id="search-results"]//ul[contains(@class, "searchResults")]//a']
     content_xpath = '//body//*//text()'
     next_button_xpath = '//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a'
 
@@ -37,23 +37,23 @@ class IncraScraperSpider(Spider):
     scraper_start_datetime = datetime.now().strftime('%Y%m%d_%H%M')
 
     def __init__(self, keyword=None, *args, **kwargs):
-        configure_logging(install_root_handler=True)
-        logging.disable(20)
         self.logger.info("[Scraper INCRA] Source")
 
         self.keyword = keyword
         self.source_url = self.base_url + '/search?SearchableText=' + self.keyword
 
-        self.link_pages_extractor = LinkExtractor(allow=(self.allowed_paths),
-                                                  allow_domains=(
-                                                      self.allowed_domains),
-                                                  restrict_xpaths=(
-                                                      self.restrict_xpaths),
-                                                  canonicalize=False,
-                                                  unique=True,
-                                                  process_value=None,
-                                                  deny_extensions=None,
-                                                  strip=True)
+        self.link_pages_extractor = LinkExtractor(
+            allow=(self.allowed_paths),
+            allow_domains=(
+                self.allowed_domains),
+            restrict_xpaths=(
+                self.restrict_xpaths),
+            canonicalize=False,
+            unique=True,
+            process_value=None,
+            deny_extensions=None,
+            strip=True
+        )
 
         (super(IncraScraperSpider, self).__init__)(*args, **kwargs)
 
@@ -77,7 +77,7 @@ class IncraScraperSpider(Spider):
             pagination_content_retrieved = False
             for retry in range(self.pagination_retries):
                 try:
-                    print(f"Page: {page},\tRetry: {retry + 1}")
+                    self.logger.info(f"Page: {page},\tRetry: {retry + 1}")
                     sleep(self.pagination_delay)
                     response = self.get_current_page_response(driver)
                     # Get links and call inner pages
@@ -91,7 +91,7 @@ class IncraScraperSpider(Spider):
 
                     if len(found_urls) > 0:
                         for url in found_urls:
-                            print("Pagina Encontrada:", url)
+                            self.logger.info("Pagina Encontrada:" + url)
 
                             yield SplashRequest(
                                 url=url,
@@ -104,8 +104,7 @@ class IncraScraperSpider(Spider):
                     pagination_content_retrieved = True
                     break
                 except PaginationException as e:
-                    print(str(e))
-                    # break
+                    self.logger.info(str(e))
 
             if not pagination_content_retrieved:
                 raise PaginationException("End of Pagination")
@@ -130,7 +129,7 @@ class IncraScraperSpider(Spider):
         page_content['content'] = re.sub(
             r'\<.*?\>|\\t|\s\s', '', page_content['content'])
 
-        print('Pagina Carregada:', response.url)
+        self.logger.info('Pagina Carregada:' + response.url)
 
         yield page_content
 
@@ -148,8 +147,6 @@ class IncraScraperSpider(Spider):
 
         driver.execute_script("arguments[0].click();", tab_all_documents_elem)
         sleep(1)
-
-
 
     def get_current_page_response(self, driver: WebDriver):
         return HtmlResponse(url=(driver.current_url),

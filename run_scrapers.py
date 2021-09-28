@@ -1,6 +1,5 @@
 import os
 import gc
-import logging
 
 import scrapy
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
@@ -24,7 +23,7 @@ keywords = [
 
 
 def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_settings={},
-                 crawler_process=True, logging=logging.basicConfig()):
+                 crawler_process=True):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
@@ -33,7 +32,7 @@ def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_set
             Example: {"SPIDER_MODULES": ['path.to.file.spiders']}
     """
 
-    logging.info("EXECUTAR SCRAPER")
+    print("EXECUTAR SCRAPER")
     os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
 
     projects_settings = get_project_settings()
@@ -41,14 +40,14 @@ def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_set
     projects_settings.update(custom_project_settings)
 
     for scraper in scrapers:
-        run_scraper(projects_settings, scraper, keywords, crawler_process, logging)
+        run_scraper(projects_settings, scraper, keywords, crawler_process)
 
 
 def run_scraper(projects_settings, scraper: Spider, keywords: [],
-                crawler_process=True, logging=logging.basicConfig()):
+                crawler_process=True):
     for keyword in keywords:
-        logging.info(f"=============================================")
-        logging.info(f"Scraping {scraper.name} source")
+        print(f"=============================================")
+        print(f"Scraping {scraper.name} source")
 
         if crawler_process:
             crawler = CrawlerProcess(projects_settings)
@@ -68,12 +67,12 @@ def run_scraper(projects_settings, scraper: Spider, keywords: [],
             running_process.addBoth(lambda _: reactor.stop())
             reactor.run(0)
         
-        logging.info(f"Source {scraper.name} scraped")
-        logging.info(f"=============================================\n")
+        print(f"Source {scraper.name} scraped")
+        print(f"=============================================\n")
 
 
 if __name__ == '__main__':
     try:
-        run_scrapers(logging=logging)
+        run_scrapers()
     finally:
         gc.collect()
