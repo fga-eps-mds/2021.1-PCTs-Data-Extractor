@@ -37,7 +37,7 @@ class MpfScraperSpider(Spider):
 
     def __init__(self, keyword=None, *args, **kwargs):
         configure_logging(install_root_handler=True)
-        logging.disable(20)  # CRITICAL = 50
+        logging.disable(20)
         self.logger.info("[Scraper MPF] Source")
 
         self.keyword = keyword
@@ -105,7 +105,7 @@ class MpfScraperSpider(Spider):
                     # break
 
             if not pagination_content_retrieved:
-                raise Exception("End of Pagination")
+                raise PaginationException("End of Pagination")
 
             # =========== Follow next Pagination
             # b_start:int=10
