@@ -7,4 +7,4 @@ def generate_checksum_from_obj(document: dict) -> str:
             document.pop("updated_at")
         except Exception:
             pass
-        return hashlib.md5(pickle.dumps(sorted(document.items()))).hexdigest()
+        return hashlib.sha256(pickle.dumps(sorted(document.items()))).hexdigest()
