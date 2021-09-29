@@ -28,7 +28,6 @@ DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 class SavePageOnDocumentsAPIPipeline:
 
     def open_spider(self, spider: Spider):
-        self.keyword = spider.keyword
         self.logger = spider.logger
         self.root_output_data_folder = DEFAULT_ROOT_OUTPUT_DATA_FOLDER
         self.scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
@@ -48,7 +47,7 @@ class SavePageOnDocumentsAPIPipeline:
             "slug": self.clean_text(item['title']),
             "title": item["title"],
             "content": item["content"],
-            # "keyword": self.keyword,
+            # "keyword": item["keyword"],
             "checksum": generate_checksum_from_obj(item),
             "updated_at": datetime.now().isoformat(),
         }
