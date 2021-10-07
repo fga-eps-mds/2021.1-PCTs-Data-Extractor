@@ -1,3 +1,7 @@
+# All
+coverage
+
+# Scrapers
 scrapy==2.5.0
 splash
 scrapy-splash
@@ -5,3 +9,5 @@ scrapyjs
 selenium
 scrapy-selenium
 avro-python3
+webdriver-manager
+pymongo

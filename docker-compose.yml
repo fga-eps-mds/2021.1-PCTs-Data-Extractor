@@ -1,21 +1,44 @@
 version: "3.5"
 services:
-  pcts-scraper:
-    container_name: pcts-scraper
-    # restart: unless-stopped
-    build: .
-    image: pcts-scraper
-    env_file: dev-env
-    command: "echo 'Hello World'"
+  pcts-scrapers-splash:
+    hostname: pcts-scrapers-splash
+    image: scrapinghub/splash
+    container_name: pcts-scrapers-splash
+    ports:
+      - 8050:8050
     networks:
       - pcts-network
+    command: "--disable-private-mode"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050"]
+      interval: 30s
+      retries: 5
+  pcts-scrapers-api:
+    container_name: pcts-scrapers-api
+    # restart: unless-stopped
+    build: .
+    image: pcts-scrapers-api
+    # env_file: dev-env
+    environment:
+      PROJECT_ENV_EXECUTOR: "DOCKER"
+      PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
+      PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
+      PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
+    ports:
+      - 8002:8002
+    networks:
+      - pcts-network
+    command: ["python", "run_scrapers.py"]
+    depends_on:
+      pcts-scrapers-splash:
+        condition: service_healthy
     volumes:
       - .:/app
       - pip-cache:/usr/local/lib/python3.8/site-packages
 
 volumes:
   pip-cache:
-    name: pcts-scraper-pip-cache
+    name: pcts-scrapers-api-pip-cache
 
 networks:
   pcts-network:

@@ -19,7 +19,14 @@ jobs:
         run: echo 'stylesheet check'
 
       - name: Build image
-        run: docker build -t pcts-scraper .
+        run: docker build -t pcts-scrapers-api .
+
+      - name: Run tests
+        run: |
+          docker run\
+            --volume ${PWD}/:/app\
+            pcts-scrapers-api bash -c\
+            "coverage run -m unittest discover && coverage xml"
 
       - name: SonarCloud Report coverage
         uses: SonarSource/sonarcloud-github-action@master
