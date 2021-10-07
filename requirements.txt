@@ -11,3 +11,7 @@ scrapy-selenium
 avro-python3
 webdriver-manager
 pymongo
+
+# Scheduler
+APScheduler
+SQLAlchemy
