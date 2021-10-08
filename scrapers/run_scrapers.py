@@ -1,5 +1,6 @@
 import os
 import gc
+import sys
 
 import scrapy
 from scrapy.crawler import CrawlerRunner
@@ -8,15 +9,14 @@ from scrapy.utils.project import get_project_settings
 from scrapy.utils.log import configure_logging
 
 from twisted.internet import reactor
-
-from pcts_scrapers.spiders import mpf_scraper
-from pcts_scrapers.spiders import incra_scraper
-
 from multiprocessing.context import Process
 
+from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
+from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
+
 scrapers = [
-    mpf_scraper.MpfScraperSpider,
-    incra_scraper.IncraScraperSpider,
+    MpfScraperSpider,
+    IncraScraperSpider,
 ]
 
 keywords = [

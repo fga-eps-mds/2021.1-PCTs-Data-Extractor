@@ -1,0 +1,7 @@
+django
+djangorestframework==3.12.*
+django-cors-headers
+django-environ==0.4.*
+psycopg2-binary>=2.8
+pycodestyle
+coverage
