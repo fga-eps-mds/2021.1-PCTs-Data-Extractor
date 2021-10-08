@@ -15,11 +15,8 @@ from rest_framework import viewsets
 from rest_framework import mixins
 
 
-sys.path.append('../scrapers')
+sys.path.append('../pcts_scraper_jobs')
 from run_scrapers import run_scrapers
-
-# sys.path.append('../module_1')
-# from module1 import show
 
 class ScraperViewSet(viewsets.ModelViewSet):
     """
@@ -37,8 +34,7 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
     def start(self, *args, **kwargs):
         logger = logging.getLogger(__name__)
 
-        show()
-        # run_scrapers()
+        run_scrapers(choosen_scrapers=["IncraScraperSpider"])
         # call_generic_scraper.run_scraper(
         #     settings_file_path="scrapers.scraper_executor.pcts_scrapers_api.settings",
         #     custom_project_settings={

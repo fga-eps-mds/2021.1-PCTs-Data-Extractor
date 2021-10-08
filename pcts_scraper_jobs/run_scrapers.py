@@ -14,10 +14,10 @@ from multiprocessing.context import Process
 from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
 from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
 
-scrapers = [
-    MpfScraperSpider,
-    IncraScraperSpider,
-]
+available_scrapers = {
+    "MpfScraperSpider": MpfScraperSpider,
+    "IncraScraperSpider": IncraScraperSpider,
+}
 
 keywords = [
     "povos e comunidades tradicionais",
@@ -25,7 +25,9 @@ keywords = [
 ]
 
 
-def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_settings={}):
+def run_scrapers(choosen_scrapers=available_scrapers.keys(),
+                 settings_file_path="pcts_scrapers.settings",
+                 custom_project_settings={}):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
@@ -42,7 +44,9 @@ def run_scrapers(settings_file_path="pcts_scrapers.settings", custom_project_set
 
     projects_settings.update(custom_project_settings)
 
-    for scraper in scrapers:
+    for scraper_id in choosen_scrapers:
+        scraper = available_scrapers[scraper_id]
+
         process_scraper_source = Process(
             target=run_scraper_source,
             args=(projects_settings, scraper, keywords)
