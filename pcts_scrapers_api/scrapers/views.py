@@ -14,9 +14,11 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework import mixins
 
+from scrapers.tasks import add
 
 sys.path.append('../pcts_scraper_jobs')
 from run_scrapers import run_scrapers
+
 
 class ScraperViewSet(viewsets.ModelViewSet):
     """
@@ -34,7 +36,7 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
     def start(self, *args, **kwargs):
         logger = logging.getLogger(__name__)
 
-        run_scrapers(choosen_scrapers=["IncraScraperSpider"])
+        # run_scrapers(choosen_scrapers=["IncraScraperSpider"])
         # call_generic_scraper.run_scraper(
         #     settings_file_path="scrapers.scraper_executor.pcts_scrapers_api.settings",
         #     custom_project_settings={
@@ -47,6 +49,10 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
         #     logging=logger
         # )
 
+        result = add.delay(1, 2)
+        result = result.get(timeout=5)
+        
         return Response({
-            "message": "Website scraped successfully!"
+            "message": "Website scraped successfully!",
+            "celery": str(result),
         })

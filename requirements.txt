@@ -15,6 +15,8 @@ pymongo
 # Scheduler
 APScheduler
 SQLAlchemy
+# celery==5.1.*
+celery==4.4
 
 
 # Django API
