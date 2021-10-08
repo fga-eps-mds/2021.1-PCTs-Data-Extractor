@@ -16,10 +16,10 @@ from rest_framework import mixins
 
 
 sys.path.append('../scrapers')
-# from run_scrapers import run_scrapers
+from run_scrapers import run_scrapers
 
-sys.path.append('../module_1')
-from module1 import show
+# sys.path.append('../module_1')
+# from module1 import show
 
 class ScraperViewSet(viewsets.ModelViewSet):
     """
@@ -40,11 +40,11 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
         show()
         # run_scrapers()
         # call_generic_scraper.run_scraper(
-        #     settings_file_path="scrapers.scraper_executor.pcts_scrapers.settings",
+        #     settings_file_path="scrapers.scraper_executor.pcts_scrapers_api.settings",
         #     custom_project_settings={
         #         'SPLASH_URL': 'http://pcts-scrapers-splash:8050',
-        #         'SPIDER_MODULES': ['scrapers.scraper_executor.pcts_scrapers.spiders'],
-        #         'NEWSPIDER_MODULE': 'scrapers.scraper_executor.pcts_scrapers.spiders',
+        #         'SPIDER_MODULES': ['scrapers.scraper_executor.pcts_scrapers_api.spiders'],
+        #         'NEWSPIDER_MODULE': 'scrapers.scraper_executor.pcts_scrapers_api.spiders',
         #         'SELENIUM_DRIVER_EXECUTABLE_PATH': f"{os.getcwd()}/scrapers/scraper_executor/chromedriver"
         #     },
         #     crawler_process=False,
