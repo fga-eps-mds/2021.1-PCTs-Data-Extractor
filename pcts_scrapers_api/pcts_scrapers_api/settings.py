@@ -83,24 +83,18 @@ WSGI_APPLICATION = 'pcts_scrapers_api.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
     # 'default': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': 'pcts-scrapers-mongodb',
-    #     'ENFORCE_SCHEMA': False,
-    #     'CLIENT': {
-    #             # 'host': 'mongodb+srv://root:pass12345@pcts-scrapers-mongodb/pcts-django?retryWrites=true&w=majority'
-    #             'host': 'pcts-scrapers-mongodb',
-    #             'port': 27017,
-    #             'username': 'root',
-    #             'password': 'pass12345',
-    #             # 'authSource': 'pcts-scrapers-mongodb',
-    #             'authMechanism': 'SCRAM-SHA-1'
-    #     }
-    # }
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', default="pcts_scrapers"),
+        'USER': os.environ.get('POSTGRES_USER', default="postgres"),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', default="test1234"),
+        'HOST': os.environ.get('POSTGRES_HOST', default="localhost"),
+        'PORT': os.environ.get('POSTGRES_PORT', default="5432")
+    },
 }
 
 

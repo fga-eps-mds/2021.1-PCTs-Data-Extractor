@@ -4,6 +4,7 @@ services:
     hostname: pcts-scrapers-splash
     image: scrapinghub/splash
     container_name: pcts-scrapers-splash
+    restart: unless-stopped
     ports:
       - 8050:8050
     networks:
@@ -14,6 +15,30 @@ services:
       interval: 30s
       retries: 5
 
+  pcts-scrapers-postgres:
+    image: postgres:13
+    container_name: pcts-scrapers-postgres
+    hostname: pcts-scrapers-postgres
+    restart: unless-stopped
+    # env_file: dev-env
+    environment:
+      - POSTGRES_HOST=pcts-scrapers-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test1234
+      - POSTGRES_DB=pcts_scrapers
+    ports:
+        - 5432:5432
+    networks:
+      - pcts-network
+    healthcheck:
+        test: ["CMD", "pg_isready", "-U", "postgres"]
+        interval: 5s
+        retries: 5
+    restart: unless-stopped
+    volumes:
+    - pcts-scrapers-postgres-data:/var/lib/postgresql/data
+
   pcts-scrapers-api:
     container_name: pcts-scrapers-api
     restart: unless-stopped
@@ -22,10 +47,16 @@ services:
     image: pcts-scrapers-api
     # env_file: dev-env
     environment:
+      CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
       PROJECT_ENV_EXECUTOR: "DOCKER"
       PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
       PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
       PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
+      POSTGRES_HOST: pcts-scrapers-postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test1234
+      POSTGRES_DB: pcts_scrapers
     ports:
       - 8002:8002
     networks:
@@ -33,6 +64,8 @@ services:
     command: ["sh", "scripts/start_dev.sh"]
     depends_on:
       pcts-scrapers-splash:
+        condition: service_healthy
+      pcts-scrapers-postgres:
         condition: service_healthy
     volumes:
       - .:/app
@@ -42,8 +75,7 @@ services:
     image: rabbitmq:3.9.7
     container_name: pcts-scrapers-rabbitmq
     hostname: pcts-scrapers-rabbitmq
-    environment:
-      CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
+    restart: unless-stopped
     ports:
       - 5672:5672
     networks:
@@ -62,11 +94,12 @@ services:
     container_name: pcts-scrapers-celery
     restart: unless-stopped
     environment:
-      # DB_HOST: db
-      # DB_NAME: app
-      # DB_USER: postgres
-      # DB_PASS: supersecretpassword
       CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
+      POSTGRES_HOST: pcts-scrapers-postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test1234
+      POSTGRES_DB: pcts_scrapers
     command: ["sh", "scripts/start_celery.sh"]
     networks:
       - pcts-network
@@ -79,6 +112,8 @@ services:
       - .:/app
 
 volumes:
+  pcts-scrapers-postgres-data:
+    name: pcts-scrapers-postgres-data
   pip-cache:
     name: pcts-scrapers-api-pip-cache
   pcts-scrapers-rabbitmq-data:
