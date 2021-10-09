@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'scrapers',
     'django_celery_results',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -174,4 +175,6 @@ CELERY_CELERYD_POOL = 'solo'
 CELERY_BROKER_URL = {os.environ.get('CELERY_BROKER_URL', default='amqp://guest@localhost')}
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # CELERY SETTINGS =================================

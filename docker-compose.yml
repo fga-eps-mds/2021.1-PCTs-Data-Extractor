@@ -1,4 +1,34 @@
 version: "3.5"
+
+x-pcts-scrapers-api-template:
+  &pcts-scrapers-api-template
+  restart: unless-stopped
+  build:
+    context: .
+  image: pcts-scrapers-api
+  environment:
+    PROJECT_ENV_EXECUTOR: "DOCKER"
+    PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
+    PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
+    PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
+    POSTGRES_HOST: pcts-scrapers-postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: test1234
+    POSTGRES_DB: pcts_scrapers
+    DJANGO_SUPERUSER_EMAIL: admin@example.com
+    DJANGO_SUPERUSER_USERNAME: admin
+    DJANGO_SUPERUSER_PASSWORD: admin
+    CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
+  networks:
+    - pcts-network
+  depends_on:
+    pcts-scrapers-postgres:
+      condition: service_healthy
+  volumes:
+    - .:/app
+    - pip-cache:/usr/local/lib/python3.8/site-packages
+
 services:
   pcts-scrapers-splash:
     hostname: pcts-scrapers-splash
@@ -12,7 +42,8 @@ services:
     command: "--disable-private-mode"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8050"]
-      interval: 30s
+      interval: 10s
+      timeout: 30s
       retries: 5
 
   pcts-scrapers-postgres:
@@ -20,7 +51,6 @@ services:
     container_name: pcts-scrapers-postgres
     hostname: pcts-scrapers-postgres
     restart: unless-stopped
-    # env_file: dev-env
     environment:
       - POSTGRES_HOST=pcts-scrapers-postgres
       - POSTGRES_PORT=5432
@@ -39,38 +69,6 @@ services:
     volumes:
     - pcts-scrapers-postgres-data:/var/lib/postgresql/data
 
-  pcts-scrapers-api:
-    container_name: pcts-scrapers-api
-    restart: unless-stopped
-    build:
-      context: .
-    image: pcts-scrapers-api
-    # env_file: dev-env
-    environment:
-      CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
-      PROJECT_ENV_EXECUTOR: "DOCKER"
-      PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
-      PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
-      PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
-      POSTGRES_HOST: pcts-scrapers-postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: test1234
-      POSTGRES_DB: pcts_scrapers
-    ports:
-      - 8002:8002
-    networks:
-      - pcts-network
-    command: ["sh", "scripts/start_dev.sh"]
-    depends_on:
-      pcts-scrapers-splash:
-        condition: service_healthy
-      pcts-scrapers-postgres:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - pip-cache:/usr/local/lib/python3.8/site-packages
-
   pcts-scrapers-rabbitmq:
     image: rabbitmq:3.9.7
     container_name: pcts-scrapers-rabbitmq
@@ -84,32 +82,29 @@ services:
       - pcts-scrapers-rabbitmq-data:/var/lib/rabbitmq/
     healthcheck:
       test: rabbitmq-diagnostics -q ping
-      interval: 30s
+      interval: 5s
       timeout: 30s
       retries: 3
 
+  # PCTS SCRAPERS DJANGO API ==============================================================================
+  pcts-scrapers-api:
+    container_name: pcts-scrapers-api
+    <<: *pcts-scrapers-api-template
+    ports:
+      - 8002:8002
+    command: ["sh", "scripts/start_dev.sh"]
+    depends_on:
+      pcts-scrapers-splash:
+        condition: service_healthy
+
   pcts-scrapers-celery:
-    build:
-      context: .
+    <<: *pcts-scrapers-api-template
     container_name: pcts-scrapers-celery
-    restart: unless-stopped
-    environment:
-      CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
-      POSTGRES_HOST: pcts-scrapers-postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: test1234
-      POSTGRES_DB: pcts_scrapers
     command: ["sh", "scripts/start_celery.sh"]
-    networks:
-      - pcts-network
     depends_on:
       pcts-scrapers-rabbitmq:
         condition: service_healthy
-      # pcts-scrapers-api:
-      #   condition: service_healthy
-    volumes:
-      - .:/app
+  # =======================================================================================================
 
 volumes:
   pcts-scrapers-postgres-data:

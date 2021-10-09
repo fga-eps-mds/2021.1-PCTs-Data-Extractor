@@ -17,7 +17,8 @@ APScheduler
 SQLAlchemy
 celery==5.1.*
 django-celery-results
-flower
+django-celery-beat==2.2.1
+# flower
 
 # Django API
 django
