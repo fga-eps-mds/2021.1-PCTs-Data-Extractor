@@ -28,7 +28,7 @@ class ScraperViewSet(viewsets.ModelViewSet):
     serializer_class = ScraperSerializer
 
 
-class ScraperExecutor(mixins.RetrieveModelMixin,
+class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
                       mixins.ListModelMixin,
                       viewsets.GenericViewSet):
 

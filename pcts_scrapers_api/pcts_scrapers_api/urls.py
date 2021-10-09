@@ -17,15 +17,14 @@ from django.contrib import admin
 from django.urls import path
 
 from django.urls import include, path
-from rest_framework import routers
 from scrapers import views
 
-router = routers.DefaultRouter()
-router.register(r'scrapers', views.ScraperViewSet)
+urls = [
+    path('scrapers/', include('scrapers.urls'))
+]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('scrapers/', include('scrapers.urls')),
-    path('', include(router.urls)),
+    path('api/', include(urls)),
 ]
