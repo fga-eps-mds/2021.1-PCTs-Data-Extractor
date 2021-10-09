@@ -104,6 +104,14 @@ services:
     depends_on:
       pcts-scrapers-rabbitmq:
         condition: service_healthy
+
+  pcts-scrapers-celery-scheduler:
+    <<: *pcts-scrapers-api-template
+    container_name: pcts-scrapers-celery-scheduler
+    command: ["sh", "scripts/start_celery_scheduler.sh"]
+    # depends_on:
+    #   pcts-scrapers-celery:
+    #     condition: service_completed_successfully
   # =======================================================================================================
 
 volumes:
