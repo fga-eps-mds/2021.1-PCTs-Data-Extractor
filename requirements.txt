@@ -15,9 +15,9 @@ pymongo
 # Scheduler
 APScheduler
 SQLAlchemy
-# celery==5.1.*
-celery==4.4
-
+celery==5.1.*
+django-celery-results
+flower
 
 # Django API
 django
@@ -28,3 +28,12 @@ psycopg2-binary>=2.8
 pycodestyle
 coverage
 dnspython
+
+
+django
+djangorestframework==3.12.*
+django-cors-headers
+django-environ==0.4.*
+psycopg2-binary>=2.8
+pycodestyle
+coverage

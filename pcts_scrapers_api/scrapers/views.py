@@ -37,21 +37,10 @@ class ScraperExecutor(mixins.RetrieveModelMixin,
         logger = logging.getLogger(__name__)
 
         # run_scrapers(choosen_scrapers=["IncraScraperSpider"])
-        # call_generic_scraper.run_scraper(
-        #     settings_file_path="scrapers.scraper_executor.pcts_scrapers_api.settings",
-        #     custom_project_settings={
-        #         'SPLASH_URL': 'http://pcts-scrapers-splash:8050',
-        #         'SPIDER_MODULES': ['scrapers.scraper_executor.pcts_scrapers_api.spiders'],
-        #         'NEWSPIDER_MODULE': 'scrapers.scraper_executor.pcts_scrapers_api.spiders',
-        #         'SELENIUM_DRIVER_EXECUTABLE_PATH': f"{os.getcwd()}/scrapers/scraper_executor/chromedriver"
-        #     },
-        #     crawler_process=False,
-        #     logging=logger
-        # )
 
-        result = add.delay(1, 2)
+        result = add.delay(1, 4)
         result = result.get(timeout=5)
-        
+
         return Response({
             "message": "Website scraped successfully!",
             "celery": str(result),

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'scrapers',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -169,13 +170,13 @@ LOGGING = {
     },
 }
 
-
 # ================================= CELERY SETTINGS
-
-# Celery Configuration Options
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_CELERYD_POOL = 'solo'
 
+CELERY_BROKER_URL = "amqp://guest@localhost//"
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
 # CELERY SETTINGS =================================
