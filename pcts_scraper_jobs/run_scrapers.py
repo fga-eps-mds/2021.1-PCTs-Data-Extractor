@@ -45,17 +45,17 @@ def run_scrapers(choosen_scrapers=available_scrapers.keys(),
     projects_settings.update(custom_project_settings)
 
     for scraper_id in choosen_scrapers:
-        scraper = available_scrapers[scraper_id]
-
         process_scraper_source = Process(
             target=run_scraper_source,
-            args=(projects_settings, scraper, keywords)
+            args=(projects_settings, scraper_id, keywords)
         )
         process_scraper_source.start()
         process_scraper_source.join()
 
 
-def run_scraper_source(projects_settings, scraper: Spider, keywords: []):
+def run_scraper_source(projects_settings, scraper_id, keywords: []):
+    scraper = available_scrapers[scraper_id]
+
     for keyword in keywords:
         print(f"=============================================")
         print(f"Scraping {scraper.name} source, Keyword: {keyword}")
