@@ -1,6 +1,7 @@
 import os
 import gc
 import sys
+import time
 
 import scrapy
 from scrapy.crawler import CrawlerRunner
@@ -24,16 +25,20 @@ keywords = [
     "quilombolas",
 ]
 
+SELENIUM_DRIVER_ARGS_WITH_BROWSERVIEW = [
+    '--no-sandbox',
+    '--disable-gpu',
+    '--javascript.enabled=False',
+    'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
+]
+
 
 def run_scrapers(choosen_scrapers=available_scrapers.keys(),
-                 settings_file_path="pcts_scrapers.settings",
-                 custom_project_settings={}):
+                 settings_file_path="pcts_scrapers.settings"):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
             Example: "path.to.file.settings"
-        custom_project_settings(str):   Customm Attributes settings to update default
-        project settings.
             Example: {"SPIDER_MODULES": ['path.to.file.spiders']}
     """
 
@@ -42,18 +47,19 @@ def run_scrapers(choosen_scrapers=available_scrapers.keys(),
 
     projects_settings = get_project_settings()
 
-    projects_settings.update(custom_project_settings)
+    projects_settings['SELENIUM_DRIVER_ARGUMENTS'] = \
+        SELENIUM_DRIVER_ARGS_WITH_BROWSERVIEW
 
     for scraper_id in choosen_scrapers:
         process_scraper_source = Process(
             target=run_scraper_source,
-            args=(projects_settings, scraper_id, keywords)
+            args=(scraper_id, keywords, projects_settings, settings_file_path)
         )
         process_scraper_source.start()
         process_scraper_source.join()
 
 
-def run_scraper_source(projects_settings, scraper_id, keywords: []):
+def run_scraper_source(scraper_id, keywords=[], projects_settings=get_project_settings()):
     scraper = available_scrapers[scraper_id]
 
     for keyword in keywords:
@@ -66,6 +72,27 @@ def run_scraper_source(projects_settings, scraper_id, keywords: []):
         )
         process_scraper_keyword.start()
         process_scraper_keyword.join()
+
+        print(f"Source {scraper.name} scraped")
+        print(f"=============================================\n")
+
+
+def run_headless_scraper(scraper_id, keywords=[], settings_file_path="pcts_scrapers.settings"):
+    os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
+
+    projects_settings = get_project_settings()
+
+    run_scraper_source_flat(scraper_id, keywords, projects_settings)
+
+
+def run_scraper_source_flat(scraper_id, keywords=[], projects_settings=get_project_settings()):
+    scraper = available_scrapers[scraper_id]
+
+    for keyword in keywords:
+        print(f"=============================================")
+        print(f"Scraping {scraper.name} source, Keyword: {keyword}")
+
+        run_scraper_keyword(projects_settings, scraper, keyword)
 
         print(f"Source {scraper.name} scraped")
         print(f"=============================================\n")

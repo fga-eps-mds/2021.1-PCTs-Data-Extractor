@@ -14,10 +14,10 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework import mixins
 
-from scrapers.tasks import add
+from scrapers.tasks import add, run_scraper
 
 sys.path.append('../pcts_scraper_jobs')
-from run_scrapers import run_scrapers
+from run_scrapers import run_scrapers, run_headless_scraper
 
 
 class ScraperViewSet(viewsets.ModelViewSet):
@@ -36,10 +36,11 @@ class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
     def start(self, *args, **kwargs):
         logger = logging.getLogger(__name__)
 
-        # run_scrapers(choosen_scrapers=["IncraScraperSpider"])
+        result = run_scraper("IncraScraperSpider", ["quilombolas"])
+        # result = run_headless_scraper("IncraScraperSpider", ["quilombolas"])
 
-        result = add.delay(1, 4)
-        result = result.get(timeout=5)
+        # result = add.delay(1, 4)
+        # result = result.get(timeout=5)
 
         return Response({
             "message": "Website scraped successfully!",

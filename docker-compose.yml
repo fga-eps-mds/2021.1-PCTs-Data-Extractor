@@ -8,7 +8,7 @@ x-pcts-scrapers-api-template:
   image: pcts-scrapers-api
   environment:
     PROJECT_ENV_EXECUTOR: "DOCKER"
-    PCTS_SCRAPERS_SPLASH_HOST: pcts-scrapers-splash
+    PCTS_SCRAPERS_SPLASH_HOST: http://pcts-scrapers-splash:5050
     PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
     PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: documents/documents/
     POSTGRES_HOST: pcts-scrapers-postgres
