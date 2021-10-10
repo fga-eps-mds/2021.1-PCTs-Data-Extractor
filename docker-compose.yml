@@ -109,9 +109,13 @@ services:
     <<: *pcts-scrapers-api-template
     container_name: pcts-scrapers-celery-scheduler
     command: ["sh", "scripts/start_celery_scheduler.sh"]
-    # depends_on:
-    #   pcts-scrapers-celery:
-    #     condition: service_completed_successfully
+
+  pcts-scrapers-celery-flower:
+    <<: *pcts-scrapers-api-template
+    container_name: pcts-scrapers-celery-flower
+    ports:
+      - 5555:5555
+    command: ["sh", "scripts/start_celery_flower.sh"]
   # =======================================================================================================
 
 volumes:
