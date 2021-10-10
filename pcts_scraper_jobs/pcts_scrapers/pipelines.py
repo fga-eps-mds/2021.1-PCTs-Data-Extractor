@@ -19,8 +19,8 @@ from scrapy.item import Item
 from .utils.checksum import generate_checksum_from_obj
 
 
-DOCUMENTS_API_HOST = os.environ.get('PCTS_DOCUMENTS_API_URL')
-DOCUMENTS_API_ENDPOINT = os.environ.get('PCTS_DOCUMENTS_API_RECORDS_ENDPOINT')
+DOCUMENTS_API_HOST = os.environ.get('PCTS_DOCUMENTS_API_URL', default="http://localhost:8000")
+DOCUMENTS_API_ENDPOINT = os.environ.get('PCTS_DOCUMENTS_API_RECORDS_ENDPOINT', default="api/documents/")
 
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
@@ -61,7 +61,7 @@ class SavePageOnDocumentsAPIPipeline:
         if response.status_code == 201:
             print("Page Saved:", item["url"])
         else:
-            self.logger.error(f"Error on Save Page: {response.text}")
+            self.logger.error(f"Error on Save Page {item['url']}: Error {response.status_code}, ResponseMessage: {response.json()}")
 
     def clean_text(self, text):
         normalized_text = unicodedata.normalize('NFKD', text.lower())\

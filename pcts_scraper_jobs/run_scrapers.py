@@ -53,7 +53,7 @@ def run_scrapers(choosen_scrapers=available_scrapers.keys(),
     for scraper_id in choosen_scrapers:
         process_scraper_source = Process(
             target=run_scraper_source,
-            args=(scraper_id, keywords, projects_settings, settings_file_path)
+            args=(scraper_id, keywords, projects_settings)
         )
         process_scraper_source.start()
         process_scraper_source.join()
