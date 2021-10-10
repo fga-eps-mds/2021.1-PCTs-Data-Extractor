@@ -1,3 +1,4 @@
+from run_scrapers import run_scrapers, run_headless_scraper
 import os
 import sys
 import logging
@@ -14,10 +15,9 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework import mixins
 
-from scrapers.tasks import add, run_scraper
+from scrapers import tasks
 
 sys.path.append('../pcts_scraper_jobs')
-from run_scrapers import run_scrapers, run_headless_scraper
 
 
 class ScraperViewSet(viewsets.ModelViewSet):
@@ -29,18 +29,18 @@ class ScraperViewSet(viewsets.ModelViewSet):
 
 
 class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
-                      mixins.ListModelMixin,
-                      viewsets.GenericViewSet):
+                             mixins.ListModelMixin,
+                             viewsets.GenericViewSet):
 
     @api_view(['GET'])
     def start(self, *args, **kwargs):
         logger = logging.getLogger(__name__)
+        keywords = [
+            "povos e comunidades tradicionais",
+            "quilombolas",
+        ]
 
-        result = run_scraper("IncraScraperSpider", ["quilombolas"])
-        # result = run_headless_scraper("IncraScraperSpider", ["quilombolas"])
-
-        # result = add.delay(1, 4)
-        # result = result.get(timeout=5)
+        result = tasks.incra_scraper(keywords=keywords)
 
         return Response({
             "message": "Website scraped successfully!",
