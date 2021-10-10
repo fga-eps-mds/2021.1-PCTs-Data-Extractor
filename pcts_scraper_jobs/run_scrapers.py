@@ -33,8 +33,8 @@ SELENIUM_DRIVER_ARGS_WITH_BROWSERVIEW = [
 ]
 
 
-def run_scrapers(choosen_scrapers=available_scrapers.keys(),
-                 settings_file_path="pcts_scrapers.settings"):
+def run_scrapers(choosen_scrapers=available_scrapers.keys(), keywords=keywords,
+                 settings_file_path="pcts_scrapers.settings", headless=True):
     """ Execute Scrapy ScraperPagination spider
     Args:
         settings_file_path(str):    Filepath of Scrapy project settings.
@@ -47,8 +47,9 @@ def run_scrapers(choosen_scrapers=available_scrapers.keys(),
 
     projects_settings = get_project_settings()
 
-    projects_settings['SELENIUM_DRIVER_ARGUMENTS'] = \
-        SELENIUM_DRIVER_ARGS_WITH_BROWSERVIEW
+    if not headless:
+        projects_settings['SELENIUM_DRIVER_ARGUMENTS'] = \
+            SELENIUM_DRIVER_ARGS_WITH_BROWSERVIEW
 
     for scraper_id in choosen_scrapers:
         process_scraper_source = Process(
@@ -113,6 +114,6 @@ def run_scraper_keyword(projects_settings, scraper: Spider, keyword=""):
 
 if __name__ == '__main__':
     try:
-        run_scrapers()
+        run_scrapers(headless=False)
     finally:
         gc.collect()
