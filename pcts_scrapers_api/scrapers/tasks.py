@@ -1,10 +1,13 @@
 # Create your tasks here
 
 import sys
+import os
 
 from celery import Celery
 from celery import shared_task, task
 from celery.schedules import crontab
+
+print("CWD ==========================================================================", os.getcwd())
 
 sys.path.append('../pcts_scraper_jobs')
 from run_scrapers import run_headless_scraper
