@@ -114,6 +114,6 @@ def run_scraper_keyword(projects_settings, scraper: Spider, keyword=""):
 
 if __name__ == '__main__':
     try:
-        run_scrapers(headless=False)
+        run_scrapers(choosen_scrapers=["MpfScraperSpider"], keywords=keywords[0:1], headless=False)
     finally:
         gc.collect()

@@ -30,21 +30,21 @@ x-pcts-scrapers-api-template:
     - pip-cache:/usr/local/lib/python3.8/site-packages
 
 services:
-  pcts-scrapers-splash:
-    hostname: pcts-scrapers-splash
-    image: scrapinghub/splash
-    container_name: pcts-scrapers-splash
-    restart: unless-stopped
-    ports:
-      - 8050:8050
-    networks:
-      - pcts-network
-    command: "--disable-private-mode"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8050"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
+  # pcts-scrapers-splash:
+  #   hostname: pcts-scrapers-splash
+  #   image: scrapinghub/splash
+  #   container_name: pcts-scrapers-splash
+  #   restart: unless-stopped
+  #   ports:
+  #     - 8050:8050
+  #   networks:
+  #     - pcts-network
+  #   command: "--disable-private-mode"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8050"]
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 5
 
   pcts-scrapers-postgres:
     image: postgres:13
@@ -93,9 +93,9 @@ services:
     ports:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
-    depends_on:
-      pcts-scrapers-splash:
-        condition: service_healthy
+    # depends_on:
+    #   pcts-scrapers-splash:
+    #     condition: service_healthy
 
   pcts-scrapers-celery:
     <<: *pcts-scrapers-api-template

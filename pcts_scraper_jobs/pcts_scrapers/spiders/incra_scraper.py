@@ -1,12 +1,15 @@
 import os
 import re
 
+from copy import deepcopy
+
 from datetime import datetime
 from scrapy.http import request
 from pcts_scrapers.items import ScraperItem
 from time import sleep
 from scrapy_selenium.http import SeleniumRequest
 from scrapy_splash.request import SplashRequest
+from scrapy import Request
 from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
@@ -58,9 +61,11 @@ class IncraScraperSpider(Spider):
         (super(IncraScraperSpider, self).__init__)(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
-        yield SeleniumRequest(url=(self.source_url),
-                              callback=(self.parse_home_pagination),
-                              meta={'donwload_timeout': self.load_page_delay})
+        yield SeleniumRequest(
+            url=(self.source_url),
+            callback=(self.parse_home_pagination),
+            meta={'donwload_timeout': self.load_page_delay}
+        )
 
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
@@ -93,11 +98,17 @@ class IncraScraperSpider(Spider):
                         for url in found_urls:
                             self.logger.info("Pagina Encontrada:" + url)
 
-                            yield SplashRequest(
+                            # yield SplashRequest(
+                            #     url=url,
+                            #     callback=self.parse_document_page,
+                            #     endpoint='render.html',
+                            #     args={'wait': self.load_page_delay},
+                            # )
+
+                            yield Request(
                                 url=url,
                                 callback=self.parse_document_page,
-                                endpoint='render.html',
-                                args={'wait': self.load_page_delay},
+                                meta={'donwload_timeout': self.load_page_delay}
                             )
 
                             sleep(0.1)
