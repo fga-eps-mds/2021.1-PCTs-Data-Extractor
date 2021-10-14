@@ -3,11 +3,17 @@ build:
     web: Dockerfile
 run:
   web: ./scripts/start_prod.sh
-  celery_worker:
+  celery_worker_beat_scheduler:
     image: web
     command:
-      - ./scripts/start_celery.sh
-  celery_beat_scheduler:
-    image: web
-    command:
-      - ./scripts/start_celery_scheduler.sh
+      - ./scripts/start_celery_worker_and_beat.sh
+  # In real production, celery worker and beat should be in different proccesses
+  # But to use Heroku free, we group celery worker + beat scheduler in one process (dyno)
+  # celery_worker:
+  #   image: web
+  #   command:
+  #     - ./scripts/start_celery.sh
+  # celery_beat_scheduler:
+  #   image: web
+  #   command:
+  #     - ./scripts/start_celery_scheduler.sh
