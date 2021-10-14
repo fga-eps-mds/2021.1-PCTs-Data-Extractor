@@ -9,7 +9,11 @@ from celery.schedules import crontab
 
 print("CWD ==========================================================================", os.getcwd())
 
-sys.path.append('../pcts_scraper_jobs')
+if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
+    sys.path.append('/app/pcts_scraper_jobs')
+else:
+    sys.path.append('../pcts_scraper_jobs')
+
 from run_scrapers import run_headless_scraper
 
 @shared_task(name="mpf_scraper")

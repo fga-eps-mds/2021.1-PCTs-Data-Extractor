@@ -3,6 +3,6 @@ build:
     web: Dockerfile
 run:
   web: chmod +x scripts/start_prod.sh && ./scripts/start_prod.sh
-  celery_worker: chmod +x scripts/start_celery.sh && ./scripts/start_celery.sh
-  celery_beat_scheduler: chmod +x scripts/start_celery_scheduler.sh && ./scripts/start_celery_scheduler.sh
+  # celery_worker: chmod +x scripts/start_celery.sh && ./scripts/start_celery.sh
+  # celery_beat_scheduler: chmod +x scripts/start_celery_scheduler.sh && ./scripts/start_celery_scheduler.sh
 
