@@ -37,15 +37,31 @@ jobs:
   deploy_dev:
     if: github.ref == 'refs/heads/dev'
     needs: integration
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_APP_NAME_DEV: ${{ 'pcts-scrapers-dev' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
-  deploy_main:
+      - name: Deploy to Heroku DEV
+        run: |
+          heroku git:remote -a $HEROKU_APP_NAME_DEV
+          git push heroku HEAD:master
+
+  deploy_prod:
     if: github.ref == 'refs/heads/main'
     needs: integration
+    env:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_APP_NAME_PROD: ${{ 'pcts-scrapers-prod' }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Deploy to Heroku PROD
+        run: |
+          heroku git:remote -a $HEROKU_APP_NAME_PROD
+          git push heroku HEAD:master
