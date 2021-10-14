@@ -6,9 +6,10 @@ run:
   celery_worker_beat_scheduler:
     image: web
     command:
-      - ./scripts/start_celery_worker_and_beat.sh
+      - ./scripts/start_celery_full.sh
   # In real production, celery worker and beat should be in different proccesses
-  # But to use Heroku free, we group celery worker + beat scheduler in one process (dyno)
+  # But to use Heroku free, we group celery worker + beat scheduler + flower
+  # in a single process (dyno)
   # celery_worker:
   #   image: web
   #   command:

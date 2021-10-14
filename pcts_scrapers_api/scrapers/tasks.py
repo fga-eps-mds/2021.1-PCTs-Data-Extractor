@@ -7,8 +7,6 @@ from celery import Celery
 from celery import shared_task, task
 from celery.schedules import crontab
 
-print("CWD ==========================================================================", os.getcwd())
-
 if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
     sys.path.append('/app/pcts_scraper_jobs')
 else:
