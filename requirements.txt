@@ -10,11 +10,8 @@ selenium
 scrapy-selenium
 avro-python3
 webdriver-manager
-pymongo
 
 # Scheduler
-APScheduler
-SQLAlchemy
 celery==4.4.7
 django-celery-results
 django-celery-beat
