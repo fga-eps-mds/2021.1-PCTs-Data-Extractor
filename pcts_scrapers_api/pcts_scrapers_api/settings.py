@@ -159,8 +159,8 @@ LOGGING = {
         },
         '': {
             'handlers': ['console'],
-            # 'level': 'INFO',
-            'level': 'DEBUG',
+            'level': 'INFO',
+            # 'level': 'DEBUG',
         },
     },
 }

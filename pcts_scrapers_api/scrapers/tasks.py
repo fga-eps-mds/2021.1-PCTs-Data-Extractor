@@ -6,6 +6,7 @@ import os
 from celery import Celery
 from celery import shared_task, task
 from celery.schedules import crontab
+from celery.canvas import group, chain, chord
 
 if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
     sys.path.append('/app/pcts_scraper_jobs')
@@ -14,15 +15,30 @@ else:
 
 from run_scrapers import run_headless_scraper
 
+
 @shared_task(name="mpf_scraper")
 def mpf_scraper(keywords, **kwargs):
     run_headless_scraper("MpfScraperSpider", keywords)
     return True
 
 
-@shared_task(name="incra_scraper")
-def incra_scraper(keywords, **kwargs):
-    run_headless_scraper("IncraScraperSpider", keywords)
+@shared_task(name="incra_scraper_keyword")
+def incra_scraper_keyword(keyword, **kwargs):
+    run_headless_scraper(
+        "IncraScraperSpider", [keyword]
+    )
+    return True
+
+
+@shared_task(name="incra_scraper_group")
+def incra_scraper_group(keywords, **kwargs):
+    incra_scraper_keywords = [
+        incra_scraper_keyword.subtask(kwargs={"keyword": keyword}, immutable=True)
+        for keyword in keywords
+    ]
+
+    result = chain(*incra_scraper_keywords).apply_async()
+
     return True
 
 

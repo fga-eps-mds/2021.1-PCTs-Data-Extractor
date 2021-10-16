@@ -55,14 +55,14 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
     sender.add_periodic_task(
         crontab(minute='0', hour='4', day_of_week='*',
                 day_of_month='*', month_of_year='*'),
-        tasks.incra_scraper.s(keywords=KEYWORDS),
-        name="incra_scraper",
+        tasks.incra_scraper_group.subtask(keywords=KEYWORDS),
+        name="incra_scraper_group",
     )
 
     # MPF SCRAPER
     sender.add_periodic_task(
         crontab(minute='0', hour='5', day_of_week='*',
                 day_of_month='*', month_of_year='*'),
-        tasks.mpf_scraper.s(keywords=KEYWORDS),
+        tasks.mpf_scraper.subtask(keywords=KEYWORDS),
         name="mpf_scraper",
     )
