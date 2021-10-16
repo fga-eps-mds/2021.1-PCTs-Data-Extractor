@@ -26,7 +26,9 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name, scraper_id
     def task_scraper_group(keywords, **kwargs):
         task_scraper_subtasks = [
             task_scraper_subtask.subtask(
-                kwargs={"keyword": keyword}, immutable=True)
+                kwargs={"keyword": keyword},
+                immutable=True
+            )
             for keyword in keywords
         ]
         result = chain(*task_scraper_subtasks).apply_async()

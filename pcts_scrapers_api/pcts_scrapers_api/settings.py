@@ -172,9 +172,13 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_CELERYD_POOL = 'solo'
 
 # CELERY_BROKER_URL = "amqp://guest@localhost//"
-CELERY_BROKER_URL = {os.environ.get('CELERY_BROKER_URL', default='amqp://guest@localhost')}
+CELERY_BROKER_URL = os.environ.get(
+    'CELERY_BROKER_URL',
+    default='amqp://guest@localhost'
+)
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
 # CELERY SETTINGS =================================
