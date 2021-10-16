@@ -35,16 +35,6 @@ def hello():
 
 # ============================= AUTO CREATE SCHEDULERS ON STARTUP
 @app.on_after_configure.connect
-def setup_periodic_tasks(sender: Celery, **kwargs):
-    sender.add_periodic_task(
-        30.0,
-        add.s(y=2, x=1),
-        name="add",
-        expires=10,
-    )
-
-
-@app.on_after_configure.connect
 def setup_periodic_scrapers(sender: Celery, **kwargs):
     KEYWORDS = [
         "povos e comunidades tradicionais",
@@ -55,14 +45,22 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
     sender.add_periodic_task(
         crontab(minute='0', hour='4', day_of_week='*',
                 day_of_month='*', month_of_year='*'),
-        tasks.incra_scraper_group.subtask(kwargs={"keywords": KEYWORDS}),
+        tasks.task_scraper_group_wrapper(
+            "incra_scraper_group",
+            "incra_scraper_keyword",
+            "IncraScraperSpider"
+        ).subtask(kwargs={"keywords": KEYWORDS}),
         name="incra_scraper_group",
     )
 
     # MPF SCRAPER
     sender.add_periodic_task(
-        crontab(minute='0', hour='5', day_of_week='*',
+        crontab(minute='0', hour='4', day_of_week='*',
                 day_of_month='*', month_of_year='*'),
-        tasks.mpf_scraper_group.subtask(kwargs={"keywords": KEYWORDS}),
+        tasks.task_scraper_group_wrapper(
+            "mpf_scraper_group",
+            "mpf_scraper_keyword",
+            "MpfScraperSpider"
+        ).subtask(kwargs={"keywords": KEYWORDS}),
         name="mpf_scraper_group",
     )

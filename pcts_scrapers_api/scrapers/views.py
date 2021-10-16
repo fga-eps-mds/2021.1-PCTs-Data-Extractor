@@ -15,7 +15,6 @@ from rest_framework import viewsets
 from rest_framework import mixins
 
 from scrapers import tasks
-from pcts_scrapers_api import celery as celery_tasks
 
 if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
     sys.path.append('/app/pcts_scraper_jobs')
@@ -45,11 +44,8 @@ class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
             "quilombolas",
         ]
 
-        result = run_scraper(scraper_id="IncraScraperSpider", keyword="quilombolas")
-        # result = tasks.incra_scraper.delay(keywords=keywords)
-
-        # result = celery_tasks.add.delay(1, 4)
-        # result = result.get()
+        result = run_scraper(
+            scraper_id="IncraScraperSpider", keyword="quilombolas")
 
         return Response({
             "message": "Website scraped successfully!",

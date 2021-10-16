@@ -16,53 +16,20 @@ else:
 from scraper_executor import run_scraper
 
 
-# @shared_task(name="mpf_scraper")
-# def mpf_scraper(keywords, **kwargs):
-#     run_scraper("MpfScraperSpider", keywords)
-#     return True
+def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name, scraper_id):
+    @shared_task(name=task_sub_prefix_name)
+    def task_scraper_subtask(keyword, **kwargs):
+        run_scraper(scraper_id, keyword)
+        return True
 
-@shared_task(name="mpf_scraper_keyword")
-def mpf_scraper_keyword(keyword, **kwargs):
-    run_scraper(
-        "MpfScraperSpider", keyword
-    )
-    return True
+    @shared_task(name=task_group_name)
+    def task_scraper_group(keywords, **kwargs):
+        task_scraper_subtasks = [
+            task_scraper_subtask.subtask(
+                kwargs={"keyword": keyword}, immutable=True)
+            for keyword in keywords
+        ]
+        result = chain(*task_scraper_subtasks).apply_async()
+        return True
 
-
-@shared_task(name="mpf_scraper_group")
-def mpf_scraper_group(keywords, **kwargs):
-    mpf_scraper_keywords = [
-        mpf_scraper_keyword.subtask(kwargs={"keyword": keyword}, immutable=True)
-        for keyword in keywords
-    ]
-
-    result = chain(*mpf_scraper_keywords).apply_async()
-
-    return True
-
-
-@shared_task(name="incra_scraper_keyword")
-def incra_scraper_keyword(keyword, **kwargs):
-    run_scraper(
-        "IncraScraperSpider", keyword
-    )
-    return True
-
-
-@shared_task(name="incra_scraper_group")
-def incra_scraper_group(keywords, **kwargs):
-    incra_scraper_keywords = [
-        incra_scraper_keyword.subtask(kwargs={"keyword": keyword}, immutable=True)
-        for keyword in keywords
-    ]
-
-    result = chain(*incra_scraper_keywords).apply_async()
-
-    return True
-
-
-# def run_template_scraper(scraper_name):
-#     @shared_task(name=scraper_name)
-#     def template_scraper(scraper_id, keywords=[], **kwargs):
-#         run_scraper(scraper_id, keywords)
-#         return True
+    return task_scraper_group
