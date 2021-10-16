@@ -48,7 +48,7 @@ jobs:
       - name: Deploy to Heroku DEV
         run: |
           heroku git:remote -a $HEROKU_APP_NAME_DEV
-          git push heroku HEAD:master
+          git push heroku HEAD:main
 
   deploy_prod:
     if: github.ref == 'refs/heads/main'
@@ -64,4 +64,4 @@ jobs:
       - name: Deploy to Heroku PROD
         run: |
           heroku git:remote -a $HEROKU_APP_NAME_PROD
-          git push heroku HEAD:master
+          git push heroku HEAD:main
