@@ -3,10 +3,12 @@ import sys
 import logging
 from django.conf import settings
 
-from .models import Scraper
+from scrapers.models import Scraper
+from scrapers.models import ScraperExecutionGroup
 from rest_framework import viewsets
 from rest_framework import permissions
 from scrapers.serializers import ScraperSerializer
+from scrapers.serializers import ScraperExecutionGroupSerializer
 
 from rest_framework.response import Response
 
@@ -30,6 +32,14 @@ class ScraperViewSet(viewsets.ModelViewSet):
     """
     queryset = Scraper.objects.all().order_by('site_name')
     serializer_class = ScraperSerializer
+
+
+class ScraperExecutionGroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows scraper executions to be viewed.
+    """
+    queryset = ScraperExecutionGroup.objects.all().order_by('task_name')
+    serializer_class = ScraperExecutionGroupSerializer
 
 
 class ScraperExecutorViewSet(mixins.RetrieveModelMixin,

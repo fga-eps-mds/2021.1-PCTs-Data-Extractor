@@ -2,22 +2,41 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
+STATUS_CHOICES = [
+    (1, "STARTED"),
+    (2, "SUCCESS"),
+    (3, "FAILED")
+]
+
+
 class Scraper(models.Model):
+    site_name = models.CharField("Site Name", max_length=100)
     url_root = models.CharField("Root Url", max_length=1024)
-    site_name = models.CharField("Site Name", max_length=50)
-    # search_steps = ArrayField(
-    #     models.CharField(max_length=10, blank=True),
-    # )
-    next_button_xpath = models.CharField("Next Button (XPATH)", max_length=240)
-    # allow_domains = ArrayField(
-    #     models.CharField(max_length=10, blank=True),
-    # )
-    # allow_resources = ArrayField(
-    #     models.CharField(max_length=10, blank=True),
-    # )
-    pagination_retries = models.IntegerField(default=1)
-    pagination_delay = models.IntegerField(default=1)
-    created_at = models.DateField(auto_now_add=True)
+    task_name_prefix = models.CharField("Task Name Prefix", max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ScraperExecutionGroup(models.Model):
+    scraper = models.ForeignKey(Scraper, on_delete=models.CASCADE)
+    task_name = models.CharField("Task Name", max_length=100)
+    start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
+    end_datetime = models.DateTimeField("End Datetime", null=True)
+    status = models.IntegerField("Execution Status", choices=STATUS_CHOICES)
+
+
+class ScraperExecution(models.Model):
+    scraper_execution_group = models.ForeignKey(
+        ScraperExecutionGroup, on_delete=models.CASCADE)
+    task_id = models.UUIDField("Task Run UUID")
+    task_name = models.CharField("Task Name", max_length=100)
+    start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
+    end_datetime = models.DateTimeField("End Datetime", null=True)
+    keyword = models.CharField("Keyword", max_length=1024)
+    status = models.IntegerField("Execution Status", choices=STATUS_CHOICES)
+    retrieved_records = models.IntegerField()
 
     def __str__(self):
         return self.name
