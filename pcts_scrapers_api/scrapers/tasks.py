@@ -13,19 +13,38 @@ if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
 else:
     sys.path.append('../pcts_scraper_jobs')
 
-from run_scrapers import run_headless_scraper
+from scraper_executor import run_scraper
 
 
-@shared_task(name="mpf_scraper")
-def mpf_scraper(keywords, **kwargs):
-    run_headless_scraper("MpfScraperSpider", keywords)
+# @shared_task(name="mpf_scraper")
+# def mpf_scraper(keywords, **kwargs):
+#     run_scraper("MpfScraperSpider", keywords)
+#     return True
+
+@shared_task(name="mpf_scraper_keyword")
+def mpf_scraper_keyword(keyword, **kwargs):
+    run_scraper(
+        "MpfScraperSpider", keyword
+    )
+    return True
+
+
+@shared_task(name="mpf_scraper_group")
+def mpf_scraper_group(keywords, **kwargs):
+    mpf_scraper_keywords = [
+        mpf_scraper_keyword.subtask(kwargs={"keyword": keyword}, immutable=True)
+        for keyword in keywords
+    ]
+
+    result = chain(*mpf_scraper_keywords).apply_async()
+
     return True
 
 
 @shared_task(name="incra_scraper_keyword")
 def incra_scraper_keyword(keyword, **kwargs):
-    run_headless_scraper(
-        "IncraScraperSpider", [keyword]
+    run_scraper(
+        "IncraScraperSpider", keyword
     )
     return True
 
@@ -45,5 +64,5 @@ def incra_scraper_group(keywords, **kwargs):
 # def run_template_scraper(scraper_name):
 #     @shared_task(name=scraper_name)
 #     def template_scraper(scraper_id, keywords=[], **kwargs):
-#         run_headless_scraper(scraper_id, keywords)
+#         run_scraper(scraper_id, keywords)
 #         return True

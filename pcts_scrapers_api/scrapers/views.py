@@ -22,7 +22,7 @@ if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
 else:
     sys.path.append('../pcts_scraper_jobs')
 
-from run_scrapers import run_scrapers, run_headless_scraper
+from scraper_executor import run_scraper
 
 
 class ScraperViewSet(viewsets.ModelViewSet):
@@ -45,7 +45,7 @@ class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
             "quilombolas",
         ]
 
-        result = run_scrapers(["IncraScraperSpider"], ["quilombolas", "povos e comunidades tradicionais"], headless=False)
+        result = run_scraper(scraper_id="IncraScraperSpider", keyword="quilombolas")
         # result = tasks.incra_scraper.delay(keywords=keywords)
 
         # result = celery_tasks.add.delay(1, 4)
