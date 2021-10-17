@@ -4,7 +4,7 @@ import sys
 import time
 
 import scrapy
-from scrapy.crawler import CrawlerRunner
+from scrapy.crawler import CrawlerRunner, CrawlerProcess
 from scrapy.spiders import Spider
 from scrapy.utils.project import get_project_settings
 from scrapy.utils.log import configure_logging
@@ -35,15 +35,17 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
     scraper = available_scrapers[scraper_id]
 
     # Scraper run
-    crawler = CrawlerRunner(projects_settings)
+    crawler = CrawlerProcess(projects_settings)
 
     running_process = crawler.crawl(
         scraper,
         keyword=keyword
     )
 
-    running_process.addBoth(lambda _: reactor.stop())
-    reactor.run()
+    crawler.start()
+
+    # running_process.addBoth(lambda _: reactor.stop())
+    # reactor.run()
     print("=======================================================================")
 
 
