@@ -38,29 +38,40 @@ class ScraperExecutionGroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows scraper executions to be viewed.
     """
-    queryset = ScraperExecutionGroup.objects.all().order_by('task_name')
     serializer_class = ScraperExecutionGroupSerializer
 
-    # def get_queryset(self):
-    #     return ScraperExecutionGroup.objects.filter(scraper=self.kwargs['scraper_pk'])
+    def get_queryset(self):
+        return ScraperExecutionGroup.objects.\
+            filter(scraper=self.kwargs['scraper_pk']).\
+            order_by('task_name')
 
 
-# class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
-#                              mixins.ListModelMixin,
-#                              viewsets.GenericViewSet):
+class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
+                             mixins.ListModelMixin,
+                             viewsets.GenericViewSet):
 
-#     @api_view(['GET'])
-#     def start(self, *args, **kwargs):
-#         logger = logging.getLogger(__name__)
-#         keywords = [
-#             "povos e comunidades tradicionais",
-#             "quilombolas",
-#         ]
+    @api_view(['GET'])
+    def start(self, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        keywords = [
+            "povos e comunidades tradicionais",
+            "quilombolas",
+        ]
 
-#         result = run_scraper(
-#             scraper_id="IncraScraperSpider", keyword="quilombolas")
+        # result = run_scraper(
+        #     scraper_id="IncraScraperSpider",
+        #     keyword="quilombolas"
+        # )
 
-#         return Response({
-#             "message": "Website scraped successfully!",
-#             "celery": str(result),
-#         })
+        tasks.task_scraper_group_wrapper(
+            "start_api_incra_scraper_group",
+            "start_api_incra_scraper_keyword",
+            "IncraScraperSpider"
+        ).delay(kwargs={"keywords": keywords})
+
+        result = tasks.get()
+
+        return Response({
+            "message": "Website scraped successfully!",
+            "celery": str(result),
+        })
