@@ -12,20 +12,21 @@ jobs:
     env:
       GIT_SHA: ${{ github.sha }}
 
-    pcts-scrapers-postgres:
-      image: postgres:13
+    services:
+      pcts-scrapers-postgres:
+        image: postgres:13
 
-      env:
-        POSTGRES_HOST: pcts-scrapers-postgres
-        POSTGRES_PORT: 5432
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: test1234
-        POSTGRES_DB: pcts_scrapers
+        env:
+          POSTGRES_HOST: pcts-scrapers-postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: test1234
+          POSTGRES_DB: pcts_scrapers
 
-      options: >-
-        --name pcts-scrapers-postgres
-      ports:
-        - 5432:5432
+        options: >-
+          --name pcts-scrapers-postgres
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
