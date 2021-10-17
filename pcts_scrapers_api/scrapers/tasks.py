@@ -17,12 +17,12 @@ from scraper_executor import run_scraper
 
 
 def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name, scraper_id):
-    @shared_task(name=task_sub_prefix_name)
+    @task(name=task_sub_prefix_name)
     def task_scraper_subtask(keyword, **kwargs):
         run_scraper(scraper_id, keyword)
         return True
 
-    @shared_task(name=task_group_name)
+    @task(name=task_group_name)
     def task_scraper_group(keywords, **kwargs):
         task_scraper_subtasks = [
             task_scraper_subtask.subtask(

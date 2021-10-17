@@ -9,13 +9,16 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from scrapers.serializers import ScraperSerializer
 from scrapers.serializers import ScraperExecutionGroupSerializer
+from multiprocessing import Process
 
 from rest_framework.response import Response
 
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework import mixins
+from rest_framework import generics
 
+from pcts_scrapers_api import celery as root_tasks
 from scrapers import tasks
 
 if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
@@ -46,32 +49,27 @@ class ScraperExecutionGroupViewSet(viewsets.ModelViewSet):
             order_by('task_name')
 
 
-class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
-                             mixins.ListModelMixin,
-                             viewsets.GenericViewSet):
+class ScraperExecutorViewSet(generics.GenericAPIView):
 
-    @api_view(['GET'])
-    def start(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         logger = logging.getLogger(__name__)
-        keywords = [
-            "povos e comunidades tradicionais",
-            "quilombolas",
-        ]
+        keyword = request.query_params.get('keyword')
 
-        # result = run_scraper(
-        #     scraper_id="IncraScraperSpider",
-        #     keyword="quilombolas"
-        # )
-
-        tasks.task_scraper_group_wrapper(
-            "start_api_incra_scraper_group",
-            "start_api_incra_scraper_keyword",
-            "IncraScraperSpider"
-        ).delay(kwargs={"keywords": keywords})
-
-        result = tasks.get()
+        result = None
+        if not keyword:
+            result = "É necessário informar uma expressão chave (parametro keyword)"
+        else:
+            process = Process(
+                target=run_scraper,
+                kwargs=dict(
+                    scraper_id="MpfScraperSpider",
+                    keyword=keyword,
+                )
+            )
+            process.start()
+            process.join()
+            result = "Site 'raspado' com sucesso"
 
         return Response({
-            "message": "Website scraped successfully!",
-            "celery": str(result),
+            "message": str(result),
         })

@@ -23,7 +23,7 @@ def debug_task(self):
     print(f'Request: {self.request!r}')
 
 
-@shared_task
+@app.task
 def add(x, y):
     return x + y
 

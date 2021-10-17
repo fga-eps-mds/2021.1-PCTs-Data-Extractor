@@ -9,6 +9,7 @@ app_name = 'scrapers'
 router = routers.DefaultRouter()
 router.register(r'scrapers', views.ScraperViewSet)
 
+
 scrapers_router = routers.NestedSimpleRouter(
     router, r'scrapers', lookup='scraper'
 )
@@ -22,5 +23,6 @@ scrapers_router.register(
 urlpatterns = [
     path(r'', include(router.urls)),
     path(r'', include(scrapers_router.urls)),
-    # path('scrapers/start', ScraperExecutorViewSet.start, name='scraper-start'),
+    # path('scraper-start', ScraperExecutorViewSet.start, name='scraper-start'),
+    path('scraper-start', ScraperExecutorViewSet.as_view(), name='scraper-start'),
 ]
