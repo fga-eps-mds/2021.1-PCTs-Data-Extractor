@@ -13,7 +13,7 @@ from scrapy import Request
 from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
-from scrapy.spiders import Spider
+from scrapy.spiders import Spider, CrawlSpider
 
 
 class PaginationException(Exception):
@@ -59,6 +59,7 @@ class IncraScraperSpider(Spider):
         )
 
     def start_requests(self, *args, **kwargs):
+        
         yield SeleniumRequest(
             url=(self.source_url),
             callback=(self.parse_home_pagination),

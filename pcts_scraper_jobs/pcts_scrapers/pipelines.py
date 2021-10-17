@@ -19,8 +19,10 @@ from scrapy.item import Item
 from .utils.checksum import generate_checksum_from_obj
 
 
-DOCUMENTS_API_HOST = os.environ.get('PCTS_DOCUMENTS_API_URL', default="http://localhost:8000")
-DOCUMENTS_API_ENDPOINT = os.environ.get('PCTS_DOCUMENTS_API_RECORDS_ENDPOINT', default="api/documents/")
+DOCUMENTS_API_HOST = os.environ.get(
+    'PCTS_DOCUMENTS_API_URL', default="http://localhost:8000")
+DOCUMENTS_API_ENDPOINT = os.environ.get(
+    'PCTS_DOCUMENTS_API_RECORDS_ENDPOINT', default="api/documents/")
 
 DEFAULT_ROOT_OUTPUT_DATA_FOLDER = f"{os.getcwd()}/output_data/"
 
@@ -29,11 +31,15 @@ class SavePageOnDocumentsAPIPipeline:
 
     def open_spider(self, spider: Spider):
         self.logger = spider.logger
+        self.stats = spider.crawler.stats
         self.root_output_data_folder = DEFAULT_ROOT_OUTPUT_DATA_FOLDER
         self.scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
-
         self.send_document_url = f'{DOCUMENTS_API_HOST}/{DOCUMENTS_API_ENDPOINT}'
         self.request_header = {}
+
+        # Metricas
+        self.stats.set_value('saved_records', 0)
+        self.stats.set_value('dropped_records', 0)
 
     def process_item(self, item: Item, spider):
         self.save_page_content(item)
@@ -59,9 +65,12 @@ class SavePageOnDocumentsAPIPipeline:
         )
 
         if response.status_code == 201:
+            self.stats.inc_value('saved_records')
             print("Page Saved:", item["url"])
         else:
-            self.logger.error(f"Error on Save Page {item['url']}: Error {response.status_code}, ResponseMessage: {response.json()}")
+            self.stats.inc_value('dropped_records')
+            self.logger.error(
+                f"Error on Save Page {item['url']}: Error {response.status_code}, ResponseMessage: {response.json()}")
 
     def clean_text(self, text):
         normalized_text = unicodedata.normalize('NFKD', text.lower())\

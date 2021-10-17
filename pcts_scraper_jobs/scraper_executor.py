@@ -15,6 +15,9 @@ from multiprocessing.context import Process
 from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
 from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
 
+
+from scrapy import signals
+
 available_scrapers = {
     "MpfScraperSpider": MpfScraperSpider,
     "IncraScraperSpider": IncraScraperSpider,
@@ -24,6 +27,19 @@ keywords = [
     "povos e comunidades tradicionais",
     "quilombolas",
 ]
+
+def callback(spider, reason):
+    stats = spider.crawler.stats.get_stats()  # stats is a dictionary
+
+    print("========================= METRICAS =========================")
+    print("METRICAS:")
+    print(stats)
+    print("========================= METRICAS =========================")
+
+    # write stats to the database here
+
+    reactor.stop()
+
 
 
 def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"):
@@ -36,13 +52,19 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
 
     # Scraper run
     crawler = CrawlerProcess(projects_settings)
+    crawler_instance = crawler.create_crawler(scraper)
 
     running_process = crawler.crawl(
-        scraper,
+        crawler_instance,
         keyword=keyword
     )
 
     crawler.start()
+
+    print("========================= METRICAS =========================")
+    print("METRICAS:")
+    print(crawler_instance.stats.get_stats())
+    print("========================= METRICAS =========================")
 
     # running_process.addBoth(lambda _: reactor.stop())
     # reactor.run()
@@ -51,6 +73,6 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
 
 if __name__ == '__main__':
     try:
-        run_scraper(scraper_id="MpfScraperSpider", keyword=keywords[0])
+        run_scraper(scraper_id="IncraScraperSpider", keyword=keywords[0])
     finally:
         gc.collect()
