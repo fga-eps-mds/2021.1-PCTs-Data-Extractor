@@ -19,12 +19,19 @@ from django.urls import path
 from django.urls import include, path
 from scrapers import views
 
-urls = [
-    path('scrapers/', include('scrapers.urls'))
-]
+from scrapers import urls as scraper_routes
+from rest_framework_nested.routers import DefaultRouter
+
+# urls = [
+#     path('scrapers/', include('scrapers.urls', namespace="scrapers"))
+# ]
+
+router = DefaultRouter()
+router.registry.extend(scraper_routes.router.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api/', include(urls)),
+    path('api/', include(router.urls)),
+    # path('api/', include(urls)),
 ]

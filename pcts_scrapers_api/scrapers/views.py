@@ -41,23 +41,26 @@ class ScraperExecutionGroupViewSet(viewsets.ModelViewSet):
     queryset = ScraperExecutionGroup.objects.all().order_by('task_name')
     serializer_class = ScraperExecutionGroupSerializer
 
+    # def get_queryset(self):
+    #     return ScraperExecutionGroup.objects.filter(scraper=self.kwargs['scraper_pk'])
 
-class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
-                             mixins.ListModelMixin,
-                             viewsets.GenericViewSet):
 
-    @api_view(['GET'])
-    def start(self, *args, **kwargs):
-        logger = logging.getLogger(__name__)
-        keywords = [
-            "povos e comunidades tradicionais",
-            "quilombolas",
-        ]
+# class ScraperExecutorViewSet(mixins.RetrieveModelMixin,
+#                              mixins.ListModelMixin,
+#                              viewsets.GenericViewSet):
 
-        result = run_scraper(
-            scraper_id="IncraScraperSpider", keyword="quilombolas")
+#     @api_view(['GET'])
+#     def start(self, *args, **kwargs):
+#         logger = logging.getLogger(__name__)
+#         keywords = [
+#             "povos e comunidades tradicionais",
+#             "quilombolas",
+#         ]
 
-        return Response({
-            "message": "Website scraped successfully!",
-            "celery": str(result),
-        })
+#         result = run_scraper(
+#             scraper_id="IncraScraperSpider", keyword="quilombolas")
+
+#         return Response({
+#             "message": "Website scraped successfully!",
+#             "celery": str(result),
+#         })

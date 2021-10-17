@@ -26,3 +26,4 @@ psycopg2-binary>=2.8
 pycodestyle
 coverage
 dnspython
+drf-nested-routers

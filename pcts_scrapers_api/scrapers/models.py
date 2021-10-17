@@ -1,6 +1,9 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from rest_framework.exceptions import NotAcceptable
+from django.utils.translation import gettext_lazy as _
+
 
 STATUS_CHOICES = [
     (1, "STARTED"),
@@ -16,7 +19,7 @@ class Scraper(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.site_name
 
 
 class ScraperExecutionGroup(models.Model):
@@ -37,6 +40,3 @@ class ScraperExecution(models.Model):
     keyword = models.CharField("Keyword", max_length=1024)
     status = models.IntegerField("Execution Status", choices=STATUS_CHOICES)
     retrieved_records = models.IntegerField()
-
-    def __str__(self):
-        return self.name
