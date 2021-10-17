@@ -25,19 +25,16 @@ keywords = [
     "quilombolas",
 ]
 
+
 def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"):
+    configure_logging({'LOG_FORMAT': '%(levelname)s: %(message)s'})
     print("=======================================================================")
     print(f"INICIAR SCRAPER {scraper_id}. KEYWORD: {keyword}")
     os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
     projects_settings = get_project_settings()
     scraper = available_scrapers[scraper_id]
 
-    run_scraper_keyword(projects_settings, scraper, keyword)
-    print("=======================================================================")
-
-
-def run_scraper_keyword(projects_settings, scraper: Spider, keyword=""):
-    configure_logging({'LOG_FORMAT': '%(levelname)s: %(message)s'})
+    # Scraper run
     crawler = CrawlerRunner(projects_settings)
 
     running_process = crawler.crawl(
@@ -47,6 +44,7 @@ def run_scraper_keyword(projects_settings, scraper: Spider, keyword=""):
 
     running_process.addBoth(lambda _: reactor.stop())
     reactor.run()
+    print("=======================================================================")
 
 
 if __name__ == '__main__':

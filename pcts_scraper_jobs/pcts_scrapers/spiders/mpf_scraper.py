@@ -38,7 +38,7 @@ class MpfScraperSpider(Spider):
         self.logger.info("[Scraper MPF] Source")
 
         self.keyword = keyword
-        self.source_url = self.base_url + '/@@search?SearchableText=' + self.keyword
+        self.source_url = f"{self.base_url}/@@search?SearchableText={self.keyword}"
 
         self.link_pages_extractor = LinkExtractor(
             allow=(self.allowed_paths),
@@ -52,8 +52,6 @@ class MpfScraperSpider(Spider):
             deny_extensions=None,
             strip=True
         )
-
-        (super(MpfScraperSpider, self).__init__)(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
         yield SeleniumRequest(url=(self.source_url),

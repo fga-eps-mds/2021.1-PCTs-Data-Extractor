@@ -43,7 +43,7 @@ class IncraScraperSpider(Spider):
         self.logger.info("[Scraper INCRA] Source")
 
         self.keyword = keyword
-        self.source_url = self.base_url + '/search?SearchableText=' + self.keyword
+        self.source_url = f"{self.base_url}/search?SearchableText={self.keyword}"
 
         self.link_pages_extractor = LinkExtractor(
             allow=(self.allowed_paths),
@@ -58,8 +58,6 @@ class IncraScraperSpider(Spider):
             strip=True
         )
 
-        (super(IncraScraperSpider, self).__init__)(*args, **kwargs)
-
     def start_requests(self, *args, **kwargs):
         yield SeleniumRequest(
             url=(self.source_url),
@@ -69,7 +67,6 @@ class IncraScraperSpider(Spider):
 
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
-
         self.execute_js_search_steps(driver)
 
         # Parse result list page
