@@ -18,4 +18,4 @@ python manage.py ensure_adminuser --username=$DJANGO_SUPERUSER_USERNAME \
     --password=$DJANGO_SUPERUSER_PASSWORD
 
 echo '========== RUNNING SERVER'
-python manage.py runserver 0.0.0.0:8002
+python manage.py runserver 0.0.0.0:$PORT

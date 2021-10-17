@@ -10,4 +10,20 @@ selenium
 scrapy-selenium
 avro-python3
 webdriver-manager
-pymongo
+
+# Scheduler
+celery==4.4.7
+django-celery-results
+django-celery-beat
+flower==0.9.5
+
+# Django API
+django
+djangorestframework==3.12.*
+django-cors-headers
+django-environ==0.4.*
+psycopg2-binary>=2.8
+pycodestyle
+coverage
+dnspython
+drf-nested-routers
