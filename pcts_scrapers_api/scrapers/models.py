@@ -51,7 +51,9 @@ class ScraperExecution(models.Model):
     keyword = models.CharField("Keyword", max_length=1024)
     status = models.IntegerField(
         "Execution Status", choices=STATUS_CHOICES, default=1)
-    retrieved_records = models.IntegerField()
+    scraped_pages = models.IntegerField()
+    saved_records = models.IntegerField()
+    droped_records = models.IntegerField()
 
     def __str__(self):
         return self.task_name

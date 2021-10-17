@@ -61,14 +61,17 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
 
     crawler.start()
 
+    stats = crawler_instance.stats.get_stats()
     print("========================= METRICAS =========================")
     print("METRICAS:")
-    print(crawler_instance.stats.get_stats())
+    print(stats)
     print("========================= METRICAS =========================")
 
     # running_process.addBoth(lambda _: reactor.stop())
     # reactor.run()
     print("=======================================================================")
+
+    return stats
 
 
 if __name__ == '__main__':

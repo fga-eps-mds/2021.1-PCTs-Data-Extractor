@@ -31,6 +31,7 @@ class SavePageOnDocumentsAPIPipeline:
 
     def open_spider(self, spider: Spider):
         self.logger = spider.logger
+        self.keyword = spider.keyword
         self.stats = spider.crawler.stats
         self.root_output_data_folder = DEFAULT_ROOT_OUTPUT_DATA_FOLDER
         self.scraper_start_datetime = datetime.now().strftime("%Y%m%d_%H%M")
@@ -53,7 +54,7 @@ class SavePageOnDocumentsAPIPipeline:
             "slug": self.clean_text(item['title']),
             "title": item["title"],
             "content": item["content"],
-            # "keyword": item["keyword"],
+            "keyword": self.keyword,
             "checksum": generate_checksum_from_obj(item),
             "updated_at": datetime.now().isoformat(),
         }
