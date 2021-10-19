@@ -181,4 +181,5 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+CELERY_RESULT_EXTENDED = True
 # CELERY SETTINGS =================================

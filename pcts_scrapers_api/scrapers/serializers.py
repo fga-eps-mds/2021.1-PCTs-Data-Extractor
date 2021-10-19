@@ -27,7 +27,7 @@ class ScraperExecutionGroupSerializer(serializers.HyperlinkedModelSerializer):
             'scraper',
             'task_name',
             'start_datetime',
-            'end_datetime',
+            'finish_datetime',
             'status',
         ]
 
@@ -41,7 +41,7 @@ class ScraperExecutionSerializer(serializers.HyperlinkedModelSerializer):
             'task_id',
             'task_name',
             'start_datetime',
-            'end_datetime',
+            'finish_datetime',
             'keyword',
             'status',
             'retrieved_records',

@@ -30,7 +30,7 @@ class ScraperExecutionGroup(models.Model):
     scraper = models.ForeignKey(Scraper, on_delete=models.CASCADE)
     task_name = models.CharField("Task Name", max_length=100)
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
-    end_datetime = models.DateTimeField("End Datetime", null=True)
+    finish_datetime = models.DateTimeField("End Datetime", null=True)
     status = models.IntegerField(
         "Execution Status",
         choices=STATUS_CHOICES,
@@ -47,13 +47,13 @@ class ScraperExecution(models.Model):
     task_id = models.UUIDField("Task Run UUID")
     task_name = models.CharField("Task Name", max_length=100)
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
-    end_datetime = models.DateTimeField("End Datetime", null=True)
+    finish_datetime = models.DateTimeField("Finish Datetime", null=True)
     keyword = models.CharField("Keyword", max_length=1024)
     status = models.IntegerField(
         "Execution Status", choices=STATUS_CHOICES, default=1)
-    scraped_pages = models.IntegerField()
-    saved_records = models.IntegerField()
-    droped_records = models.IntegerField()
+    scraped_pages = models.IntegerField(null=True)
+    saved_records = models.IntegerField(null=True)
+    dropped_records = models.IntegerField(null=True)
 
     def __str__(self):
         return self.task_name

@@ -62,6 +62,8 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
     crawler.start()
 
     stats = crawler_instance.stats.get_stats()
+    stats["keyword"] = keyword
+
     print("========================= METRICAS =========================")
     print("METRICAS:")
     print(stats)
