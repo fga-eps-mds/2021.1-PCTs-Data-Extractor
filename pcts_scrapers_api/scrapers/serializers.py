@@ -33,7 +33,8 @@ class ScraperExecutionSerializer(serializers.ModelSerializer):
             'status',
             'scraped_pages',
             'saved_records',
-            'dropped_records'
+            'dropped_records',
+            'error_log'
         ]
 
 

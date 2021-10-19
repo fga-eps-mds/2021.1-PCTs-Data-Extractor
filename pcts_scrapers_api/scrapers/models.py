@@ -5,10 +5,14 @@ from rest_framework.exceptions import NotAcceptable
 from django.utils.translation import gettext_lazy as _
 
 
+STATUS_STARTED = 1
+STATUS_SUCCESS = 2
+STATUS_FAILED = 3
+
 STATUS_CHOICES = [
-    (1, "STARTED"),
-    (2, "SUCCESS"),
-    (3, "FAILED")
+    (STATUS_STARTED, "STARTED"),
+    (STATUS_SUCCESS, "SUCCESS"),
+    (STATUS_FAILED, "FAILED")
 ]
 
 
@@ -61,6 +65,7 @@ class ScraperExecution(models.Model):
     scraped_pages = models.IntegerField(null=True)
     saved_records = models.IntegerField(null=True)
     dropped_records = models.IntegerField(null=True)
+    error_log = models.TextField(null=True)
 
     def __str__(self):
         return self.task_name
