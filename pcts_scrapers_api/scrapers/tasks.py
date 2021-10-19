@@ -61,11 +61,11 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
             scraper_execution.finish_datetime = datetime.now()
             scraper_execution.status = STATUS_CHOICES[1][0]
             scraper_execution.scraped_pages = execution_stats.get(
-                "downloader/request_count")
+                "downloader/request_count") or 0
             scraper_execution.saved_records = execution_stats.get(
-                "saved_records")
+                "saved_records") or 0
             scraper_execution.dropped_records = execution_stats.get(
-                "droped_records")
+                "droped_records") or 0
         except Exception as e:
             # Update execution monitoring on fail
             scraper_execution.finish_datetime = datetime.now()

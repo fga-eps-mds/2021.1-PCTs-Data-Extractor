@@ -27,7 +27,11 @@ class Scraper(models.Model):
 
 
 class ScraperExecutionGroup(models.Model):
-    scraper = models.ForeignKey(Scraper, on_delete=models.CASCADE)
+    scraper = models.ForeignKey(
+        Scraper,
+        on_delete=models.CASCADE,
+        related_name="scraper_executions_group"
+    )
     task_name = models.CharField("Task Name", max_length=100)
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
     finish_datetime = models.DateTimeField("End Datetime", null=True)
@@ -43,7 +47,10 @@ class ScraperExecutionGroup(models.Model):
 
 class ScraperExecution(models.Model):
     scraper_execution_group = models.ForeignKey(
-        ScraperExecutionGroup, on_delete=models.CASCADE)
+        ScraperExecutionGroup,
+        on_delete=models.CASCADE,
+        related_name="scraper_executions_keywords"
+    )
     task_id = models.UUIDField("Task Run UUID")
     task_name = models.CharField("Task Name", max_length=100)
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
