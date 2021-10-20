@@ -61,7 +61,17 @@ jobs:
             pcts-scrapers-api bash -c\
             "cd pcts_scraper_jobs && coverage run -m unittest discover && coverage xml &&\
               cd ../pcts_scrapers_api && python manage.py migrate && \
-              coverage run --source='.' manage.py test && coverage xml"
+              coverage run --source='.' manage.py test && coverage xml" &&\
+              cd ..
+
+      - name: Usuario
+        run: echo $USER && sudo chown $USER:$USER */coverage.xml
+
+      - name: Show Scrapers COVERAGE FILE
+        run: echo "SCRAPER JOBS COVERAGE FILE" && ls -la pcts_scraper_jobs
+
+      - name: Show API COVERAGE FILE
+        run: echo "SCRAPER API COVERAGE FILE" && ls -la pcts_scrapers_api
 
       - name: SonarCloud Report coverage
         uses: SonarSource/sonarcloud-github-action@master
