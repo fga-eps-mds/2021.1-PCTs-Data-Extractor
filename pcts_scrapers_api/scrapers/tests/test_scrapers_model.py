@@ -36,14 +36,12 @@ class TestScraperExecutionGroupModel(TestCase):
 
         scraper = scraper_model
         task_name = "mpf_scraper_group"
-        start_datetime = datetime(2021, 10, 10, 8, 30, 4)
         finish_datetime = datetime(2021, 10, 10, 8, 34, 56)
         status = STATUS_SUCCESS
 
         scraper_execution_group = ScraperExecutionGroup.objects.create(
             scraper=scraper,
             task_name=task_name,
-            start_datetime=start_datetime,
             finish_datetime=finish_datetime,
             status=status,
         )
@@ -68,7 +66,6 @@ class TestScraperExecutionModel(TestCase):
         scraper_execution_group_model = ScraperExecutionGroup.objects.create(
             scraper=scraper_model,
             task_name="mpf_scraper_group",
-            start_datetime=datetime(2021, 10, 10, 8, 30, 4),
             finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
             status=STATUS_STARTED,
         )

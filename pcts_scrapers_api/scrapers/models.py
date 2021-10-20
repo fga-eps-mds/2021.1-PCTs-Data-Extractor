@@ -61,7 +61,10 @@ class ScraperExecution(models.Model):
     finish_datetime = models.DateTimeField("Finish Datetime", null=True)
     keyword = models.CharField("Keyword", max_length=1024)
     status = models.IntegerField(
-        "Execution Status", choices=STATUS_CHOICES, default=1)
+        "Execution Status",
+        choices=STATUS_CHOICES,
+        default=1
+    )
     scraped_pages = models.IntegerField(null=True)
     saved_records = models.IntegerField(null=True)
     dropped_records = models.IntegerField(null=True)
