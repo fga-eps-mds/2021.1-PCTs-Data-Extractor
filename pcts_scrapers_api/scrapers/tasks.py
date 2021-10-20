@@ -42,8 +42,8 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
         return prev_task_result
 
     @task(name=task_sub_prefix_name, bind=True)
-    def task_scraper_subtask(self, prev_task_result, scraper_classname, scraper_execution_group_id,
-                             keyword, **kwargs):
+    def task_scraper_subtask(self, prev_task_result, scraper_classname,
+                             scraper_execution_group_id, keyword, **kwargs):
         scraper_execution_group = ScraperExecutionGroup.objects.get(
             pk=scraper_execution_group_id
         )
@@ -116,7 +116,7 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
 
         task_scraper_subtasks = []
         for idx, keyword in enumerate(keywords):
-            kwargs = {
+            task_args = {
                 "keyword": keyword,
                 "scraper_classname": scraper_classname,
                 "scraper_execution_group_id": scraper_group.id,
@@ -126,11 +126,11 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
             # Nas próximas tasks, o próprio Celery irá setar
             # este atributo com o resultado da task anterior
             if idx == 0:
-                kwargs["prev_task_result"] = None
+                task_args["prev_task_result"] = None
 
             task_scraper_subtasks.append(
                 task_scraper_subtask.subtask(
-                    kwargs=kwargs,
+                    kwargs=task_args,
                     # immutable=True
                 )
             )
