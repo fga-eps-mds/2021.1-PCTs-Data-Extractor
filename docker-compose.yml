@@ -109,6 +109,8 @@ services:
     <<: *pcts-scrapers-api-template
     container_name: pcts-scrapers-celery-scheduler
     command: ["sh", "scripts/start_celery_scheduler.sh"]
+    depends_on:
+      - pcts-scrapers-celery
 
   pcts-scrapers-celery-flower:
     <<: *pcts-scrapers-api-template

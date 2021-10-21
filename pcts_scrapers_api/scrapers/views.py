@@ -21,8 +21,11 @@ from rest_framework import generics
 from pcts_scrapers_api import celery as root_tasks
 from scrapers import tasks
 
-if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
+ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
+if ENVIRONMENT_EXEC == "DOCKER":
     sys.path.append('/app/pcts_scraper_jobs')
+elif ENVIRONMENT_EXEC == "TEST":
+    sys.path.append('pcts_scraper_jobs')
 else:
     sys.path.append('../pcts_scraper_jobs')
 

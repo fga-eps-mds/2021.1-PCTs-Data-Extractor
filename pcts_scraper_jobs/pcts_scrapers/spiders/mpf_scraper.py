@@ -3,7 +3,7 @@ import re
 
 from datetime import datetime
 from scrapy.http import request
-from pcts_scrapers.items import ScraperItem
+from ..items import ScraperItem
 from time import sleep
 from scrapy_selenium.http import SeleniumRequest
 from scrapy_splash.request import SplashRequest
