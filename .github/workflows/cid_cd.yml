@@ -37,7 +37,7 @@ jobs:
       - name: Build image
         run: docker build -t pcts-scrapers-api .
 
-      - name: Run scraper tests
+      - name: Run Scrapers tests
         run: |
           docker run\
             --volume ${PWD}/:/app\
@@ -59,19 +59,32 @@ jobs:
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
             pcts-scrapers-api bash -c\
-            "cd pcts_scraper_jobs && coverage run -m unittest discover && coverage xml &&\
-              cd ../pcts_scrapers_api && python manage.py migrate && \
-              coverage run --source='.' manage.py test && coverage xml" &&\
-              cd ..
+            "coverage run -m unittest discover && coverage xml -o coverage_scrapers.xml"
 
-      - name: Usuario
-        run: echo $USER && sudo chown $USER:$USER */coverage.xml
-
-      - name: Show Scrapers COVERAGE FILE
-        run: echo "SCRAPER JOBS COVERAGE FILE" && ls -la pcts_scraper_jobs
-
-      - name: Show API COVERAGE FILE
-        run: echo "SCRAPER API COVERAGE FILE" && ls -la pcts_scrapers_api
+      - name: Run API tests
+        run: |
+          docker run\
+            --volume ${PWD}/:/app\
+            --env PROJECT_ENV_EXECUTOR="DOCKER"\
+            --env PCTS_SCRAPERS_SPLASH_HOST=http://pcts-scrapers-splash:8050\
+            --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
+            --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
+            --env POSTGRES_HOST=pcts-scrapers-postgres\
+            --env POSTGRES_PORT=5432\
+            --env POSTGRES_USER=postgres\
+            --env POSTGRES_PASSWORD=test1234\
+            --env POSTGRES_DB=pcts_scrapers\
+            --env ENVIRONMENT=development\
+            --env ALLOWED_HOSTS=*\
+            --env DJANGO_SUPERUSER_EMAIL=admin@example.com\
+            --env DJANGO_SUPERUSER_USERNAME=admin\
+            --env DJANGO_SUPERUSER_PASSWORD=admin\
+            --env CELERY_BROKER_URL=amqp:"//guest@pcts-scrapers-rabbitmq:5672"\
+            --volume ${PWD}/:/app\
+            --network ${{ job.container.network }}\
+            pcts-scrapers-api bash -c\
+            "python manage.py migrate &&\
+            coverage run --source='pcts_scrapers_api/' -m unittest discover && coverage xml -o coverage_api.xml"
 
       - name: SonarCloud Report coverage
         uses: SonarSource/sonarcloud-github-action@master

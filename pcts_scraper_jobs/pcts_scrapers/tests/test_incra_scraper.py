@@ -1,5 +1,5 @@
 import unittest
-from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
+from ..spiders.incra_scraper import IncraScraperSpider
 from .responses.responses import fake_response_from_file
 
 
