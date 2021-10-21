@@ -41,7 +41,7 @@ jobs:
         run: |
           docker run\
             --volume ${PWD}/:/app\
-            --env PROJECT_ENV_EXECUTOR="DOCKER"\
+            --env PROJECT_ENV_EXECUTOR="TEST"\
             --env PCTS_SCRAPERS_SPLASH_HOST=http://pcts-scrapers-splash:8050\
             --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
             --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
@@ -59,7 +59,8 @@ jobs:
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
             pcts-scrapers-api bash -c\
-            "coverage run -m unittest discover && coverage xml -o coverage_scrapers.xml"
+            "coverage run -m --source='pcts_scraper_jobs' unittest discover &&\
+            coverage xml -o coverage_scrapers.xml"
 
       - name: Run API tests
         run: |
@@ -83,8 +84,9 @@ jobs:
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
             pcts-scrapers-api bash -c\
-            "python manage.py migrate &&\
-            coverage run --source='pcts_scrapers_api/' -m unittest discover && coverage xml -o coverage_api.xml"
+            "python pcts_scrapers_api/manage.py migrate &&\
+            coverage run --source='pcts_scrapers_api/' pcts_scrapers_api/manage.py test pcts_scrapers_api/ &&\
+            coverage xml -o coverage_api.xml"
 
       - name: SonarCloud Report coverage
         uses: SonarSource/sonarcloud-github-action@master

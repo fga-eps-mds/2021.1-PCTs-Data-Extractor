@@ -9,8 +9,11 @@ from celery.schedules import crontab
 from celery.canvas import group, chain, chord
 from pcts_scrapers_api.celery import app as celery_app
 
-if (os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST") == "DOCKER"):
+ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
+if ENVIRONMENT_EXEC == "DOCKER":
     sys.path.append('/app/pcts_scraper_jobs')
+elif ENVIRONMENT_EXEC == "TEST":
+    sys.path.append('pcts_scraper_jobs')
 else:
     sys.path.append('../pcts_scraper_jobs')
 
