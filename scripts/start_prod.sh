@@ -17,5 +17,8 @@ python manage.py ensure_adminuser --username=$DJANGO_SUPERUSER_USERNAME \
     --email=$DJANGO_SUPERUSER_EMAIL \
     --password=$DJANGO_SUPERUSER_PASSWORD
 
+echo '========== LOAD DEFAULT SCRAPERS DATA'
+python manage.py loaddata scrapers/fixtures/scrapers.json
+
 echo '========== RUNNING SERVER'
 python manage.py runserver 0.0.0.0:$PORT
