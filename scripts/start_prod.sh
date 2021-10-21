@@ -21,4 +21,4 @@ echo '========== LOAD DEFAULT SCRAPERS DATA'
 python manage.py loaddata scrapers/fixtures/scrapers.json
 
 echo '========== RUNNING SERVER'
-python manage.py runserver 0.0.0.0:8002
+python manage.py runserver 0.0.0.0:$PORT

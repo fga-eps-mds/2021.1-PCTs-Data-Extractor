@@ -3,10 +3,11 @@ import re
 
 from datetime import datetime
 from scrapy.http import request
-from pcts_scrapers.items import ScraperItem
+from ..items import ScraperItem
 from time import sleep
 from scrapy_selenium.http import SeleniumRequest
 from scrapy_splash.request import SplashRequest
+from scrapy import Request
 from selenium.webdriver.chrome.webdriver import WebDriver
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
@@ -37,7 +38,7 @@ class MpfScraperSpider(Spider):
         self.logger.info("[Scraper MPF] Source")
 
         self.keyword = keyword
-        self.source_url = self.base_url + '/@@search?SearchableText=' + self.keyword
+        self.source_url = f"{self.base_url}/@@search?SearchableText={self.keyword}"
 
         self.link_pages_extractor = LinkExtractor(
             allow=(self.allowed_paths),
@@ -51,8 +52,6 @@ class MpfScraperSpider(Spider):
             deny_extensions=None,
             strip=True
         )
-
-        (super(MpfScraperSpider, self).__init__)(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
         yield SeleniumRequest(url=(self.source_url),
@@ -88,11 +87,17 @@ class MpfScraperSpider(Spider):
                         for url in found_urls:
                             self.logger.info("Pagina Encontrada: " + url)
 
-                            yield SplashRequest(
+                            # yield SplashRequest(
+                            #     url=url,
+                            #     callback=self.parse_document_page,
+                            #     endpoint='render.html',
+                            #     args={'wait': self.load_page_delay},
+                            # )
+
+                            yield Request(
                                 url=url,
                                 callback=self.parse_document_page,
-                                endpoint='render.html',
-                                args={'wait': self.load_page_delay},
+                                meta={'donwload_timeout': self.load_page_delay}
                             )
 
                             sleep(0.1)

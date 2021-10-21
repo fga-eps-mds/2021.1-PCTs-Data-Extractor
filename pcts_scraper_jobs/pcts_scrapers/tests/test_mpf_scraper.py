@@ -1,5 +1,5 @@
 import unittest
-from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
+from ..spiders.mpf_scraper import MpfScraperSpider
 from .responses.responses import fake_response_from_file
 
 

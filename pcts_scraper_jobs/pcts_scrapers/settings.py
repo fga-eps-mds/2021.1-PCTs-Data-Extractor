@@ -64,7 +64,7 @@ SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
 
 SELENIUM_DRIVER_ARGUMENTS = [
-    # '--headless',
+    '--headless',
     '--no-sandbox',
     '--disable-gpu',
     '--javascript.enabled=False',
@@ -73,9 +73,10 @@ SELENIUM_DRIVER_ARGUMENTS = [
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
 
-splash_host = os.environ.get("PCTS_SCRAPERS_SPLASH_HOST")
-
-SPLASH_URL = f'http://{splash_host if splash_host else "localhost"}:8050'
+SPLASH_URL = os.environ.get(
+    "PCTS_SCRAPERS_SPLASH_HOST",
+    default="http://localhost:8050"
+)
 
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800,

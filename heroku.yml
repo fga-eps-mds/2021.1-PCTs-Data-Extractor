@@ -1,0 +1,9 @@
+build:
+  docker:
+    web: Dockerfile
+run:
+  web: ./scripts/start_prod.sh
+  celery_worker_beat_scheduler:
+    image: web
+    command:
+      - ./scripts/start_celery_full.sh
