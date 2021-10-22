@@ -1,10 +1,6 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from rest_framework.exceptions import NotAcceptable
-from django.utils.translation import gettext_lazy as _
-
-
 STATUS_STARTED = 1
 STATUS_SUCCESS = 2
 STATUS_FAILED = 3
@@ -24,6 +20,40 @@ class Scraper(models.Model):
         unique=True,
         max_length=50
     )
+    js_search_steps = ArrayField(
+        models.CharField(max_length=10, blank=True, null=True),
+        max_length=50,
+        null=True
+    )
+    next_button_xpath = models.CharField(
+        "Next Button XPATH",
+        max_length=500,
+        null=True
+    )
+    allowed_domains = ArrayField(
+        models.CharField("Allowed Domains", max_length=500),
+        null=True
+    )
+    allowed_paths = ArrayField(
+        models.CharField("Allowed Paths", max_length=1000),
+        null=True
+    )
+    pagination_retries = models.IntegerField(
+        "Pagination Retries",
+        default=3,
+        null=True
+    )
+    pagination_delay = models.IntegerField(
+        "Pagination Delay",
+        default=3,
+        null=True
+    )
+    page_load_timeout = models.IntegerField(
+        "Page Load Delay",
+        default=3,
+        null=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

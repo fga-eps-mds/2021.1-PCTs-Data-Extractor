@@ -14,6 +14,13 @@ class ScraperSerializer(serializers.ModelSerializer):
             'site_name',
             'url_root',
             'task_name_prefix',
+            'js_search_steps',
+            'next_button_xpath',
+            'allowed_domains',
+            'allowed_paths',
+            'pagination_retries',
+            'pagination_delay',
+            'page_load_timeout',
             'created_at',
             'url',
         ]

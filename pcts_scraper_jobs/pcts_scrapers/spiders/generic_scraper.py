@@ -201,22 +201,23 @@ class GenericScraper(Spider):
             "btn": BTN_ACTION,
         }
 
-        for search_step in self.js_search_steps:
-            elem = driver.find_element_by_xpath(search_step["xpath"])
+        if self.js_search_steps:
+            for search_step in self.js_search_steps:
+                elem = driver.find_element_by_xpath(search_step["xpath"])
 
-            action_type = ACTION_TYPES[search_step["elem_type"]]
+                action_type = ACTION_TYPES[search_step["elem_type"]]
 
-            search_step_value = search_step["action"][action_type["type"]]
+                search_step_value = search_step["action"][action_type["type"]]
 
-            action = action_type["action"]
+                action = action_type["action"]
 
-            # Substitui valor
-            if action_type["need_value"]:
-                action = action.replace("${VALUE}", search_step_value)
+                # Substitui valor
+                if action_type["need_value"]:
+                    action = action.replace("${VALUE}", search_step_value)
 
-            driver.execute_script(action, elem)
+                driver.execute_script(action, elem)
 
-            sleep(1)
+                sleep(1)
 
     def get_current_page_response(self, driver: WebDriver):
         return HtmlResponse(
