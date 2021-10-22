@@ -1,89 +1,132 @@
 version: "3.5"
+
+x-pcts-scrapers-api-template:
+  &pcts-scrapers-api-template
+  restart: unless-stopped
+  build:
+    context: .
+  image: pcts-scrapers-api
+  environment:
+    PROJECT_ENV_EXECUTOR: "DOCKER"
+    PCTS_SCRAPERS_SPLASH_HOST: http://pcts-scrapers-splash:8050
+    PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
+    PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: api/documents/
+    POSTGRES_HOST: pcts-scrapers-postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: test1234
+    POSTGRES_DB: pcts_scrapers
+    DJANGO_SUPERUSER_EMAIL: admin@example.com
+    DJANGO_SUPERUSER_USERNAME: admin
+    DJANGO_SUPERUSER_PASSWORD: admin
+    CELERY_BROKER_URL: amqp://guest@pcts-scrapers-rabbitmq:5672
+  networks:
+    - pcts-network
+  depends_on:
+    pcts-scrapers-postgres:
+      condition: service_healthy
+  volumes:
+    - .:/app
+    - pip-cache:/usr/local/lib/python3.8/site-packages
+
 services:
-  pcts-scrapers-splash:
-    hostname: pcts-scrapers-splash
-    image: scrapinghub/splash
-    container_name: pcts-scrapers-splash
-    ports:
-      - 8050:8050
-    command: "--disable-private-mode"
-    networks:
-      - pcts-network
+  # pcts-scrapers-splash:
+  #   hostname: pcts-scrapers-splash
+  #   image: scrapinghub/splash
+  #   container_name: pcts-scrapers-splash
+  #   restart: unless-stopped
+  #   ports:
+  #     - 8050:8050
+  #   networks:
+  #     - pcts-network
+  #   command: "--disable-private-mode"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8050"]
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 5
 
-  pcts-scrapers-mongodb:
-    image: mongo
-    container_name: pcts-scrapers-mongodb
-    hostname: pcts-scrapers-mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=pass12345
-    volumes:
-      - pcts-scrapers-mongodb-data:/data/db
-    networks:
-      - pcts-network
-    ports:
-      - 27017:27017
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo pcts-scrapers-mongodb:27017/test --quiet
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  pcts-scrapers-postgres:
+    image: postgres:13
+    container_name: pcts-scrapers-postgres
+    hostname: pcts-scrapers-postgres
     restart: unless-stopped
-
-  pcts-scrapers-mongo-express:
-    image: mongo-express
-    container_name: pcts-scrapers-mongo-express
     environment:
-      - ME_CONFIG_MONGODB_SERVER=pcts-scrapers-mongodb
-      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass12345
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
-    volumes:
-      - pcts-scrapers-mongodb-data
-    depends_on:
-      - pcts-scrapers-mongodb
+      - POSTGRES_HOST=pcts-scrapers-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test1234
+      - POSTGRES_DB=pcts_scrapers
+    ports:
+        - 5432:5432
     networks:
       - pcts-network
-    ports:
-      - 8081:8081
     healthcheck:
-      test: wget --quiet --tries=3 --spider http://admin:admin123@10.10.10.60:8081 || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
+        test: ["CMD", "pg_isready", "-U", "postgres"]
+        interval: 5s
+        retries: 5
     restart: unless-stopped
+    volumes:
+    - pcts-scrapers-postgres-data:/var/lib/postgresql/data
 
+  pcts-scrapers-rabbitmq:
+    image: rabbitmq:3.9.7
+    container_name: pcts-scrapers-rabbitmq
+    hostname: pcts-scrapers-rabbitmq
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+    networks:
+      - pcts-network
+    volumes:
+      - pcts-scrapers-rabbitmq-data:/var/lib/rabbitmq/
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 30s
+      retries: 3
+
+  # PCTS SCRAPERS DJANGO API ==============================================================================
   pcts-scrapers-api:
     container_name: pcts-scrapers-api
-    # restart: unless-stopped
-    build: .
-    image: pcts-scrapers-api
-    # env_file: dev-env
-    environment:
-      PROJECT_ENV_EXECUTOR: "DOCKER"
-      PCTS_SCRAPERS_RAW_DOCUMENTS_HOST_DB: pcts-scrapers-mongodb:27017
-      PCTS_SCRAPERS_RAW_DOCUMENTS_DB: pcts_raw_documents
-      PCTS_SCRAPERS_RAW_DOCUMENTS_DB_USER: root
-      PCTS_SCRAPERS_RAW_DOCUMENTS_DB_PASS: pass12345
+    <<: *pcts-scrapers-api-template
     ports:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
-    networks:
-      - pcts-network
+    # depends_on:
+    #   pcts-scrapers-splash:
+    #     condition: service_healthy
+
+  pcts-scrapers-celery:
+    <<: *pcts-scrapers-api-template
+    container_name: pcts-scrapers-celery
+    command: ["sh", "scripts/start_celery.sh"]
     depends_on:
-      pcts-scrapers-mongodb:
+      pcts-scrapers-rabbitmq:
         condition: service_healthy
-    volumes:
-      - .:/app
-      - pip-cache:/usr/local/lib/python3.8/site-packages
+
+  pcts-scrapers-celery-scheduler:
+    <<: *pcts-scrapers-api-template
+    container_name: pcts-scrapers-celery-scheduler
+    command: ["sh", "scripts/start_celery_scheduler.sh"]
+    depends_on:
+      - pcts-scrapers-celery
+
+  pcts-scrapers-celery-flower:
+    <<: *pcts-scrapers-api-template
+    container_name: pcts-scrapers-celery-flower
+    ports:
+      - 5555:5555
+    command: ["sh", "scripts/start_celery_flower.sh"]
+  # =======================================================================================================
 
 volumes:
-  pcts-scrapers-mongodb-data:
-    name: pcts-scrapers-mongodb-data
+  pcts-scrapers-postgres-data:
+    name: pcts-scrapers-postgres-data
   pip-cache:
-    name: pip-cache
+    name: pcts-scrapers-api-pip-cache
+  pcts-scrapers-rabbitmq-data:
+    name: pcts-scrapers-rabbitmq-data
 
 networks:
   pcts-network:

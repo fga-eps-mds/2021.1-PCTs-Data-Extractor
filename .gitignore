@@ -1,6 +1,7 @@
 # Project
 output_data
 venv
+coverage*.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
