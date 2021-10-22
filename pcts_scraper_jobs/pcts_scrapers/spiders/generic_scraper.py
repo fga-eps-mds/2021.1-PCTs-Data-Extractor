@@ -36,8 +36,9 @@ class GenericScraper(Spider):
     name = 'generic-scraper'
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, query_string_params=None, js_search_steps=None, next_button_xpath=None,
-                 content_xpath=None, pagination_retries=1, pagination_delay=1, *args, **kwargs):
+    def __init__(self, root=None, site_name=None, query_string_params=None, js_search_steps=None,
+                 next_button_xpath=None, content_xpath=None, pagination_retries=1, pagination_delay=1,
+                 load_page_delay=2, *args, **kwargs):
         """ Initializes GenericScraper
 
         Args:
@@ -60,6 +61,7 @@ class GenericScraper(Spider):
         self.content_xpath = content_xpath
         self.pagination_retries = pagination_retries
         self.pagination_delay = pagination_delay
+        self.load_page_delay = load_page_delay
         self.options = kwargs
 
         self.search_by_url = True if query_string_params else False
@@ -129,11 +131,17 @@ class GenericScraper(Spider):
                         for url in found_urls:
                             print("Pagina Encontrada:", url)
 
-                            yield SplashRequest(
+                            # yield SplashRequest(
+                            #     url=url,
+                            #     callback=self.parse_document_page,
+                            #     endpoint='render.html',
+                            #     args={'wait': self.load_page_delay},
+                            # )
+
+                            yield Request(
                                 url=url,
                                 callback=self.parse_document_page,
-                                endpoint='render.html',
-                                args={'wait': 1},
+                                meta={'donwload_timeout': self.load_page_delay}
                             )
 
                             sleep(0.1)
@@ -158,13 +166,15 @@ class GenericScraper(Spider):
 
         page_content['source'] = self.site_name
         page_content['url'] = response.url
-        page_content['title'] = response.xpath("/html/head/title/text()").extract_first()
+        page_content['title'] = response.xpath(
+            "/html/head/title/text()").extract_first()
 
         # Extracao de conteudo baseado no mapeamento passado em content_xpath
         for content_key in self.content_xpath:
             if self.content_xpath[content_key]:
                 res = response.xpath(self.content_xpath[content_key]).extract()
-                page_content[content_key] = '\n'.join(elem for elem in res).strip()
+                page_content[content_key] = '\n'.join(
+                    elem for elem in res).strip()
 
         # Exemplo manual
         # page_content['content'] = response.body.decode("utf-8")
