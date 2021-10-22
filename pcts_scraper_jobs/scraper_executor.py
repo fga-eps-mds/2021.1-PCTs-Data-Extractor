@@ -126,7 +126,7 @@ if __name__ == '__main__':
         }
 
         incra_args = {
-            "root": 'https://www.gov.br/incra/pt-br/search?SearchableText=quilombolas',
+            "root": 'https://www.gov.br/incra/pt-br/search',
             "site_name": 'incra',
             "js_search_steps": [
                 {
@@ -150,8 +150,106 @@ if __name__ == '__main__':
             },
             "pagination_retries": 5,
             "pagination_delay": 10,
+            "query_string_params": [
+                {
+                    "param": "SearchableText",
+                    "value": "quilombolas",
+                }
+            ],
         }
 
         run_generic_scraper("GenericScraper", incra_args, keyword=keywords[0])
     finally:
         gc.collect()
+
+
+# TCU MAPPING
+# generic_scraper_pagination.ScraperPagination,
+# root = 'https://pesquisa.apps.tcu.gov.br',
+# site_name = 'tcu',
+# js_search_steps = [
+#     {
+#         "elem_type": "input",
+#         "xpath": '//*[@id="termo"]',
+#         "action": {"write": "Povos e Comunidades Tradicionais"}
+#     },
+#     {
+#         "elem_type": "btn",
+#         "xpath": '//*[@id="container-campo-pesquisa"]/div/div[1]/div[5]/div/button',
+#         "action": {"click": True}
+#     },
+# ],
+# next_button_xpath = '//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
+# allow_domains = ['pesquisa.apps.tcu.gov.br'],
+# allow_path = ['#/documento'],
+# content_xpath = {
+#     "content": '//body//*//text()',
+# },
+# pagination_retries = 3,
+# pagination_delay = 10,
+# keyword = "Povos e Comunidades Tradicionais",
+
+
+# SENADO MAPPING
+# running_process = crawler.crawl(
+#     ScraperPagination,
+#     root='https://www6g.senado.leg.br/busca',
+#     site_name='senado',
+#     js_search_steps=[
+#         {
+#             "elem_type": "input",
+#             "xpath": '//*[@id="busca-query"]',
+#             "action": {"write": "Povos e Comunidades Tradicionais"}
+#         },
+#         {
+#             "elem_type": "btn",
+#             "xpath": '//*[@id="search-addon"]/button',
+#             "action": {"click": True}
+#         },
+#     ],
+#     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
+#     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
+    # allow_path=['noticias'],
+    # allow_path=['noticias'],
+    #     content_xpath={
+    #         "content": '//body//*//text()',
+    #     },
+    #     pagination_retries=3,
+    #     pagination_delay=5,
+    #     keyword="Povos e Comunidades Tradicionais",
+
+ # running_process = crawler.crawl(
+    #     ScraperPagination,
+    #     root='https://www.in.gov.br/consulta/-/buscar/',
+    #     site_name='diario_oficial',
+    #     js_search_steps=[
+    #         {
+    #             "elem_type": "input",
+    #             "xpath": '//*[@id="search-bar"]',
+    #             "action": {"write": "Povos e Comunidades Tradicionais"}
+    #         },
+    #         {
+    #             "elem_type": "btn",
+    #             "xpath": '//*[@id="toggle-search-advanced"]',
+    #             "action": {"click": True}
+    #         },
+    #         {
+    #             "elem_type": "btn",
+    #             "xpath": '//*[@id="search-advanced"]/div[1]/div[1]/div[1]/div[2]/label',
+    #             "action": {"click": True}
+    #         },
+    #         {
+    #             "elem_type": "btn",
+    #             "xpath": '//*[@id="div-search-bar"]/div/div/div/i',
+    #             "action": {"click": True}
+    #         },
+    #     ],
+    #     next_button_xpath='//*[@id="rightArrow"]',
+    #     allow_domains=['www.in.gov.br'],
+    #     allow_path=['web/dou'],
+    #     content_xpath={
+    #         "content": '//body//*//text()',
+    #     },
+    #     pagination_retries=3,
+    #     pagination_delay=5,
+    #     keyword="Povos e Comunidades Tradicionais",

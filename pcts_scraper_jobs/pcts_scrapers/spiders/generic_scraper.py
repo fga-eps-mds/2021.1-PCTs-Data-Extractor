@@ -102,8 +102,7 @@ class GenericScraper(Spider):
     def parse_home_pagination(self, response: HtmlResponse):
         driver: WebDriver = response.request.meta['driver']
 
-        if not self.search_by_url:
-            self.execute_js_search_steps(driver)
+        self.execute_js_search_steps(driver)
 
         # Parse result list page
         found_urls = []
