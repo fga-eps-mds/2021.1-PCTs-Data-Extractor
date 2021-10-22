@@ -67,11 +67,11 @@ class GenericScraper(Spider):
         self.search_by_url = True if query_string_params else False
 
         GenericScraper.start_urls.append(root)
-        GenericScraper.allowed_domains = self.options.get('allow_domains')
+        GenericScraper.allowed_domains = self.options.get('allowed_domains')
         self.link_pages_extractor = LinkExtractor(
-            allow=self.options.get('allow_path'),
+            allow=self.options.get('allowed_paths'),
             deny=self.options.get('deny'),
-            allow_domains=self.options.get('allow_domains'),
+            allow_domains=self.options.get('allowed_domains'),
             deny_domains=self.options.get('deny_domains'),
             restrict_xpaths=self.options.get('restrict_xpaths'),
             canonicalize=False,

@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 STATUS_STARTED = 1
@@ -20,9 +19,8 @@ class Scraper(models.Model):
         unique=True,
         max_length=50
     )
-    js_search_steps = ArrayField(
-        models.CharField(max_length=10, blank=True, null=True),
-        max_length=50,
+    js_search_steps = models.JSONField(
+        "JS Search Steps (JSON List of Objects (elem_type, xpath, action))",
         null=True
     )
     next_button_xpath = models.CharField(
@@ -30,12 +28,12 @@ class Scraper(models.Model):
         max_length=500,
         null=True
     )
-    allowed_domains = ArrayField(
-        models.CharField("Allowed Domains", max_length=500),
+    allowed_domains = models.JSONField(
+        "Allowed Domains (JSON List of strings)",
         null=True
     )
-    allowed_paths = ArrayField(
-        models.CharField("Allowed Paths", max_length=1000),
+    allowed_paths = models.JSONField(
+        "Allowed Paths (JSON List of strings)",
         null=True
     )
     pagination_retries = models.IntegerField(
@@ -51,6 +49,22 @@ class Scraper(models.Model):
     page_load_timeout = models.IntegerField(
         "Page Load Delay",
         default=3,
+        null=True
+    )
+    restrict_xpaths = models.JSONField(
+        "Restrict by Xpath (JSON List of strings)",
+        null=True
+    )
+    restrict_css = models.JSONField(
+        "Restrict by CSS (Json List of strings)",
+        null=True
+    )
+    content_xpath = models.JSONField(
+        "Content XPATH (JSON Object (any key-value))",
+        null=True
+    )
+    query_string_params = models.JSONField(
+        "Query String Params (JSON List Object (param, value))",
         null=True
     )
 

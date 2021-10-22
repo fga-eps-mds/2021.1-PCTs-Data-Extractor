@@ -116,8 +116,8 @@ if __name__ == '__main__':
                 },
             ],
             "next_button_xpath": '//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-            "allow_domains": ['www12.senado.leg.br', 'www25.senado.leg.br'],
-            "allow_path": ['noticias'],
+            "allowed_domains": ['www12.senado.leg.br', 'www25.senado.leg.br'],
+            "allowed_paths": ['noticias'],
             "content_xpath": {
                 "content": '//body//*//text()',
             },
@@ -137,8 +137,8 @@ if __name__ == '__main__':
                 },
             ],
             "next_button_xpath": '//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a',
-            "allow_domains": ['www.gov.br'],
-            "allow_path": [
+            "allowed_domains": ['www.gov.br'],
+            "allowed_paths": [
                 'incra/pt-br/assuntos/noticias',
                 'incra/pt-br/assuntos/governanca-fundiaria'
             ],

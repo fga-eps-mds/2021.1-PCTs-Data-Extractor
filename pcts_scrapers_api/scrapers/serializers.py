@@ -21,6 +21,10 @@ class ScraperSerializer(serializers.ModelSerializer):
             'pagination_retries',
             'pagination_delay',
             'page_load_timeout',
+            'restrict_xpaths',
+            'restrict_css',
+            'content_xpath',
+            'query_string_params',
             'created_at',
             'url',
         ]
