@@ -100,32 +100,70 @@ if __name__ == '__main__':
         # run_scraper(scraper_id="IncraScraperSpider", keyword=keywords[0])
 
         # Scraper Generico
-        senado_args = {
-            "url_root": 'https://www6g.senado.leg.br/busca',
-            "site_name": 'senado',
+        # senado_args = {
+        #     "url_root": 'https://www6g.senado.leg.br/busca',
+        #     "site_name": 'senado',
+        #     "js_search_steps": [
+        #         {
+        #             "elem_type": "input",
+        #             "xpath": '//*[@id="busca-query"]',
+        #             "action": {"write": "Povos e Comunidades Tradicionais"}
+        #         },
+        #         {
+        #             "elem_type": "btn",
+        #             "xpath": '//*[@id="search-addon"]/button',
+        #             "action": {"click": True}
+        #         },
+        #     ],
+        #     "next_button_xpath": '//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
+        #     "allowed_domains": ['www12.senado.leg.br', 'www25.senado.leg.br'],
+        #     "allowed_paths": ['noticias'],
+        #     "content_xpath": {
+        #         "content": '//body//*//text()',
+        #     },
+        #     "pagination_retries": 3,
+        #     "pagination_delay": 5,
+        # }
+
+        mpf_args = {
+            "site_name": "mpf",
+            "url_root": "http://www.mpf.mp.br/",
+            "task_name_prefix": "mpf_scraper",
             "js_search_steps": [
                 {
                     "elem_type": "input",
-                    "xpath": '//*[@id="busca-query"]',
-                    "action": {"write": "Povos e Comunidades Tradicionais"}
+                    "xpath": "//*[@id=\"SearchableText\"]",
+                    "action": {
+                        "write": "Povos e Comunidades Tradicionais"
+                    }
                 },
                 {
                     "elem_type": "btn",
-                    "xpath": '//*[@id="search-addon"]/button',
-                    "action": {"click": True}
-                },
+                    "xpath": "/html/body/div[3]/header/div[3]/div[3]/form/input[2]",
+                    "action": {
+                        "click": True
+                    }
+                }
             ],
-            "next_button_xpath": '//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-            "allowed_domains": ['www12.senado.leg.br', 'www25.senado.leg.br'],
-            "allowed_paths": ['noticias'],
+            "next_button_xpath": "//*[@id=\"search-results\"]/div/span[contains(@class, \"next\")]/a",
+            "allowed_domains": [
+                "www.mpf.mp.br"
+            ],
+            "allowed_paths": [
+                "pgr/noticias-pgr",
+                "pgr/documentos",
+                "atuacao-tematica"
+            ],
+            "restrict_xpaths": ["//*[@id=\"search-results\"]/dl/dt/a"],
             "content_xpath": {
-                "content": '//body//*//text()',
+                "content": "//*[@id=\"content\"]"
             },
-            "pagination_retries": 3,
-            "pagination_delay": 5,
+            "pagination_retries": 5,
+            "pagination_delay": 10,
+            "created_at": "2021-10-17T19:26:54.660443"
         }
 
-        run_generic_scraper("GenericScraperSpider", senado_args, keyword=keywords[0])
+        run_generic_scraper(mpf_args, keyword=keywords[0])
     finally:
         gc.collect()
 

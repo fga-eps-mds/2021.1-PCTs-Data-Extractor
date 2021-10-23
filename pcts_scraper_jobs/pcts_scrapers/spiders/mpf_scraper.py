@@ -44,8 +44,7 @@ class MpfScraperSpider(Spider):
             allow=(self.allowed_paths),
             allow_domains=(
                 self.allowed_domains),
-            restrict_xpaths=(
-                self.restrict_xpaths),
+            restrict_xpaths=self.restrict_xpaths,
             canonicalize=False,
             unique=True,
             process_value=None,

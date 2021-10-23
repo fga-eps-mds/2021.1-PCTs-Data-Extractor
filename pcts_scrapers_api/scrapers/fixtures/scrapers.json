@@ -6,6 +6,37 @@
             "site_name": "mpf",
             "url_root": "http://www.mpf.mp.br/",
             "task_name_prefix": "mpf_scraper",
+            "js_search_steps": [
+                {
+                    "elem_type": "input",
+                    "xpath": "//*[@id=\"SearchableText\"]",
+                    "action": {
+                        "write": "Povos e Comunidades Tradicionais"
+                    }
+                },
+                {
+                    "elem_type": "btn",
+                    "xpath": "/html/body/div[3]/header/div[3]/div[3]/form/input[2]",
+                    "action": {
+                        "click": true
+                    }
+                }
+            ],
+            "next_button_xpath": "//*[@id=\"search-results\"]/div/span[contains(@class, \"next\")]/a",
+            "allowed_domains": [
+                "www.mpf.mp.br"
+            ],
+            "allowed_paths": [
+                "pgr/noticias-pgr",
+                "pgr/documentos",
+                "atuacao-tematica"
+            ],
+            "restrict_xpaths": ["//*[@id=\"search-results\"]/dl/dt/a"],
+            "content_xpath": {
+                "content": "//*[@id=\"content\"]"
+            },
+            "pagination_retries": 5,
+            "pagination_delay": 10,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },

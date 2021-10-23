@@ -36,21 +36,6 @@ class Scraper(models.Model):
         "Allowed Paths (JSON List of strings)",
         null=True
     )
-    pagination_retries = models.IntegerField(
-        "Pagination Retries",
-        default=3,
-        null=True
-    )
-    pagination_delay = models.IntegerField(
-        "Pagination Delay",
-        default=3,
-        null=True
-    )
-    page_load_timeout = models.IntegerField(
-        "Page Load Delay",
-        default=3,
-        null=True
-    )
     restrict_xpaths = models.JSONField(
         "Restrict by Xpath (JSON List of strings)",
         null=True
@@ -65,6 +50,21 @@ class Scraper(models.Model):
     )
     query_string_params = models.JSONField(
         "Query String Params (JSON List Object (param, value))",
+        null=True
+    )
+    pagination_retries = models.IntegerField(
+        "Pagination Retries",
+        default=3,
+        null=True
+    )
+    pagination_delay = models.IntegerField(
+        "Pagination Delay",
+        default=3,
+        null=True
+    )
+    page_load_timeout = models.IntegerField(
+        "Page Load Delay",
+        default=3,
         null=True
     )
 

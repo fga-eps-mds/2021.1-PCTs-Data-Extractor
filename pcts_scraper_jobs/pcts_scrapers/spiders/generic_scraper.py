@@ -38,7 +38,7 @@ class GenericScraperSpider(Spider):
 
     def __init__(self, url_root=None, site_name=None, query_string_params=None, js_search_steps=None,
                  next_button_xpath=None, content_xpath=None, pagination_retries=1, pagination_delay=1,
-                 load_page_delay=2, *args, **kwargs):
+                 page_load_timeout=2, keyword="", *args, **kwargs):
         """ Initializes GenericScraperSpider
 
         Args:
@@ -63,7 +63,8 @@ class GenericScraperSpider(Spider):
         self.content_xpath = content_xpath
         self.pagination_retries = pagination_retries
         self.pagination_delay = pagination_delay
-        self.load_page_delay = load_page_delay
+        self.page_load_timeout = page_load_timeout
+        self.keyword = keyword
         self.options = kwargs
 
         self.search_by_url = True if query_string_params else False
@@ -136,13 +137,13 @@ class GenericScraperSpider(Spider):
                             #     url=url,
                             #     callback=self.parse_document_page,
                             #     endpoint='render.html',
-                            #     args={'wait': self.load_page_delay},
+                            #     args={'wait': self.page_load_timeout},
                             # )
 
                             yield Request(
                                 url=url,
                                 callback=self.parse_document_page,
-                                meta={'donwload_timeout': self.load_page_delay}
+                                meta={'donwload_timeout': self.page_load_timeout}
                             )
 
                             sleep(0.1)
