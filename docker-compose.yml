@@ -93,6 +93,10 @@ services:
     ports:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8002/api"]
+      interval: 10s
+      retries: 5
     # depends_on:
     #   pcts-scrapers-splash:
     #     condition: service_healthy
@@ -104,13 +108,16 @@ services:
     depends_on:
       pcts-scrapers-rabbitmq:
         condition: service_healthy
+      pcts-scrapers-api:
+        condition: service_healthy
 
   pcts-scrapers-celery-scheduler:
     <<: *pcts-scrapers-api-template
     container_name: pcts-scrapers-celery-scheduler
     command: ["sh", "scripts/start_celery_scheduler.sh"]
     depends_on:
-      - pcts-scrapers-celery
+      pcts-scrapers-api:
+        condition: service_healthy
 
   pcts-scrapers-celery-flower:
     <<: *pcts-scrapers-api-template
