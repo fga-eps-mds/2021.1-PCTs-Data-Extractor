@@ -42,7 +42,7 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
         return prev_task_result
 
     @task(name=task_sub_prefix_name, bind=True)
-    def task_scraper_subtask(self, prev_task_result, scraper_classname,
+    def task_scraper_subtask(self, prev_task_result,
                              scraper_execution_group_id, scraper_args,
                              keyword, **kwargs):
         scraper_execution_group = ScraperExecutionGroup.objects.get(
@@ -70,7 +70,6 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
         result_status = True
         try:
             execution_stats = run_generic_scraper(
-                scraper_id=scraper_classname,
                 scraper_args=scraper_args,
                 keyword=keyword
             )
@@ -101,7 +100,7 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
             return prev_task_result and result_status
 
     @task(name=f"{task_group_name}_start", bind=True)
-    def task_scraper_group(self, scraper_classname, scraper_id, scraper_args, keywords, **kwargs):
+    def task_scraper_group(self, scraper_id, scraper_args, keywords, **kwargs):
         scraper = Scraper.objects.get(pk=scraper_id)
 
         task_id = self.request.id
@@ -122,7 +121,6 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
         task_scraper_subtasks = []
         for idx, keyword in enumerate(keywords):
             task_args = {
-                "scraper_classname": scraper_classname,
                 "scraper_execution_group_id": scraper_group.id,
                 "scraper_args": scraper_args,
                 "keyword": keyword,
@@ -169,15 +167,8 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
     ]
     print("ADICIONANDO PERIODIC TASKS")
 
-    DEFAULT_SCRAPERS = [
-        # {"id": 1, "class": "MpfScraperSpider"},
-        # {"id": 2, "class": "IncraScraperSpider"},
-        {"id": 3, "class": "GenericScraperSpider"},
-    ]
-
-    for scraper_config in DEFAULT_SCRAPERS:
-        scraper = Scraper.objects.get(pk=scraper_config["id"])
-
+    scrapers = Scraper.objects.all()
+    for scraper in scrapers:
         sender.add_periodic_task(
             crontab(minute='0', hour='4', day_of_week='*',
                     day_of_month='*', month_of_year='*'),
@@ -185,8 +176,7 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
                 scraper.task_name_prefix,
                 f"{scraper.task_name_prefix}_keyword",
             ).subtask(kwargs={
-                "scraper_classname": scraper_config["class"],
-                "scraper_id": scraper_config["id"],
+                "scraper_id": scraper.id,
                 "scraper_args": {
                     "site_name": scraper.site_name,
                     "url_root": scraper.url_root,

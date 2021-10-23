@@ -62,10 +62,10 @@ def run_scraper(scraper_id, keyword, settings_file_path="pcts_scrapers.settings"
     return stats
 
 
-def run_generic_scraper(scraper_id, scraper_args, keyword, settings_file_path="pcts_scrapers.settings"):
+def run_generic_scraper(scraper_args, keyword, settings_file_path="pcts_scrapers.settings"):
     configure_logging({'LOG_FORMAT': '%(levelname)s: %(message)s'})
     print("=======================================================================")
-    print(f"INICIAR SCRAPER {scraper_id}. KEYWORD: {keyword}")
+    print(f"INICIAR SCRAPER {scraper_args['site_name']}. KEYWORD: {keyword}")
     os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
     projects_settings = get_project_settings()
     scraper = GenericScraperSpider
