@@ -11,7 +11,7 @@
                     "elem_type": "input",
                     "xpath": "//*[@id=\"SearchableText\"]",
                     "action": {
-                        "write": "Povos e Comunidades Tradicionais"
+                        "write": "DEPRECATED: TEXTO AGORA EH PASSADO PELA KEYWORD"
                     }
                 },
                 {
@@ -76,7 +76,7 @@
             "query_string_params": [
                 {
                     "param": "SearchableText",
-                    "value": "quilombolas"
+                    "value": "DEPRECATED: TEXTO AGORA EH PASSADO PELA KEYWORD"
                 }
             ]
         }
@@ -93,7 +93,7 @@
                     "elem_type": "input",
                     "xpath": "//*[@id=\"busca-query\"]",
                     "action": {
-                        "write": "Povos e Comunidades Tradicionais"
+                        "write": "DEPRECATED: TEXTO AGORA EH PASSADO PELA KEYWORD"
                     }
                 },
                 {
