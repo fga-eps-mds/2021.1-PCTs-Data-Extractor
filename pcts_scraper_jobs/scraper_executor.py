@@ -14,7 +14,7 @@ from multiprocessing.context import Process
 
 from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
 from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
-from pcts_scrapers.spiders.generic_scraper import GenericScraper
+from pcts_scrapers.spiders.generic_scraper import GenericScraperSpider
 
 
 from scrapy import signals
@@ -68,7 +68,7 @@ def run_generic_scraper(scraper_id, scraper_args, keyword, settings_file_path="p
     print(f"INICIAR SCRAPER {scraper_id}. KEYWORD: {keyword}")
     os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
     projects_settings = get_project_settings()
-    scraper = GenericScraper
+    scraper = GenericScraperSpider
 
     # Scraper run
     crawler = CrawlerProcess(projects_settings)
@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
         # Scraper Generico
         senado_args = {
-            "root": 'https://www6g.senado.leg.br/busca',
+            "url_root": 'https://www6g.senado.leg.br/busca',
             "site_name": 'senado',
             "js_search_steps": [
                 {
@@ -125,47 +125,14 @@ if __name__ == '__main__':
             "pagination_delay": 5,
         }
 
-        incra_args = {
-            "root": 'https://www.gov.br/incra/pt-br/search',
-            "site_name": 'incra',
-            "js_search_steps": [
-                {
-                    "elem_type": "btn",
-                    "xpath": ('//*[@id="search-results"]/div[contains(@class, "govbr-tabs")]/'
-                              'div[contains(@class, "swiper-wrapper")]/div[last()]//a'),
-                    "action": {"click": True}
-                },
-            ],
-            "next_button_xpath": '//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a',
-            "allowed_domains": ['www.gov.br'],
-            "allowed_paths": [
-                'incra/pt-br/assuntos/noticias',
-                'incra/pt-br/assuntos/governanca-fundiaria'
-            ],
-            "restrict_xpaths": [
-                '//*[@id="search-results"]//ul[contains(@class, "searchResults")]//a'
-            ],
-            "content_xpath": {
-                "content": '//body//*//text()',
-            },
-            "pagination_retries": 5,
-            "pagination_delay": 10,
-            "query_string_params": [
-                {
-                    "param": "SearchableText",
-                    "value": "quilombolas",
-                }
-            ],
-        }
-
-        run_generic_scraper("GenericScraper", incra_args, keyword=keywords[0])
+        run_generic_scraper("GenericScraperSpider", senado_args, keyword=keywords[0])
     finally:
         gc.collect()
 
 
 # TCU MAPPING
 # generic_scraper_pagination.ScraperPagination,
-# root = 'https://pesquisa.apps.tcu.gov.br',
+# url_root = 'https://pesquisa.apps.tcu.gov.br',
 # site_name = 'tcu',
 # js_search_steps = [
 #     {
@@ -180,8 +147,8 @@ if __name__ == '__main__':
 #     },
 # ],
 # next_button_xpath = '//*[@id="container"]/div[2]/div/div/header/div[2]/mat-paginator/div/div/div[2]/button[2]',
-# allow_domains = ['pesquisa.apps.tcu.gov.br'],
-# allow_path = ['#/documento'],
+# allowed_domains = ['pesquisa.apps.tcu.gov.br'],
+# allowed_paths = ['#/documento'],
 # content_xpath = {
 #     "content": '//body//*//text()',
 # },
@@ -193,7 +160,7 @@ if __name__ == '__main__':
 # SENADO MAPPING
 # running_process = crawler.crawl(
 #     ScraperPagination,
-#     root='https://www6g.senado.leg.br/busca',
+#     url_root='https://www6g.senado.leg.br/busca',
 #     site_name='senado',
 #     js_search_steps=[
 #         {
@@ -208,9 +175,8 @@ if __name__ == '__main__':
 #         },
 #     ],
 #     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-#     allow_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-    # allow_path=['noticias'],
-    # allow_path=['noticias'],
+#     allowed_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
+    # allowed_paths=['noticias'],
     #     content_xpath={
     #         "content": '//body//*//text()',
     #     },
@@ -245,11 +211,45 @@ if __name__ == '__main__':
     #         },
     #     ],
     #     next_button_xpath='//*[@id="rightArrow"]',
-    #     allow_domains=['www.in.gov.br'],
-    #     allow_path=['web/dou'],
+    #     allowed_domains=['www.in.gov.br'],
+    #     allowed_paths=['web/dou'],
     #     content_xpath={
     #         "content": '//body//*//text()',
     #     },
     #     pagination_retries=3,
     #     pagination_delay=5,
     #     keyword="Povos e Comunidades Tradicionais",
+
+# INCRA
+# incra_args = {
+#     "url_root": 'https://www.gov.br/incra/pt-br/search',
+#     "site_name": 'incra',
+#     "js_search_steps": [
+#                 {
+#                     "elem_type": "btn",
+#                     "xpath": ('//*[@id="search-results"]/div[contains(@class, "govbr-tabs")]/'
+#                               'div[contains(@class, "swiper-wrapper")]/div[last()]//a'),
+#                     "action": {"click": True}
+#                 },
+#     ],
+#     "next_button_xpath": '//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a',
+#     "allowed_domains": ['www.gov.br'],
+#     "allowed_paths": [
+#         'incra/pt-br/assuntos/noticias',
+#         'incra/pt-br/assuntos/governanca-fundiaria'
+#     ],
+#     "restrict_xpaths": [
+#         '//*[@id="search-results"]//ul[contains(@class, "searchResults")]//a'
+#     ],
+#     "content_xpath": {
+#         "content": '//body//*//text()',
+#     },
+#     "pagination_retries": 5,
+#     "pagination_delay": 10,
+#     "query_string_params": [
+#         {
+#             "param": "SearchableText",
+#             "value": "quilombolas",
+#         }
+#     ],
+# }

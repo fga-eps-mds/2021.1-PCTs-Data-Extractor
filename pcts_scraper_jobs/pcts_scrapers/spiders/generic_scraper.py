@@ -29,20 +29,20 @@ class PaginationException(Exception):
     pass
 
 
-class GenericScraper(Spider):
+class GenericScraperSpider(Spider):
     """ Generic Scraper for use on paginated item listing page of the target website
     """
 
     name = 'generic-scraper'
     start_urls = []
 
-    def __init__(self, root=None, site_name=None, query_string_params=None, js_search_steps=None,
+    def __init__(self, url_root=None, site_name=None, query_string_params=None, js_search_steps=None,
                  next_button_xpath=None, content_xpath=None, pagination_retries=1, pagination_delay=1,
                  load_page_delay=2, *args, **kwargs):
-        """ Initializes GenericScraper
+        """ Initializes GenericScraperSpider
 
         Args:
-            root(str): root page url
+            url_root(str): root page url
             site_name(str): site name
             js_search_steps(list<dict>): steps to generate the documents result list
             next_button_xpath(str): XPATH of "Next" button of the listing page
@@ -51,9 +51,11 @@ class GenericScraper(Spider):
         """
         configure_logging(install_root_handler=True)
         logging.disable(20)  # CRITICAL = 50
-        self.logger.info("[Scraper Pagination] Source: %s Kwargs: %s",
-                         root, kwargs)
-        self.source_url = root
+        self.logger.info(
+            "[Scraper Pagination] Source: %s Kwargs: %s",
+            url_root, kwargs
+        )
+        self.source_url = url_root
         self.site_name = site_name
         self.query_string_params = query_string_params
         self.js_search_steps = js_search_steps
@@ -66,8 +68,8 @@ class GenericScraper(Spider):
 
         self.search_by_url = True if query_string_params else False
 
-        GenericScraper.start_urls.append(root)
-        GenericScraper.allowed_domains = self.options.get('allowed_domains')
+        GenericScraperSpider.start_urls.append(self.source_url)
+        GenericScraperSpider.allowed_domains = self.options.get('allowed_domains')
         self.link_pages_extractor = LinkExtractor(
             allow=self.options.get('allowed_paths'),
             deny=self.options.get('deny'),
@@ -82,7 +84,7 @@ class GenericScraper(Spider):
             strip=True,
         )
 
-        super(GenericScraper, self).__init__(*args, **kwargs)
+        super(GenericScraperSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self, *args, **kwargs):
         if self.search_by_url:

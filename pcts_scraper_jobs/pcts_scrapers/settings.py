@@ -64,7 +64,7 @@ SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
 
 SELENIUM_DRIVER_ARGUMENTS = [
-    # '--headless',
+    '--headless',
     '--no-sandbox',
     '--disable-gpu',
     '--javascript.enabled=False',

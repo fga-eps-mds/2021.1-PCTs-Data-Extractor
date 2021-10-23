@@ -18,5 +18,35 @@
             "task_name_prefix": "incra_scraper",
             "created_at": "2021-10-17T19:26:54.660443"
         }
+    },
+    {
+        "pk": 3,
+        "model": "scrapers.scraper",
+        "fields": {
+            "site_name": "senado",
+            "url_root": "https://www6g.senado.leg.br/busca",
+            "task_name_prefix": "senado_scraper",
+            "js_search_steps": [
+                {
+                    "elem_type": "input",
+                    "xpath": "//*[@id=\"busca-query\"]",
+                    "action": {"write": "Povos e Comunidades Tradicionais"}
+                },
+                {
+                    "elem_type": "btn",
+                    "xpath": "//*[@id=\"search-addon\"]/button",
+                    "action": {"click": true}
+                }
+            ],
+            "next_button_xpath": "//*[@id=\"conteudoPrincipal\"]/div/div[2]/div[2]/nav/ul/li[8]/a",
+            "allowed_domains": ["www12.senado.leg.br", "www25.senado.leg.br"],
+            "allowed_paths": ["noticias"],
+            "content_xpath": {
+                "content": "//body//*//text()"
+            },
+            "pagination_retries": 3,
+            "pagination_delay": 5,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
     }
 ]

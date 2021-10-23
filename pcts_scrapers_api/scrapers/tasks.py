@@ -1,3 +1,7 @@
+from scrapers.models import STATUS_STARTED, STATUS_SUCCESS, STATUS_FAILED
+from scrapers.models import ScraperExecution
+from scrapers.models import ScraperExecutionGroup
+from scrapers.models import Scraper
 import sys
 import os
 
@@ -16,14 +20,7 @@ elif ENVIRONMENT_EXEC == "TEST":
     sys.path.append('pcts_scraper_jobs')
 else:
     sys.path.append('../pcts_scraper_jobs')
-
-from scraper_executor import run_scraper
-
-from scrapers.models import Scraper
-
-from scrapers.models import ScraperExecutionGroup
-from scrapers.models import ScraperExecution
-from scrapers.models import STATUS_STARTED, STATUS_SUCCESS, STATUS_FAILED
+from scraper_executor import run_scraper, run_generic_scraper
 
 
 def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
@@ -46,7 +43,8 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
 
     @task(name=task_sub_prefix_name, bind=True)
     def task_scraper_subtask(self, prev_task_result, scraper_classname,
-                             scraper_execution_group_id, keyword, **kwargs):
+                             scraper_execution_group_id, scraper_args,
+                             keyword, **kwargs):
         scraper_execution_group = ScraperExecutionGroup.objects.get(
             pk=scraper_execution_group_id
         )
@@ -71,7 +69,11 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
 
         result_status = True
         try:
-            execution_stats = run_scraper(scraper_classname, keyword)
+            execution_stats = run_generic_scraper(
+                scraper_id=scraper_classname,
+                scraper_args=scraper_args,
+                keyword=keyword
+            )
 
             # Update execution monitoring on success
             scraper_execution.finish_datetime = datetime.now()
@@ -99,7 +101,7 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
             return prev_task_result and result_status
 
     @task(name=f"{task_group_name}_start", bind=True)
-    def task_scraper_group(self, scraper_classname, scraper_id, keywords, **kwargs):
+    def task_scraper_group(self, scraper_classname, scraper_id, scraper_args, keywords, **kwargs):
         scraper = Scraper.objects.get(pk=scraper_id)
 
         task_id = self.request.id
@@ -120,9 +122,10 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
         task_scraper_subtasks = []
         for idx, keyword in enumerate(keywords):
             task_args = {
-                "keyword": keyword,
                 "scraper_classname": scraper_classname,
                 "scraper_execution_group_id": scraper_group.id,
+                "scraper_args": scraper_args,
+                "keyword": keyword,
             }
 
             # A primeira task da chain, possui o argumento a prev_task_result.
@@ -167,8 +170,9 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
     print("ADICIONANDO PERIODIC TASKS")
 
     DEFAULT_SCRAPERS = [
-        {"id": 1, "class": "MpfScraperSpider"},
-        {"id": 2, "class": "IncraScraperSpider"},
+        # {"id": 1, "class": "MpfScraperSpider"},
+        # {"id": 2, "class": "IncraScraperSpider"},
+        {"id": 3, "class": "GenericScraperSpider"},
     ]
 
     for scraper_config in DEFAULT_SCRAPERS:
@@ -183,6 +187,18 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
             ).subtask(kwargs={
                 "scraper_classname": scraper_config["class"],
                 "scraper_id": scraper_config["id"],
+                "scraper_args": {
+                    "site_name": scraper.site_name,
+                    "url_root": scraper.url_root,
+                    "task_name_prefix": scraper.task_name_prefix,
+                    "js_search_steps": scraper.js_search_steps,
+                    "next_button_xpath": scraper.next_button_xpath,
+                    "allowed_domains": scraper.allowed_domains,
+                    "allowed_paths": scraper.allowed_paths,
+                    "content_xpath": scraper.content_xpath,
+                    "pagination_retries": scraper.pagination_retries,
+                    "pagination_delay": scraper.pagination_delay,
+                },
                 "keywords": KEYWORDS,
             }),
             name=scraper.task_name_prefix,
