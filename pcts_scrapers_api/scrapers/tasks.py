@@ -41,7 +41,7 @@ def task_scraper_group_wrapper(task_group_name, task_sub_prefix_name):
 
         return prev_task_result
 
-    @task(name=task_sub_prefix_name, bind=True)
+    @task(name=task_sub_prefix_name, bind=True, time_limit=sys.maxsize)
     def task_scraper_subtask(self, prev_task_result,
                              scraper_execution_group_id, scraper_args,
                              keyword, **kwargs):
