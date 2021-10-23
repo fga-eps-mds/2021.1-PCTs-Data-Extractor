@@ -89,7 +89,8 @@ class GenericScraperSpider(Spider):
 
     def start_requests(self, *args, **kwargs):
         if self.search_by_url:
-            home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(param["value"]) for param in self.query_string_params)}'
+            # home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(param["value"]) for param in self.query_string_params)}'
+            home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(self.keyword) for param in self.query_string_params)}'
         else:
             home_url = self.source_url
 
@@ -215,7 +216,7 @@ class GenericScraperSpider(Spider):
 
                 # Substitui valor
                 if action_type["need_value"]:
-                    action = action.replace("${VALUE}", search_step_value)
+                    action = action.replace("${VALUE}", self.keyword)
 
                 driver.execute_script(action, elem)
 
