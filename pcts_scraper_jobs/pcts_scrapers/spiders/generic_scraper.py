@@ -36,7 +36,7 @@ class GenericScraperSpider(Spider):
     name = 'generic-scraper'
     start_urls = []
 
-    def __init__(self, url_root=None, site_name=None, query_string_params=None, js_search_steps=None,
+    def __init__(self, url_root=None, site_name=None, qs_search_keyword_param=None, js_search_steps=None,
                  next_button_xpath=None, content_xpath=None, pagination_retries=1, pagination_delay=1,
                  page_load_timeout=2, keyword="", *args, **kwargs):
         """ Initializes GenericScraperSpider
@@ -57,7 +57,7 @@ class GenericScraperSpider(Spider):
         )
         self.source_url = url_root
         self.site_name = site_name
-        self.query_string_params = query_string_params
+        self.qs_search_keyword_param = qs_search_keyword_param
         self.js_search_steps = js_search_steps
         self.next_button_xpath = next_button_xpath
         self.content_xpath = content_xpath
@@ -67,10 +67,11 @@ class GenericScraperSpider(Spider):
         self.keyword = keyword
         self.options = kwargs
 
-        self.search_by_url = True if query_string_params else False
+        self.search_by_url = True if qs_search_keyword_param else False
 
         GenericScraperSpider.start_urls.append(self.source_url)
-        GenericScraperSpider.allowed_domains = self.options.get('allowed_domains')
+        GenericScraperSpider.allowed_domains = self.options.get(
+            'allowed_domains')
         self.link_pages_extractor = LinkExtractor(
             allow=self.options.get('allowed_paths'),
             deny=self.options.get('deny'),
@@ -89,8 +90,7 @@ class GenericScraperSpider(Spider):
 
     def start_requests(self, *args, **kwargs):
         if self.search_by_url:
-            # home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(param["value"]) for param in self.query_string_params)}'
-            home_url = f'{self.source_url}?{"&".join(str(param["param"]) + "=" + str(self.keyword) for param in self.query_string_params)}'
+            home_url = f'{self.source_url}?{str(self.qs_search_keyword_param)}={str(self.keyword)}'
         else:
             home_url = self.source_url
 
@@ -187,20 +187,18 @@ class GenericScraperSpider(Spider):
         yield page_content
 
     def execute_js_search_steps(self, driver: WebDriver):
-        INPUT_ACTION = {
-            "need_value": True,
+        INPUT_KEYWORD_ACTION = {
             "type": "write",
             "action": "arguments[0].value = '${VALUE}';",
         }
 
         BTN_ACTION = {
-            "need_value": False,
             "type": "click",
             "action": "arguments[0].click();",
         }
 
         ACTION_TYPES = {
-            "input": INPUT_ACTION,
+            "input_keyword": INPUT_KEYWORD_ACTION,
             "btn": BTN_ACTION,
         }
 
@@ -210,13 +208,10 @@ class GenericScraperSpider(Spider):
 
                 action_type = ACTION_TYPES[search_step["elem_type"]]
 
-                search_step_value = search_step["action"][action_type["type"]]
-
                 action = action_type["action"]
 
                 # Substitui valor
-                if action_type["need_value"]:
-                    action = action.replace("${VALUE}", self.keyword)
+                action = action.replace("${VALUE}", self.keyword)
 
                 driver.execute_script(action, elem)
 

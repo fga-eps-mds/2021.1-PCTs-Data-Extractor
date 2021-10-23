@@ -24,7 +24,7 @@ class ScraperSerializer(serializers.ModelSerializer):
             'restrict_xpaths',
             'restrict_css',
             'content_xpath',
-            'query_string_params',
+            'qs_search_keyword_param',
             'created_at',
             'url',
         ]

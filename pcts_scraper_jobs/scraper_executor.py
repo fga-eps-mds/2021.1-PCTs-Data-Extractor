@@ -90,80 +90,42 @@ def run_generic_scraper(scraper_args, keyword, settings_file_path="pcts_scrapers
     print(stats)
     print("========================= METRICAS =========================")
 
-    # running_process.addBoth(lambda _: reactor.stop())
-    # reactor.run()
     return stats
 
 
 if __name__ == '__main__':
     try:
-        # run_scraper(scraper_id="IncraScraperSpider", keyword=keywords[0])
-
-        # Scraper Generico
-        # senado_args = {
-        #     "url_root": 'https://www6g.senado.leg.br/busca',
-        #     "site_name": 'senado',
-        #     "js_search_steps": [
-        #         {
-        #             "elem_type": "input",
-        #             "xpath": '//*[@id="busca-query"]',
-        #             "action": {"write": "Povos e Comunidades Tradicionais"}
-        #         },
-        #         {
-        #             "elem_type": "btn",
-        #             "xpath": '//*[@id="search-addon"]/button',
-        #             "action": {"click": True}
-        #         },
-        #     ],
-        #     "next_button_xpath": '//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-        #     "allowed_domains": ['www12.senado.leg.br', 'www25.senado.leg.br'],
-        #     "allowed_paths": ['noticias'],
-        #     "content_xpath": {
-        #         "content": '//body//*//text()',
-        #     },
-        #     "pagination_retries": 3,
-        #     "pagination_delay": 5,
-        # }
-
-        mpf_args = {
-            "site_name": "mpf",
-            "url_root": "http://www.mpf.mp.br/",
-            "task_name_prefix": "mpf_scraper",
+        scraper_args = {
+            "site_name": "incra",
+            "url_root": "https://www.gov.br/incra/pt-br/search",
+            "task_name_prefix": "incra_scraper",
             "js_search_steps": [
                 {
-                    "elem_type": "input",
-                    "xpath": "//*[@id=\"SearchableText\"]",
-                    "action": {
-                        "write": "Povos e Comunidades Tradicionais"
-                    }
-                },
-                {
                     "elem_type": "btn",
-                    "xpath": "/html/body/div[3]/header/div[3]/div[3]/form/input[2]",
-                    "action": {
-                        "click": True
-                    }
+                    "xpath": "//*[@id=\"search-results\"]/div[contains(@class, \"govbr-tabs\")]/div[contains(@class, \"swiper-wrapper\")]/div[last()]//a"
                 }
             ],
-            "next_button_xpath": "//*[@id=\"search-results\"]/div/span[contains(@class, \"next\")]/a",
+            "next_button_xpath": "//*[@id=\"search-results\"]//ul[contains(@class, \"paginacao\")]/li[last()]//a",
             "allowed_domains": [
-                "www.mpf.mp.br"
+                "www.gov.br"
             ],
             "allowed_paths": [
-                "pgr/noticias-pgr",
-                "pgr/documentos",
-                "atuacao-tematica"
+                "incra/pt-br/assuntos/noticias",
+                "incra/pt-br/assuntos/governanca-fundiaria"
             ],
-            "restrict_xpaths": ["//*[@id=\"search-results\"]/dl/dt/a"],
+            "restrict_xpaths": [
+                "//*[@id=\"search-results\"]//ul[contains(@class, \"searchResults\")]//a"
+            ],
             "content_xpath": {
-                "content": "//*[@id=\"content\"]"
+                "content": "//body//*//text()"
             },
             "pagination_retries": 5,
             "pagination_delay": 10,
+            "qs_search_keyword_param": "SearchableText",
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
-        run_generic_scraper(mpf_args, keyword=keywords[0])
+        run_generic_scraper(scraper_args, keyword=keywords[0])
     finally:
         gc.collect()
 
@@ -194,100 +156,38 @@ if __name__ == '__main__':
 # pagination_delay = 10,
 # keyword = "Povos e Comunidades Tradicionais",
 
-
-# SENADO MAPPING
 # running_process = crawler.crawl(
 #     ScraperPagination,
-#     url_root='https://www6g.senado.leg.br/busca',
-#     site_name='senado',
+#     root='https://www.in.gov.br/consulta/-/buscar/',
+#     site_name='diario_oficial',
 #     js_search_steps=[
 #         {
 #             "elem_type": "input",
-#             "xpath": '//*[@id="busca-query"]',
+#             "xpath": '//*[@id="search-bar"]',
 #             "action": {"write": "Povos e Comunidades Tradicionais"}
 #         },
 #         {
 #             "elem_type": "btn",
-#             "xpath": '//*[@id="search-addon"]/button',
+#             "xpath": '//*[@id="toggle-search-advanced"]',
+#             "action": {"click": True}
+#         },
+#         {
+#             "elem_type": "btn",
+#             "xpath": '//*[@id="search-advanced"]/div[1]/div[1]/div[1]/div[2]/label',
+#             "action": {"click": True}
+#         },
+#         {
+#             "elem_type": "btn",
+#             "xpath": '//*[@id="div-search-bar"]/div/div/div/i',
 #             "action": {"click": True}
 #         },
 #     ],
-#     next_button_xpath='//*[@id="conteudoPrincipal"]/div/div[2]/div[2]/nav/ul/li[8]/a',
-#     allowed_domains=['www12.senado.leg.br', 'www25.senado.leg.br'],
-    # allowed_paths=['noticias'],
-    #     content_xpath={
-    #         "content": '//body//*//text()',
-    #     },
-    #     pagination_retries=3,
-    #     pagination_delay=5,
-    #     keyword="Povos e Comunidades Tradicionais",
-
- # running_process = crawler.crawl(
-    #     ScraperPagination,
-    #     root='https://www.in.gov.br/consulta/-/buscar/',
-    #     site_name='diario_oficial',
-    #     js_search_steps=[
-    #         {
-    #             "elem_type": "input",
-    #             "xpath": '//*[@id="search-bar"]',
-    #             "action": {"write": "Povos e Comunidades Tradicionais"}
-    #         },
-    #         {
-    #             "elem_type": "btn",
-    #             "xpath": '//*[@id="toggle-search-advanced"]',
-    #             "action": {"click": True}
-    #         },
-    #         {
-    #             "elem_type": "btn",
-    #             "xpath": '//*[@id="search-advanced"]/div[1]/div[1]/div[1]/div[2]/label',
-    #             "action": {"click": True}
-    #         },
-    #         {
-    #             "elem_type": "btn",
-    #             "xpath": '//*[@id="div-search-bar"]/div/div/div/i',
-    #             "action": {"click": True}
-    #         },
-    #     ],
-    #     next_button_xpath='//*[@id="rightArrow"]',
-    #     allowed_domains=['www.in.gov.br'],
-    #     allowed_paths=['web/dou'],
-    #     content_xpath={
-    #         "content": '//body//*//text()',
-    #     },
-    #     pagination_retries=3,
-    #     pagination_delay=5,
-    #     keyword="Povos e Comunidades Tradicionais",
-
-# INCRA
-# incra_args = {
-#     "url_root": 'https://www.gov.br/incra/pt-br/search',
-#     "site_name": 'incra',
-#     "js_search_steps": [
-#                 {
-#                     "elem_type": "btn",
-#                     "xpath": ('//*[@id="search-results"]/div[contains(@class, "govbr-tabs")]/'
-#                               'div[contains(@class, "swiper-wrapper")]/div[last()]//a'),
-#                     "action": {"click": True}
-#                 },
-#     ],
-#     "next_button_xpath": '//*[@id="search-results"]//ul[contains(@class, "paginacao")]/li[last()]//a',
-#     "allowed_domains": ['www.gov.br'],
-#     "allowed_paths": [
-#         'incra/pt-br/assuntos/noticias',
-#         'incra/pt-br/assuntos/governanca-fundiaria'
-#     ],
-#     "restrict_xpaths": [
-#         '//*[@id="search-results"]//ul[contains(@class, "searchResults")]//a'
-#     ],
-#     "content_xpath": {
+#     next_button_xpath='//*[@id="rightArrow"]',
+#     allowed_domains=['www.in.gov.br'],
+#     allowed_paths=['web/dou'],
+#     content_xpath={
 #         "content": '//body//*//text()',
 #     },
-#     "pagination_retries": 5,
-#     "pagination_delay": 10,
-#     "query_string_params": [
-#         {
-#             "param": "SearchableText",
-#             "value": "quilombolas",
-#         }
-#     ],
-# }
+#     pagination_retries=3,
+#     pagination_delay=5,
+#     keyword="Povos e Comunidades Tradicionais",

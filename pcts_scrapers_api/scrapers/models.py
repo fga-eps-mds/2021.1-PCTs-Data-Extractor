@@ -48,9 +48,10 @@ class Scraper(models.Model):
         "Content XPATH (JSON Object (any key-value))",
         null=True
     )
-    query_string_params = models.JSONField(
+    qs_search_keyword_param = models.CharField(
         "Query String Params (JSON List Object (param, value))",
-        null=True
+        null=True,
+        max_length=500
     )
     pagination_retries = models.IntegerField(
         "Pagination Retries",

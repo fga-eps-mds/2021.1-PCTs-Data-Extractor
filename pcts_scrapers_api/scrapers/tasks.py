@@ -188,7 +188,7 @@ def setup_periodic_scrapers(sender: Celery, **kwargs):
                     "restrict_xpaths": scraper.restrict_xpaths,
                     "restrict_css": scraper.restrict_css,
                     "content_xpath": scraper.content_xpath,
-                    "query_string_params": scraper.query_string_params,
+                    "qs_search_keyword_param": scraper.qs_search_keyword_param,
                     "pagination_retries": scraper.pagination_retries,
                     "pagination_delay": scraper.pagination_delay,
                     "page_load_timeout": scraper.page_load_timeout
