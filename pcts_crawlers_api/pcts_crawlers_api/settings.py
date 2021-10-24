@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import sys
 import os
 from pathlib import Path
 
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-csjnfz&f1o=0h%9)sb%4gxh!dx0hxb3eh*qjz&94@d@46423^l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split()
 
@@ -144,9 +145,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'handlers': {
         'console': {
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
         },
     },
@@ -154,13 +156,10 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
-            # 'level': 'DEBUG',
-
         },
         '': {
             'handlers': ['console'],
             'level': 'INFO',
-            # 'level': 'DEBUG',
         },
     },
 }

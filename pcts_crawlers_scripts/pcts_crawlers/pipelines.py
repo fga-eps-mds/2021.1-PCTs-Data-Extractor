@@ -66,7 +66,7 @@ class SavePageOnDocumentsAPIPipeline:
 
         if response.status_code == 201:
             self.stats.inc_value('saved_records')
-            print("Page Saved:", item["url"])
+            self.logger.info(f"Page Saved: {item['url']}")
         else:
             self.stats.inc_value('dropped_records')
             self.logger.error(
