@@ -13,7 +13,7 @@ from ..items import CrawlerItem
 
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
-    "///body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style) and not(ancestor::header)]"
+    "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style) and not(ancestor::header)]"
 )
 DEFAULT_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and "
@@ -22,6 +22,7 @@ DEFAULT_CONTENT_XPATH = (
     "not(ancestor::dialog) and not(ancestor::form) and not(ancestor::a) and "
     "not(ancestor::ul) and not(ancestor::li) and not(ancestor::label)]"
 )
+
 
 class GenericCrawlerSpider(CrawlSpider):
     """ Generic Crawler for use on paginated item listing page of the target website
@@ -57,6 +58,7 @@ class GenericCrawlerSpider(CrawlSpider):
         self.page_load_timeout = page_load_timeout
         self.keyword = keyword
         self.start_urls.append(self.source_url)
+        self.search_page = True
 
         self.link_pages_extractor = LinkExtractor(
             allow_domains=self.allowed_domains,
@@ -130,7 +132,8 @@ class GenericCrawlerSpider(CrawlSpider):
             restrict_content = '\n'.\
                 join(elem for elem in restrict_content_list).strip()
 
-            if self.check_keyword_affinity(restrict_content):
+            if (self.check_keyword_affinity(restrict_content) and
+                    not self.is_in_base_page(self.source_url, response.url)):
                 page_content = CrawlerItem()
                 page_content['source'] = self.site_name
                 page_content['url'] = response.url.strip(" /")
@@ -146,6 +149,9 @@ class GenericCrawlerSpider(CrawlSpider):
                 )
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
+
+    def is_in_base_page(self, base_url, current_url):
+        return current_url.split("/")[1:-1] == base_url.split("/")[1:]
 
     def check_keyword_affinity(self, content: str):
         return re.search(self.keyword, content, flags=re.IGNORECASE)
