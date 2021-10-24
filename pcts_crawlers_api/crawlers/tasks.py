@@ -155,6 +155,37 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
     return task_crawler_group
 
 
+def create_periodic_task(sender: Celery, crawler: Crawler, keywords=[]):
+    sender.add_periodic_task(
+        crontab(
+            minute=crawler.cron_minute,
+            hour=crawler.cron_hour,
+            day_of_week=crawler.cron_day_of_week,
+            day_of_month=crawler.cron_day_of_month,
+            month_of_year=crawler.cron_month_of_year
+        ),
+        task_crawler_group_wrapper(
+            crawler.task_name_prefix,
+            f"{crawler.task_name_prefix}_keyword",
+        ).subtask(kwargs={
+            "crawler_id": crawler.id,
+            "crawler_args": {
+                "site_name": crawler.site_name,
+                "url_root": crawler.url_root,
+                "qs_search_keyword_param": crawler.qs_search_keyword_param,
+                "contains_end_path_keyword": crawler.contains_end_path_keyword,
+                "task_name_prefix": crawler.task_name_prefix,
+                "allowed_domains": crawler.allowed_domains,
+                "allowed_paths": crawler.allowed_paths,
+                "retries": crawler.retries,
+                "page_load_timeout": crawler.page_load_timeout
+            },
+            "keywords": keywords,
+        }),
+        name=crawler.task_name_prefix,
+    )
+
+
 # ============================= AUTO CREATE SCHEDULERS ON STARTUP
 @celery_app.on_after_finalize.connect
 def setup_periodic_crawlers(sender: Celery, **kwargs):
@@ -169,31 +200,4 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
 
     crawler = Crawler.objects.all()
     for crawler in crawler:
-        sender.add_periodic_task(
-            crontab(
-                minute=crawler.cron_minute,
-                hour=crawler.cron_hour,
-                day_of_week=crawler.cron_day_of_week,
-                day_of_month=crawler.cron_day_of_month,
-                month_of_year=crawler.cron_month_of_year
-            ),
-            task_crawler_group_wrapper(
-                crawler.task_name_prefix,
-                f"{crawler.task_name_prefix}_keyword",
-            ).subtask(kwargs={
-                "crawler_id": crawler.id,
-                "crawler_args": {
-                    "site_name": crawler.site_name,
-                    "url_root": crawler.url_root,
-                    "qs_search_keyword_param": crawler.qs_search_keyword_param,
-                    "contains_end_path_keyword": crawler.contains_end_path_keyword,
-                    "task_name_prefix": crawler.task_name_prefix,
-                    "allowed_domains": crawler.allowed_domains,
-                    "allowed_paths": crawler.allowed_paths,
-                    "retries": crawler.retries,
-                    "page_load_timeout": crawler.page_load_timeout
-                },
-                "keywords": KEYWORDS,
-            }),
-            name=crawler.task_name_prefix,
-        )
+        create_periodic_task(sender, crawler, KEYWORDS)
