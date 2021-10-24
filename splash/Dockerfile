@@ -34,4 +34,4 @@ CMD python3 /app/bin/splash \
     --port $PORT
 
 # Command Example
-# docker run -p 80:80 pcts-scrapers-splash
+# docker run -p 80:80 pcts-crawlers-splash

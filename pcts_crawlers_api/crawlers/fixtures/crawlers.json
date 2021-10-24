@@ -1,0 +1,63 @@
+[
+    {
+        "pk": 1,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "mpf",
+            "task_name_prefix": "mpf_crawler",
+            "url_root": "http://www.mpf.mp.br/@@search",
+            "qs_search_keyword_param": "SearchableText",
+            "allowed_domains": [
+                "www.mpf.mp.br"
+            ],
+            "allowed_paths": [
+                "pgr/noticias-pgr",
+                "pgr/documentos",
+                "atuacao-tematica"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "incra",
+            "task_name_prefix": "incra_crawler",
+            "url_root": "https://www.gov.br/incra/pt-br/search",
+            "qs_search_keyword_param": "SearchableText",
+            "allowed_domains": [
+                "www.gov.br"
+            ],
+            "allowed_paths": [
+                "incra/pt-br/assuntos/noticias",
+                "incra/pt-br/assuntos/governanca-fundiaria"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "senado",
+            "task_name_prefix": "senado_crawler",
+            "url_root": "https://www6g.senado.leg.br/busca",
+            "qs_search_keyword_param": "q",
+            "allowed_domains": [
+                "www12.senado.leg.br",
+                "www25.senado.leg.br"
+            ],
+            "allowed_paths": [
+                "noticias"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
+    }
+]

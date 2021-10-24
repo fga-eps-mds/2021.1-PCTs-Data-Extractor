@@ -1,7 +1,7 @@
 # All
 coverage
 
-# Scrapers
+# Crawlers
 scrapy==2.5.0
 splash
 scrapy-splash
