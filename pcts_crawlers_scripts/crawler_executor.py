@@ -68,6 +68,23 @@ if __name__ == '__main__':
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
+        # crawler_args = {
+        #     "site_name": "incra",
+        #     "task_name_prefix": "incra_crawler",
+        #     "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
+        #     "qs_search_keyword_param": "gsc.q",
+        #     "allowed_domains": [
+        #         "pesquisa.apps.tcu.gov.br"
+        #     ],
+        #     "allowed_paths": [
+        #         "#/resultado",
+        #         "#/documento"
+        #     ],
+        #     "retries": 3,
+        #     "page_load_timeout": 3,
+        #     "created_at": "2021-10-17T19:26:54.660443"
+        # }
+
         run_generic_crawler(crawler_args, keyword="quilombolas")
     finally:
         gc.collect()

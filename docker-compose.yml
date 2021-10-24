@@ -8,6 +8,7 @@ x-pcts-crawlers-api-template:
   image: pcts-crawlers-api
   environment:
     PROJECT_ENV_EXECUTOR: "DOCKER"
+    USE_SPLASH: True
     PCTS_CRAWLERS_SPLASH_HOST: http://pcts-crawlers-splash:8050
     PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
     PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: api/documents/
@@ -30,21 +31,21 @@ x-pcts-crawlers-api-template:
     - pip-cache:/usr/local/lib/python3.8/site-packages
 
 services:
-  # pcts-crawlers-splash:
-  #   hostname: pcts-crawlers-splash
-  #   image: scrapinghub/splash
-  #   container_name: pcts-crawlers-splash
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8050:8050
-  #   networks:
-  #     - pcts-network
-  #   command: "--disable-private-mode"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8050"]
-  #     interval: 10s
-  #     timeout: 30s
-  #     retries: 5
+  pcts-crawlers-splash:
+    hostname: pcts-crawlers-splash
+    image: scrapinghub/splash
+    container_name: pcts-crawlers-splash
+    restart: unless-stopped
+    ports:
+      - 8050:8050
+    networks:
+      - pcts-network
+    command: "--disable-private-mode"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8050"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
 
   pcts-crawlers-postgres:
     image: postgres:13

@@ -1,16 +1,18 @@
+import os
 import re
 
-from scrapy.spiders import CrawlSpider
-from scrapy import Request
+from scrapy.spiders import Spider
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http.response.html import HtmlResponse
 from scrapy_selenium import SeleniumRequest
 from scrapy.selector.unified import Selector
+from scrapy import Request
 
 from scrapy_splash import SplashRequest
 
 from ..items import CrawlerItem
 
+USE_SPLASH = os.environ.get('USE_SPLASH', default=True)
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style) and not(ancestor::header)]"
@@ -24,7 +26,7 @@ DEFAULT_CONTENT_XPATH = (
 )
 
 
-class GenericCrawlerSpider(CrawlSpider):
+class GenericCrawlerSpider(Spider):
     """ Generic Crawler for use on paginated item listing page of the target website
     """
 
@@ -80,11 +82,23 @@ class GenericCrawlerSpider(CrawlSpider):
         )
 
         self.logger.info(f"ENTRYPOINT URL: {entrypoint_url}")
-        yield Request(
-            url=entrypoint_url,
-            callback=self.parse_page,
-            meta={'donwload_timeout': self.page_load_timeout}
-        )
+
+        yield self.make_request(entrypoint_url)
+
+    def make_request(self, url):
+        if USE_SPLASH:
+            return SplashRequest(
+                url=url,
+                callback=self.parse_page,
+                endpoint='render.html',
+                args={'wait': self.page_load_timeout},
+            )
+        else:
+            yield Request(
+                url=url,
+                callback=self.parse_page,
+                meta={'donwload_timeout': self.page_load_timeout}
+            )
 
     def define_stats_attributes(self):
         self.stats = self.crawler.stats
@@ -114,44 +128,35 @@ class GenericCrawlerSpider(CrawlSpider):
         if self.check_keyword_affinity(all_content):
             links_found = self.get_page_links(response)
 
-            # self.logger.info(f"URLS ENCONTRADAS: {links_found}")
-
             for url in links_found:
-                yield Request(
-                    url=url,
-                    callback=self.parse_page,
-                    meta={'donwload_timeout': self.page_load_timeout}
-                )
-
-            # Extracao restrita a apenas a partes importantes
-            # do conteudo da pagina
-            restrict_content_list = response.xpath(
-                DEFAULT_CONTENT_XPATH
-            ).extract()
-
-            restrict_content = '\n'.\
-                join(elem for elem in restrict_content_list).strip()
-
-            if (self.check_keyword_affinity(restrict_content) and
-                    not self.is_in_base_page(self.source_url, response.url)):
-                page_content = CrawlerItem()
-                page_content['source'] = self.site_name
-                page_content['url'] = response.url.strip(" /")
-                page_content['title'] = response.xpath(
-                    DEFAULT_TITLE_XPATH
-                ).extract_first()
-                page_content['content'] = restrict_content
-
-                yield page_content
-            else:
-                self.stats.inc_value(
-                    'dropped_records_by_keyword_restrict_content'
-                )
+                yield self.make_request(url)
+            yield self.data_extraction(response)
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
 
-    def is_in_base_page(self, base_url, current_url):
-        return current_url.split("/")[1:-1] == base_url.split("/")[1:]
+    def data_extraction(self, response: HtmlResponse):
+        # Extracao restrita a apenas as partes importantes
+        # do conteudo da pagina
+        restrict_content_list = response.xpath(
+            DEFAULT_CONTENT_XPATH
+        ).extract()
+
+        restrict_content = '\n'.\
+            join(elem for elem in restrict_content_list).strip()
+
+        if self.check_keyword_affinity(restrict_content):
+            page_content = CrawlerItem()
+            page_content['source'] = self.site_name
+            page_content['url'] = response.url.strip(" /")
+            page_content['title'] = response.xpath(
+                DEFAULT_TITLE_XPATH
+            ).extract_first()
+            page_content['content'] = restrict_content
+            return page_content
+        else:
+            self.stats.inc_value(
+                'dropped_records_by_keyword_restrict_content'
+            )
 
     def check_keyword_affinity(self, content: str):
         return re.search(self.keyword, content, flags=re.IGNORECASE)
