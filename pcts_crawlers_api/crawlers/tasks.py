@@ -169,8 +169,13 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
     crawler = Crawler.objects.all()
     for crawler in crawler:
         sender.add_periodic_task(
-            crontab(minute='0', hour='4', day_of_week='*',
-                    day_of_month='*', month_of_year='*'),
+            crontab(
+                minute=crawler.cron_minute,
+                hour=crawler.cron_hour,
+                day_of_week=crawler.cron_day_of_week,
+                day_of_month=crawler.cron_day_of_month,
+                month_of_year=crawler.cron_month_of_year
+            ),
             task_crawler_group_wrapper(
                 crawler.task_name_prefix,
                 f"{crawler.task_name_prefix}_keyword",

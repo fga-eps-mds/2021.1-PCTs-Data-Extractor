@@ -42,6 +42,31 @@ class Crawler(models.Model):
         default=3,
         null=True
     )
+    cron_minute = models.CharField(
+        "Crontab Minute",
+        default="*",
+        max_length=20
+    )
+    cron_hour = models.CharField(
+        "Crontab Hour",
+        default="*",
+        max_length=20
+    )
+    cron_day_of_week = models.CharField(
+        "Crontab Day of Week",
+        default="*",
+        max_length=20
+    )
+    cron_day_of_month = models.CharField(
+        "Crontab Day of Month",
+        default="*",
+        max_length=20
+    )
+    cron_month_of_year = models.CharField(
+        "Crontab Month of Year",
+        default="*",
+        max_length=20
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

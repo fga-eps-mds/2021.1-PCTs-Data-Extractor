@@ -28,7 +28,6 @@ elif ENVIRONMENT_EXEC == "TEST":
     sys.path.append('pcts_crawlers_scripts')
 else:
     sys.path.append('../pcts_crawlers_scripts')
-
 from crawler_executor import run_generic_crawler
 
 
