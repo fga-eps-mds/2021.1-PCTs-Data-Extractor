@@ -37,20 +37,20 @@ class TestCrawlerExecutionGroupModel(TestCase):
         crawler = crawler_model
         task_name = "mpf_crawler_group"
         finish_datetime = datetime(2021, 10, 10, 8, 34, 56)
-        status = SUCCESS
+        state = SUCCESS
 
         crawler_execution_group = CrawlerExecutionGroup.objects.create(
             crawler=crawler,
             task_name=task_name,
             finish_datetime=finish_datetime,
-            state=status,
+            state=state,
         )
 
         self.assertEqual(crawler.id, crawler_execution_group.crawler.id)
         self.assertEqual(task_name, crawler_execution_group.task_name)
         self.assertEqual(
             finish_datetime, crawler_execution_group.finish_datetime)
-        self.assertEqual(status, crawler_execution_group.state)
+        self.assertEqual(state, crawler_execution_group.state)
         self.assertIsNotNone(crawler_execution_group.start_datetime)
 
 
@@ -75,7 +75,7 @@ class TestCrawlerExecutionModel(TestCase):
         task_name = "mpf_crawler_keyword"
         finish_datetime = datetime.now()
         keyword = "quilombolas"
-        status = FAILURE
+        state = FAILURE
         scraped_pages = 40
         saved_records = 37
         dropped_records = 3
