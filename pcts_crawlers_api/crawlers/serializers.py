@@ -42,7 +42,7 @@ class CrawlerExecutionSerializer(serializers.ModelSerializer):
             'finish_datetime',
             'keyword',
             'state',
-            'scraped_pages',
+            'crawled_pages',
             'saved_records',
             'dropped_records',
             'error_log'

@@ -127,7 +127,7 @@ class CrawlerExecution(models.Model):
         default=STARTED,
         max_length=50
     )
-    scraped_pages = models.IntegerField(null=True)
+    crawled_pages = models.IntegerField(null=True)
     saved_records = models.IntegerField(null=True)
     dropped_records = models.IntegerField(null=True)
     error_log = models.TextField(null=True)

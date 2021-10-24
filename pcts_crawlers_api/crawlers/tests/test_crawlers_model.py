@@ -76,7 +76,7 @@ class TestCrawlerExecutionModel(TestCase):
         finish_datetime = datetime.now()
         keyword = "quilombolas"
         state = FAILURE
-        scraped_pages = 40
+        crawled_pages = 40
         saved_records = 37
         dropped_records = 3
         error_log = "error"
@@ -88,7 +88,7 @@ class TestCrawlerExecutionModel(TestCase):
             finish_datetime=finish_datetime,
             keyword=keyword,
             state=state,
-            scraped_pages=scraped_pages,
+            crawled_pages=crawled_pages,
             saved_records=saved_records,
             dropped_records=dropped_records,
             error_log=error_log,
@@ -101,7 +101,7 @@ class TestCrawlerExecutionModel(TestCase):
         self.assertEqual(finish_datetime, crawler_execution.finish_datetime)
         self.assertEqual(keyword, crawler_execution.keyword)
         self.assertEqual(state, crawler_execution.state)
-        self.assertEqual(scraped_pages, crawler_execution.scraped_pages)
+        self.assertEqual(crawled_pages, crawler_execution.crawled_pages)
         self.assertEqual(saved_records, crawler_execution.saved_records)
         self.assertEqual(dropped_records, crawler_execution.dropped_records)
         self.assertEqual(error_log, crawler_execution.error_log)

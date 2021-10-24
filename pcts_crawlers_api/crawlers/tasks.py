@@ -79,7 +79,7 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
             )
 
             # Update execution monitoring on success
-            crawler_execution.scraped_pages = execution_stats.get(
+            crawler_execution.crawled_pages = execution_stats.get(
                 "downloader/request_count") or 0
             crawler_execution.saved_records = execution_stats.get(
                 "saved_records") or 0
