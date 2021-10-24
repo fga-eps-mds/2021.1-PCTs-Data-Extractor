@@ -3,6 +3,7 @@ import re
 
 from scrapy.spiders import Spider
 from scrapy.linkextractors import LinkExtractor
+from scrapy.link import Link
 from scrapy.http.response.html import HtmlResponse
 from scrapy_selenium import SeleniumRequest
 from scrapy.selector.unified import Selector
@@ -86,9 +87,9 @@ class GenericCrawlerSpider(Spider):
 
         self.logger.info(f"ENTRYPOINT URL: {entrypoint_url}")
 
-        yield self.make_request(entrypoint_url)
+        yield self.make_request(entrypoint_url, 'INITIAL_SEARCH_PAGE')
 
-    def parse_page(self, response: HtmlResponse):
+    def parse_page(self, response: HtmlResponse, title):
         # self.logger.info(f"PARSE PAGE: {response.url}")
 
         # Extracao de todo o conteudo da pagina
@@ -104,9 +105,9 @@ class GenericCrawlerSpider(Spider):
         if self.check_keyword_affinity(all_content):
             links_found = self.get_page_links(response)
 
-            for url in links_found:
-                yield self.make_request(url)
-            yield self.data_extraction(response)
+            for link in links_found:
+                yield self.make_request(link['url'], link['text'])
+            yield self.data_extraction(response, title)
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
 
@@ -122,22 +123,24 @@ class GenericCrawlerSpider(Spider):
             0
         )
 
-    def make_request(self, url):
+    def make_request(self, url, title):
         if USE_SPLASH:
             return SplashRequest(
                 url=url,
                 callback=self.parse_page,
                 endpoint='render.html',
                 args={'wait': self.page_load_timeout},
+                cb_kwargs={"title": title}
             )
         else:
             return Request(
                 url=url,
                 callback=self.parse_page,
-                meta={'donwload_timeout': self.page_load_timeout}
+                meta={'donwload_timeout': self.page_load_timeout},
+                cb_kwargs={"title": title}
             )
 
-    def data_extraction(self, response: HtmlResponse):
+    def data_extraction(self, response: HtmlResponse, title):
         # Extracao restrita a apenas as partes importantes
         # do conteudo da pagina
         restrict_content_list = response.xpath(
@@ -151,9 +154,12 @@ class GenericCrawlerSpider(Spider):
             page_content = CrawlerItem()
             page_content['source'] = self.site_name
             page_content['url'] = response.url.strip(" /")
-            page_content['title'] = response.xpath(
-                DEFAULT_TITLE_XPATH
-            ).extract_first()
+            if title:
+                page_content['title'] = title
+            else:
+                page_content['title'] = response.xpath(
+                    DEFAULT_TITLE_XPATH
+                ).extract_first()
             page_content['content'] = restrict_content
             return page_content
         else:
@@ -168,5 +174,8 @@ class GenericCrawlerSpider(Spider):
         links = self.link_pages_extractor.extract_links(response)
         str_links = []
         for link in links:
-            str_links.append(link.url)
+            str_links.append({
+                "url": link.url,
+                "text": link.text
+            })
         return str_links

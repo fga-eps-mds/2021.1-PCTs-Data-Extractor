@@ -32,10 +32,10 @@ class Crawler(models.Model):
         null=True,
         max_length=500
     )
-    contains_end_path_keyword = models.CharField(
+    contains_end_path_keyword = models.BooleanField(
         "Contains End Path with Keyword for Search",
         null=True,
-        max_length=100
+        default=False
     )
     retries = models.IntegerField(
         "Retries",
