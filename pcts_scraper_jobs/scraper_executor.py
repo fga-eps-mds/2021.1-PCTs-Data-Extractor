@@ -16,6 +16,8 @@ from pcts_scrapers.spiders.mpf_scraper import MpfScraperSpider
 from pcts_scrapers.spiders.incra_scraper import IncraScraperSpider
 from pcts_scrapers.spiders.generic_scraper import GenericScraperSpider
 
+from pcts_scrapers.spiders.generic_crawler import GenericCrawlerSpider
+
 
 from scrapy import signals
 
@@ -93,19 +95,75 @@ def run_generic_scraper(scraper_args, keyword, settings_file_path="pcts_scrapers
     return stats
 
 
+def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_scrapers.settings"):
+    configure_logging({'LOG_FORMAT': '%(levelname)s: %(message)s'})
+    print("=======================================================================")
+    print(f"INICIAR CRAWLER {crawler_args['site_name']}. KEYWORD: {keyword}")
+    os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
+    projects_settings = get_project_settings()
+
+    # Crawler run
+    crawler = CrawlerProcess(projects_settings)
+    crawler_instance = crawler.create_crawler(GenericCrawlerSpider)
+
+    running_process = crawler.crawl(
+        crawler_instance,
+        **crawler_args,
+        keyword=keyword
+    )
+
+    crawler.start()
+
+    stats = crawler_instance.stats.get_stats()
+    stats["keyword"] = keyword
+
+    print("========================= METRICAS =========================")
+    print("METRICAS:")
+    print(stats)
+    print("========================= METRICAS =========================")
+
+    return stats
+
+
 if __name__ == '__main__':
     try:
-        scraper_args = {
+        # scraper_args = {
+        #     "site_name": "incra",
+        #     "url_root": "https://www.gov.br/incra/pt-br/search",
+        #     "task_name_prefix": "incra_scraper",
+        #     "js_search_steps": [
+        #         {
+        #             "elem_type": "btn",
+        #             "xpath": "//*[@id=\"search-results\"]/div[contains(@class, \"govbr-tabs\")]/div[contains(@class, \"swiper-wrapper\")]/div[last()]//a"
+        #         }
+        #     ],
+        #     "next_button_xpath": "//*[@id=\"search-results\"]//ul[contains(@class, \"paginacao\")]/li[last()]//a",
+        #     "allowed_domains": [
+        #         "www.gov.br"
+        #     ],
+        #     "allowed_paths": [
+        #         "incra/pt-br/assuntos/noticias",
+        #         "incra/pt-br/assuntos/governanca-fundiaria"
+        #     ],
+        #     "restrict_xpaths": [
+        #         "//*[@id=\"search-results\"]//ul[contains(@class, \"searchResults\")]//a"
+        #     ],
+        #     "content_xpath": {
+        #         "content": "//body//*//text()"
+        #     },
+        #     "pagination_retries": 5,
+        #     "pagination_delay": 10,
+        #     "qs_search_keyword_param": "SearchableText",
+        #     "created_at": "2021-10-17T19:26:54.660443"
+        # }
+
+        # run_generic_scraper(scraper_args, keyword=keywords[0])
+
+        crawler_args = {
             "site_name": "incra",
-            "url_root": "https://www.gov.br/incra/pt-br/search",
             "task_name_prefix": "incra_scraper",
-            "js_search_steps": [
-                {
-                    "elem_type": "btn",
-                    "xpath": "//*[@id=\"search-results\"]/div[contains(@class, \"govbr-tabs\")]/div[contains(@class, \"swiper-wrapper\")]/div[last()]//a"
-                }
-            ],
-            "next_button_xpath": "//*[@id=\"search-results\"]//ul[contains(@class, \"paginacao\")]/li[last()]//a",
+            "url_root": "https://www.gov.br/incra/pt-br/search",
+            "qs_search_keyword_param": "SearchableText",
             "allowed_domains": [
                 "www.gov.br"
             ],
@@ -113,19 +171,12 @@ if __name__ == '__main__':
                 "incra/pt-br/assuntos/noticias",
                 "incra/pt-br/assuntos/governanca-fundiaria"
             ],
-            "restrict_xpaths": [
-                "//*[@id=\"search-results\"]//ul[contains(@class, \"searchResults\")]//a"
-            ],
-            "content_xpath": {
-                "content": "//body//*//text()"
-            },
-            "pagination_retries": 5,
-            "pagination_delay": 10,
-            "qs_search_keyword_param": "SearchableText",
+            "retries": 3,
+            "page_load_timeout": 3,
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
-        run_generic_scraper(scraper_args, keyword=keywords[0])
+        run_generic_crawler(crawler_args, keyword="quilombolas")
     finally:
         gc.collect()
 
