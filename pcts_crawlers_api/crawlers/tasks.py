@@ -1,12 +1,6 @@
-from crawlers.models import PENDING
-from crawlers.models import RECEIVED
 from crawlers.models import STARTED
 from crawlers.models import SUCCESS
 from crawlers.models import FAILURE
-from crawlers.models import REVOKED
-from crawlers.models import REJECTED
-from crawlers.models import RETRY
-from crawlers.models import IGNORED
 
 from crawlers.models import CrawlerExecution
 from crawlers.models import CrawlerExecutionGroup
@@ -32,53 +26,23 @@ else:
 from crawler_executor import run_generic_crawler
 
 
-STATE_HIERARCHY = {
-    FAILURE: 9,     # ERROR
-    REJECTED: 8,    # ERROR
-    IGNORED: 7,     # ERROR
-    REVOKED: 6,     # ERROR
-    RETRY: 5,       # ERROR
-    PENDING: 4,     # STARTED
-    RECEIVED: 3,    # STARTED
-    STARTED: 2,     # STARTED
-    SUCCESS: 1,     # SUCCESS
-}
-
-
 def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
     """ Wrapper do task group de execucao de um crawler inteiro
         e a subtask de execucao de uma keyword por vez
     """
 
     @task(name=f"{task_group_name}_finish", bind=True)
-    def task_finish_group_execution(self, prev_subtasks, crawler_execution_group_id):
+    def task_finish_group_execution(self, subtasks_result, crawler_execution_group_id):
         crawler_execution_group = CrawlerExecutionGroup.objects.get(
             pk=crawler_execution_group_id
         )
 
-        # Checar o estado de todas as subtasks de crawlers
-        # divididos por keywords
-        overall_state = {
-            "state": PENDING,
-            "value": 0
-        }
-        for subtask_result in prev_subtasks:
-            task_instance = celery_app.AsyncResult(subtask_result['task_id'])
-            crawler_exec = CrawlerExecution.objects.get(
-                pk=subtask_result['crawler_exec_id'])
-
-            crawler_exec.state = task_instance.state
-            crawler_exec.save()
-
-            if STATE_HIERARCHY[task_instance.state] > overall_state['value']:
-                overall_state['state'] = task_instance.state
-                overall_state['value'] = STATE_HIERARCHY[task_instance.state]
-
-        crawler_execution_group.state = overall_state['state']
+        crawler_execution_group.state = \
+            SUCCESS if subtasks_result else FAILURE
         crawler_execution_group.finish_datetime = datetime.now()
         crawler_execution_group.save()
 
-        return prev_subtasks
+        return subtasks_result
 
     @task(name=task_sub_prefix_name, bind=True, time_limit=sys.maxsize)
     def task_crawler_subtask(self, prev_subtasks,
@@ -107,32 +71,34 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
         )
 
         result_state = True
-        execution_stats = run_generic_crawler(
-            crawler_args=crawler_args,
-            keyword=keyword
-        )
 
-        # Update execution monitoring on success
-        crawler_execution.finish_datetime = datetime.now()
-        crawler_execution.state = task_instance.state
-        crawler_execution.scraped_pages = execution_stats.get(
-            "downloader/request_count") or 0
-        crawler_execution.saved_records = execution_stats.get(
-            "saved_records") or 0
-        crawler_execution.dropped_records = execution_stats.get(
-            "droped_records") or 0
+        try:
+            execution_stats = run_generic_crawler(
+                crawler_args=crawler_args,
+                keyword=keyword
+            )
 
-        crawler_execution.save()
+            # Update execution monitoring on success
+            crawler_execution.scraped_pages = execution_stats.get(
+                "downloader/request_count") or 0
+            crawler_execution.saved_records = execution_stats.get(
+                "saved_records") or 0
+            crawler_execution.dropped_records = execution_stats.get(
+                "droped_records") or 0
+            crawler_execution.state = SUCCESS
+            pass
+        except Exception as e:
+            result_state = False
+            crawler_execution.state = FAILURE
+            crawler_execution.error_log = str(e)
+        finally:
+            crawler_execution.finish_datetime = datetime.now()
+            crawler_execution.save()
 
-        result = {
-            "task_id": task_id,
-            "crawler_exec_id": crawler_execution.id
-        }
-
-        if type(prev_subtasks) == list:
-            return prev_subtasks.append(result)
-        else:
-            return [result]
+            if prev_subtasks == None:
+                return result_state
+            else:
+                return prev_subtasks and result_state
 
     @task(name=f"{task_group_name}_start", bind=True)
     def task_crawler_group(self, crawler_id, crawler_args, keywords, **kwargs):
