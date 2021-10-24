@@ -1,13 +1,25 @@
 from django.db import models
+from celery.states import PENDING
+from celery.states import RECEIVED
+from celery.states import STARTED
+from celery.states import SUCCESS
+from celery.states import FAILURE
+from celery.states import REVOKED
+from celery.states import REJECTED
+from celery.states import RETRY
+from celery.states import IGNORED
 
-STATUS_STARTED = 1
-STATUS_SUCCESS = 2
-STATUS_FAILED = 3
 
-STATUS_CHOICES = [
-    (STATUS_STARTED, "STARTED"),
-    (STATUS_SUCCESS, "SUCCESS"),
-    (STATUS_FAILED, "FAILED")
+STATE_CHOICES = [
+    (PENDING, 'PENDING'),
+    (RECEIVED, 'RECEIVED'),
+    (STARTED, 'STARTED'),
+    (SUCCESS, 'SUCCESS'),
+    (FAILURE, 'FAILURE'),
+    (REVOKED, 'REVOKED'),
+    (REJECTED, 'REJECTED'),
+    (RETRY, 'RETRY'),
+    (IGNORED, 'IGNORED'),
 ]
 
 
@@ -87,10 +99,11 @@ class CrawlerExecutionGroup(models.Model):
     task_name = models.CharField("Task Name", max_length=100)
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
     finish_datetime = models.DateTimeField("End Datetime", null=True)
-    status = models.IntegerField(
-        "Execution Status",
-        choices=STATUS_CHOICES,
-        default=1
+    state = models.CharField(
+        "Execution State",
+        choices=STATE_CHOICES,
+        default=STARTED,
+        max_length=50
     )
 
     def __str__(self):
@@ -108,10 +121,11 @@ class CrawlerExecution(models.Model):
     start_datetime = models.DateTimeField("Start Datetime", auto_now_add=True)
     finish_datetime = models.DateTimeField("Finish Datetime", null=True)
     keyword = models.CharField("Keyword", max_length=1024)
-    status = models.IntegerField(
-        "Execution Status",
-        choices=STATUS_CHOICES,
-        default=1
+    state = models.CharField(
+        "Execution State",
+        choices=STATE_CHOICES,
+        default=STARTED,
+        max_length=50
     )
     scraped_pages = models.IntegerField(null=True)
     saved_records = models.IntegerField(null=True)

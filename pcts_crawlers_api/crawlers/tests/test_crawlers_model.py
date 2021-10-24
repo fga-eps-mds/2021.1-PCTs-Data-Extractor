@@ -3,7 +3,7 @@ from django.test import TestCase
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecution
 from crawlers.models import CrawlerExecutionGroup
-from crawlers.models import STATUS_STARTED, STATUS_SUCCESS, STATUS_FAILED
+from crawlers.models import STARTED, SUCCESS, FAILURE
 
 
 class TestCrawlerModel(TestCase):
@@ -37,20 +37,20 @@ class TestCrawlerExecutionGroupModel(TestCase):
         crawler = crawler_model
         task_name = "mpf_crawler_group"
         finish_datetime = datetime(2021, 10, 10, 8, 34, 56)
-        status = STATUS_SUCCESS
+        status = SUCCESS
 
         crawler_execution_group = CrawlerExecutionGroup.objects.create(
             crawler=crawler,
             task_name=task_name,
             finish_datetime=finish_datetime,
-            status=status,
+            state=status,
         )
 
         self.assertEqual(crawler.id, crawler_execution_group.crawler.id)
         self.assertEqual(task_name, crawler_execution_group.task_name)
         self.assertEqual(
             finish_datetime, crawler_execution_group.finish_datetime)
-        self.assertEqual(status, crawler_execution_group.status)
+        self.assertEqual(status, crawler_execution_group.state)
         self.assertIsNotNone(crawler_execution_group.start_datetime)
 
 
@@ -67,7 +67,7 @@ class TestCrawlerExecutionModel(TestCase):
             crawler=crawler_model,
             task_name="mpf_crawler_group",
             finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
-            status=STATUS_STARTED,
+            state=STARTED,
         )
 
         crawler_execution_group = crawler_execution_group_model
@@ -75,7 +75,7 @@ class TestCrawlerExecutionModel(TestCase):
         task_name = "mpf_crawler_keyword"
         finish_datetime = datetime.now()
         keyword = "quilombolas"
-        status = STATUS_FAILED
+        status = FAILURE
         scraped_pages = 40
         saved_records = 37
         dropped_records = 3
@@ -87,7 +87,7 @@ class TestCrawlerExecutionModel(TestCase):
             task_name=task_name,
             finish_datetime=finish_datetime,
             keyword=keyword,
-            status=status,
+            state=state,
             scraped_pages=scraped_pages,
             saved_records=saved_records,
             dropped_records=dropped_records,
@@ -100,7 +100,7 @@ class TestCrawlerExecutionModel(TestCase):
         self.assertEqual(task_name, crawler_execution.task_name)
         self.assertEqual(finish_datetime, crawler_execution.finish_datetime)
         self.assertEqual(keyword, crawler_execution.keyword)
-        self.assertEqual(status, crawler_execution.status)
+        self.assertEqual(state, crawler_execution.state)
         self.assertEqual(scraped_pages, crawler_execution.scraped_pages)
         self.assertEqual(saved_records, crawler_execution.saved_records)
         self.assertEqual(dropped_records, crawler_execution.dropped_records)

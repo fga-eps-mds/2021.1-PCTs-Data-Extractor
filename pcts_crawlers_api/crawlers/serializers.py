@@ -41,7 +41,7 @@ class CrawlerExecutionSerializer(serializers.ModelSerializer):
             'start_datetime',
             'finish_datetime',
             'keyword',
-            'status',
+            'state',
             'scraped_pages',
             'saved_records',
             'dropped_records',
@@ -64,6 +64,6 @@ class CrawlerExecutionGroupSerializer(serializers.ModelSerializer):
             'task_name',
             'start_datetime',
             'finish_datetime',
-            'status',
+            'state',
             'crawler_executions'
         ]

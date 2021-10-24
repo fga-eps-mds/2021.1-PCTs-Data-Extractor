@@ -9,7 +9,6 @@ scrapyjs
 selenium
 scrapy-selenium
 avro-python3
-
 webdriver-manager
 
 # Scheduler

@@ -6,7 +6,7 @@ import json
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecution
 from crawlers.models import CrawlerExecutionGroup
-from crawlers.models import STATUS_STARTED
+from crawlers.models import STARTED
 
 
 class CrawlerEndpoint(APITestCase):
@@ -57,7 +57,7 @@ class CrawlerExecutionsEndpoint(APITestCase):
             crawler=crawler,
             task_name="mpf_crawler_group",
             finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
-            status=STATUS_STARTED,
+            state=STARTED,
         )
 
         CrawlerExecution.objects.bulk_create([

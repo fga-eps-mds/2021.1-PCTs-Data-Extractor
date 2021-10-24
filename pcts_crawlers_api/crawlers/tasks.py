@@ -1,4 +1,13 @@
-from crawlers.models import STATUS_STARTED, STATUS_SUCCESS, STATUS_FAILED
+from crawlers.models import PENDING
+from crawlers.models import RECEIVED
+from crawlers.models import STARTED
+from crawlers.models import SUCCESS
+from crawlers.models import FAILURE
+from crawlers.models import REVOKED
+from crawlers.models import REJECTED
+from crawlers.models import RETRY
+from crawlers.models import IGNORED
+
 from crawlers.models import CrawlerExecution
 from crawlers.models import CrawlerExecutionGroup
 from crawlers.models import Crawler
@@ -23,26 +32,56 @@ else:
 from crawler_executor import run_generic_crawler
 
 
+STATE_HIERARCHY = {
+    FAILURE: 9,     # ERROR
+    REJECTED: 8,    # ERROR
+    IGNORED: 7,     # ERROR
+    REVOKED: 6,     # ERROR
+    RETRY: 5,       # ERROR
+    PENDING: 4,     # STARTED
+    RECEIVED: 3,    # STARTED
+    STARTED: 2,     # STARTED
+    SUCCESS: 1,     # SUCCESS
+}
+
+
 def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
     """ Wrapper do task group de execucao de um crawler inteiro
         e a subtask de execucao de uma keyword por vez
     """
 
     @task(name=f"{task_group_name}_finish", bind=True)
-    def task_finish_group_execution(self, prev_task_result, crawler_execution_group_id):
+    def task_finish_group_execution(self, prev_subtasks, crawler_execution_group_id):
         crawler_execution_group = CrawlerExecutionGroup.objects.get(
             pk=crawler_execution_group_id
         )
 
-        crawler_execution_group.status = \
-            STATUS_SUCCESS if prev_task_result else STATUS_FAILED
+        # Checar o estado de todas as subtasks de crawlers
+        # divididos por keywords
+        overall_state = {
+            "state": PENDING,
+            "value": 0
+        }
+        for subtask_result in prev_subtasks:
+            task_instance = celery_app.AsyncResult(subtask_result['task_id'])
+            crawler_exec = CrawlerExecution.objects.get(
+                pk=subtask_result['crawler_exec_id'])
+
+            crawler_exec.state = task_instance.state
+            crawler_exec.save()
+
+            if STATE_HIERARCHY[task_instance.state] > overall_state['value']:
+                overall_state['state'] = task_instance.state
+                overall_state['value'] = STATE_HIERARCHY[task_instance.state]
+
+        crawler_execution_group.state = overall_state['state']
         crawler_execution_group.finish_datetime = datetime.now()
         crawler_execution_group.save()
 
-        return prev_task_result
+        return prev_subtasks
 
     @task(name=task_sub_prefix_name, bind=True, time_limit=sys.maxsize)
-    def task_crawler_subtask(self, prev_task_result,
+    def task_crawler_subtask(self, prev_subtasks,
                              crawler_execution_group_id, crawler_args,
                              keyword, **kwargs):
         crawler_execution_group = CrawlerExecutionGroup.objects.get(
@@ -64,40 +103,36 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
             task_id=task_id,
             task_name=task_name,
             keyword=keyword,
-            status=STATUS_STARTED
+            state=STARTED
         )
 
-        result_status = True
-        try:
-            execution_stats = run_generic_crawler(
-                crawler_args=crawler_args,
-                keyword=keyword
-            )
+        result_state = True
+        execution_stats = run_generic_crawler(
+            crawler_args=crawler_args,
+            keyword=keyword
+        )
 
-            # Update execution monitoring on success
-            crawler_execution.finish_datetime = datetime.now()
-            crawler_execution.status = STATUS_SUCCESS
-            crawler_execution.scraped_pages = execution_stats.get(
-                "downloader/request_count") or 0
-            crawler_execution.saved_records = execution_stats.get(
-                "saved_records") or 0
-            crawler_execution.dropped_records = execution_stats.get(
-                "droped_records") or 0
-        except Exception as e:
-            # Update execution monitoring on fail
-
-            crawler_execution.error_log = str(e)
-            crawler_execution.finish_datetime = datetime.now()
-            crawler_execution.status = STATUS_FAILED
-
-            result_status = False
+        # Update execution monitoring on success
+        crawler_execution.finish_datetime = datetime.now()
+        crawler_execution.state = task_instance.state
+        crawler_execution.scraped_pages = execution_stats.get(
+            "downloader/request_count") or 0
+        crawler_execution.saved_records = execution_stats.get(
+            "saved_records") or 0
+        crawler_execution.dropped_records = execution_stats.get(
+            "droped_records") or 0
 
         crawler_execution.save()
 
-        if prev_task_result == None:
-            return result_status
+        result = {
+            "task_id": task_id,
+            "crawler_exec_id": crawler_execution.id
+        }
+
+        if type(prev_subtasks) == list:
+            return prev_subtasks.append(result)
         else:
-            return prev_task_result and result_status
+            return [result]
 
     @task(name=f"{task_group_name}_start", bind=True)
     def task_crawler_group(self, crawler_id, crawler_args, keywords, **kwargs):
@@ -115,7 +150,7 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
         crawler_group = CrawlerExecutionGroup.objects.create(
             crawler=crawler,
             task_name=task_name,
-            status=STATUS_STARTED,
+            state=STARTED,
         )
 
         task_crawler_subtasks = []
@@ -126,11 +161,11 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
                 "keyword": keyword,
             }
 
-            # A primeira task da chain, possui o argumento a prev_task_result.
+            # A primeira task da chain, possui o argumento a prev_subtasks.
             # Nas próximas tasks, o próprio Celery irá setar
             # este atributo com o resultado da task anterior
             if idx == 0:
-                task_args["prev_task_result"] = None
+                task_args["prev_subtasks"] = None
 
             task_crawler_subtasks.append(
                 task_crawler_subtask.subtask(
