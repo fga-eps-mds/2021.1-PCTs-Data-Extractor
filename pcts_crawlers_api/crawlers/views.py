@@ -23,11 +23,11 @@ from crawlers import tasks
 
 ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
 if ENVIRONMENT_EXEC == "DOCKER":
-    sys.path.append('/app/pcts_crawlers')
+    sys.path.append('/app/pcts_crawlers_scripts')
 elif ENVIRONMENT_EXEC == "TEST":
-    sys.path.append('pcts_crawlers')
+    sys.path.append('pcts_crawlers_scripts')
 else:
-    sys.path.append('../pcts_crawlers')
+    sys.path.append('../pcts_crawlers_scripts')
 
 from crawler_executor import run_generic_crawler
 

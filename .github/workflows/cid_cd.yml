@@ -59,7 +59,7 @@ jobs:
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
             pcts-crawlers-api bash -c\
-            "coverage run -m --source='pcts_crawlers' unittest discover &&\
+            "coverage run -m --source='pcts_crawlers_scripts' unittest discover &&\
             coverage xml -o coverage_crawlers.xml"
 
       - name: Run API tests
