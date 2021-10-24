@@ -13,7 +13,7 @@ from scrapy_splash import SplashRequest
 
 from ..items import CrawlerItem
 
-USE_SPLASH = os.environ.get('USE_SPLASH', default=True)
+SCRAPY_REQUEST_METHOD = os.environ.get('SCRAPY_REQUEST_METHOD', default="SPLASH")
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style) and not(ancestor::header)]"
@@ -124,7 +124,7 @@ class GenericCrawlerSpider(Spider):
         )
 
     def make_request(self, url, title):
-        if USE_SPLASH:
+        if SCRAPY_REQUEST_METHOD == "SPLASH":
             return SplashRequest(
                 url=url,
                 callback=self.parse_page,

@@ -8,7 +8,7 @@ x-pcts-crawlers-api-template:
   image: pcts-crawlers-api
   environment:
     PROJECT_ENV_EXECUTOR: "DOCKER"
-    USE_SPLASH: 'true'
+    SCRAPY_REQUEST_METHOD: "SPLASH"
     PCTS_CRAWLERS_SPLASH_HOST: http://pcts-crawlers-splash:8050
     PCTS_DOCUMENTS_API_URL: http://pcts-documents:8000
     PCTS_DOCUMENTS_API_RECORDS_ENDPOINT: api/documents/
