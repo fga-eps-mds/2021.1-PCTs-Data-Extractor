@@ -51,39 +51,39 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 
 if __name__ == '__main__':
     try:
-        crawler_args = {
-            "site_name": "incra",
-            "task_name_prefix": "incra_crawler",
-            "url_root": "https://www.gov.br/incra/pt-br/search",
-            "qs_search_keyword_param": "SearchableText",
-            "allowed_domains": [
-                "www.gov.br"
-            ],
-            "allowed_paths": [
-                "incra/pt-br/assuntos/noticias",
-                "incra/pt-br/assuntos/governanca-fundiaria"
-            ],
-            "retries": 3,
-            "page_load_timeout": 3,
-            "created_at": "2021-10-17T19:26:54.660443"
-        }
-
         # crawler_args = {
         #     "site_name": "incra",
         #     "task_name_prefix": "incra_crawler",
-        #     "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
-        #     "qs_search_keyword_param": "gsc.q",
+        #     "url_root": "https://www.gov.br/incra/pt-br/search",
+        #     "qs_search_keyword_param": "SearchableText",
         #     "allowed_domains": [
-        #         "pesquisa.apps.tcu.gov.br"
+        #         "www.gov.br"
         #     ],
         #     "allowed_paths": [
-        #         "#/resultado",
-        #         "#/documento"
+        #         "incra/pt-br/assuntos/noticias",
+        #         "incra/pt-br/assuntos/governanca-fundiaria"
         #     ],
         #     "retries": 3,
         #     "page_load_timeout": 3,
         #     "created_at": "2021-10-17T19:26:54.660443"
         # }
+
+        crawler_args = {
+            "site_name": "tcu_pesquisa_integrada",
+            "task_name_prefix": "tcu_pesquisa_integrada_crawler",
+            "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
+            "contains_end_path_keyword": True,
+            "allowed_domains": [
+                "pesquisa.apps.tcu.gov.br"
+            ],
+            "allowed_paths": [
+                "#/resultado",
+                "#/documento"
+            ],
+            "retries": 3,
+            "page_load_timeout": 3,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
 
         run_generic_crawler(crawler_args, keyword="quilombolas")
     finally:

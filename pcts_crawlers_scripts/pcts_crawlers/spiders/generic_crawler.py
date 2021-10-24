@@ -34,8 +34,8 @@ class GenericCrawlerSpider(Spider):
     start_urls = []
 
     def __init__(self, url_root, site_name, allowed_domains=None, allowed_paths=None,
-                 qs_search_keyword_param=None, retries=1, page_load_timeout=2,
-                 keyword="", *args, **kwargs):
+                 qs_search_keyword_param=None, contains_end_path_keyword=False, retries=1,
+                 page_load_timeout=2, keyword="", *args, **kwargs):
         """ Initializes GenericCrawlerSpider
 
         Args:
@@ -56,6 +56,7 @@ class GenericCrawlerSpider(Spider):
         self.allowed_domains = allowed_domains
         self.allowed_paths = allowed_paths
         self.qs_search_keyword_param = qs_search_keyword_param
+        self.contains_end_path_keyword = contains_end_path_keyword
         self.retries = retries
         self.page_load_timeout = page_load_timeout
         self.keyword = keyword
@@ -75,42 +76,17 @@ class GenericCrawlerSpider(Spider):
     def start_requests(self, *args, **kwargs):
         self.define_stats_attributes()
 
-        entrypoint_url = (
-            f'{self.source_url}?'
-            f'{str(self.qs_search_keyword_param)}'
-            f'={str(self.keyword)}'
-        )
+        end_path = ""
+        query_string = ""
+        if self.contains_end_path_keyword:
+            end_path = "/" + str(self.keyword)
+        if self.qs_search_keyword_param:
+            query_string = f"?{str(self.qs_search_keyword_param)}={str(self.keyword)}"
+        entrypoint_url = self.source_url + end_path + query_string
 
         self.logger.info(f"ENTRYPOINT URL: {entrypoint_url}")
 
         yield self.make_request(entrypoint_url)
-
-    def make_request(self, url):
-        if USE_SPLASH:
-            return SplashRequest(
-                url=url,
-                callback=self.parse_page,
-                endpoint='render.html',
-                args={'wait': self.page_load_timeout},
-            )
-        else:
-            yield Request(
-                url=url,
-                callback=self.parse_page,
-                meta={'donwload_timeout': self.page_load_timeout}
-            )
-
-    def define_stats_attributes(self):
-        self.stats = self.crawler.stats
-
-        self.stats.set_value(
-            'dropped_records_by_keyword_all_content',
-            0
-        )
-        self.stats.set_value(
-            'dropped_records_by_keyword_restrict_content',
-            0
-        )
 
     def parse_page(self, response: HtmlResponse):
         # self.logger.info(f"PARSE PAGE: {response.url}")
@@ -133,6 +109,33 @@ class GenericCrawlerSpider(Spider):
             yield self.data_extraction(response)
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
+
+    def define_stats_attributes(self):
+        self.stats = self.crawler.stats
+
+        self.stats.set_value(
+            'dropped_records_by_keyword_all_content',
+            0
+        )
+        self.stats.set_value(
+            'dropped_records_by_keyword_restrict_content',
+            0
+        )
+
+    def make_request(self, url):
+        if USE_SPLASH:
+            return SplashRequest(
+                url=url,
+                callback=self.parse_page,
+                endpoint='render.html',
+                args={'wait': self.page_load_timeout},
+            )
+        else:
+            return Request(
+                url=url,
+                callback=self.parse_page,
+                meta={'donwload_timeout': self.page_load_timeout}
+            )
 
     def data_extraction(self, response: HtmlResponse):
         # Extracao restrita a apenas as partes importantes

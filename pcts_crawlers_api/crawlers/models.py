@@ -32,6 +32,11 @@ class Crawler(models.Model):
         null=True,
         max_length=500
     )
+    contains_end_path_keyword = models.CharField(
+        "Contains End Path with Keyword for Search",
+        null=True,
+        max_length=100
+    )
     retries = models.IntegerField(
         "Retries",
         default=3,
@@ -44,12 +49,12 @@ class Crawler(models.Model):
     )
     cron_minute = models.CharField(
         "Crontab Minute",
-        default="*",
+        default="0",
         max_length=20
     )
     cron_hour = models.CharField(
         "Crontab Hour",
-        default="*",
+        default="4",
         max_length=20
     )
     cron_day_of_week = models.CharField(

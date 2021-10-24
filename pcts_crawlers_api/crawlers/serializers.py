@@ -12,9 +12,10 @@ class CrawlerSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'site_name',
+            'task_name_prefix',
             'url_root',
             'qs_search_keyword_param',
-            'task_name_prefix',
+            'contains_end_path_keyword',
             'allowed_domains',
             'allowed_paths',
             'retries',

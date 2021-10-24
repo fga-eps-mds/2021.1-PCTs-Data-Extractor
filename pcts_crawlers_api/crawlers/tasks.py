@@ -185,6 +185,7 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
                     "site_name": crawler.site_name,
                     "url_root": crawler.url_root,
                     "qs_search_keyword_param": crawler.qs_search_keyword_param,
+                    "contains_end_path_keyword": crawler.contains_end_path_keyword,
                     "task_name_prefix": crawler.task_name_prefix,
                     "allowed_domains": crawler.allowed_domains,
                     "allowed_paths": crawler.allowed_paths,
