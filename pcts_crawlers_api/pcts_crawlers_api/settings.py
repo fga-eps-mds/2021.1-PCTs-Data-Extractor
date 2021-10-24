@@ -27,6 +27,8 @@ SECRET_KEY = 'django-insecure-csjnfz&f1o=0h%9)sb%4gxh!dx0hxb3eh*qjz&94@d@46423^l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+print("ARGV DO PROJETO:", sys.argv)
+
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split()
 
 
@@ -172,6 +174,9 @@ LOGGING = {
 }
 
 # ================================= CELERY SETTINGS
+if 'celery' in sys.argv[0]:
+    DEBUG = False
+
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60

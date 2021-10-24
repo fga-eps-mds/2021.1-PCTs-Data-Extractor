@@ -4,4 +4,4 @@ echo '========== CHANGE TO API DIR'
 cd pcts_crawlers_api
 
 echo '========== START CELERY'
-celery -A pcts_crawlers_api beat -l INFO
+celery -A pcts_crawlers_api beat --loglevel=INFO
