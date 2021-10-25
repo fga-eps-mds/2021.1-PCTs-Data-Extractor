@@ -16,7 +16,7 @@ from ..items import CrawlerItem
 SCRAPY_REQUEST_METHOD = os.environ.get('SCRAPY_REQUEST_METHOD', default="SPLASH")
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
-    "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style) and not(ancestor::header)]"
+    "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style)]"
 )
 DEFAULT_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and "
@@ -85,7 +85,7 @@ class GenericCrawlerSpider(Spider):
             query_string = f"?{str(self.qs_search_keyword_param)}={str(self.keyword)}"
         entrypoint_url = self.source_url + end_path + query_string
 
-        self.logger.info(f"ENTRYPOINT URL: {entrypoint_url}")
+        self.logger.info(f"INITIAL URL: {entrypoint_url}")
 
         yield self.make_request(entrypoint_url, 'INITIAL_SEARCH_PAGE')
 
