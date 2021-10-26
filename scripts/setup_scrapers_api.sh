@@ -4,7 +4,7 @@ echo '========== CHECKING FOR UNINSTALLED PKGs AND INSTALLING'
 pip install -r requirements.txt
 
 echo '========== CHANGE TO API DIR'
-cd pcts_scrapers_api
+cd pcts_crawlers_api
 
 echo '========== MAKING MIGRATIONS'
 python manage.py makemigrations
