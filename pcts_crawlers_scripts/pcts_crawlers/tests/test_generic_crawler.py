@@ -8,33 +8,37 @@ class GenericCrawlerTest(unittest.TestCase):
     
     
     def setUp(self):
-        crawler_args = {
-            "site_name": "incra",
-            "task_name_prefix": "incra_crawler",
-            "url_root": "https://www.gov.br/incra/pt-br/search",
-            "qs_search_keyword_param": "SearchableText",
-            "allowed_domains": [
+        self.url = (
+            "https://www.gov.br/incra/pt-br/assuntos/noticias/"
+            "quilombolas-tratam-de-titulacao-e-acesso-a-creditos"
+            "-com-gestores-do-incra-rs"
+        )
+        self.crawler = GenericCrawlerSpider(
+            url_root=self.url,
+            site_name="incra",
+            allowed_domains=[
                 "www.gov.br"
             ],
-            "allowed_paths": [
+            allowed_paths=[
                 "incra/pt-br/assuntos/noticias",
                 "incra/pt-br/assuntos/governanca-fundiaria"
             ],
-            "retries": 3,
-            "page_load_timeout": 3,
-            "created_at": "2021-10-17T19:26:54.660443"
-        }
-        keyword="quilombolas"
+            qs_search_keyword_param="SearchableText",
+            keyword="quilombolas"
+            )
+        
 
-        projects_settings = get_project_settings()
-        crawler = CrawlerProcess(projects_settings)
-        crawler_instance = crawler.create_crawler(GenericCrawlerSpider)
-
-        crawler.crawl(
-            crawler_instance,
-            **crawler_args,
-            keyword=keyword
-        )
-
-    def test_document_page_parse(self):
-        pass
+    def test_document_page_parse_from_incra(self):
+        results = self.crawler.parse_page(fake_response_from_file('fixtures/incra_scraper/document_page.html', self.url), "test")
+        for item in results:
+            print("===============================START=================================")
+            print(item)
+            print("================================================================")
+            print(item['source'])
+            print("================================================================")
+            print(item['url'])
+            print("================================================================")
+            print(item['title'])
+            print("================================================================")
+            print(item['content'])
+            print("================================================================")
