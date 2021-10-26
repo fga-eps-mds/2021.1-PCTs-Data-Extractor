@@ -136,7 +136,7 @@ class GenericCrawlerSpider(Spider):
             return Request(
                 url=url,
                 callback=self.parse_page,
-                meta={'donwload_timeout': self.page_load_timeout},
+                meta={'download_timeout': self.page_load_timeout},
                 cb_kwargs={"title": title}
             )
 
