@@ -1,5 +1,6 @@
 import os
 import re
+import difflib
 
 from scrapy.spiders import Spider
 from scrapy.linkextractors import LinkExtractor
@@ -185,6 +186,14 @@ class GenericCrawlerSpider(Spider):
 
     def check_keyword_affinity(self, content: str):
         return re.search(self.keyword, content, flags=re.IGNORECASE)
+        # words = list(map(
+        #     lambda word: word.lower(),
+        #     content.split(" ")
+        # ))
+        # matches = difflib.get_close_matches(
+        #     self.keyword, words, cutoff=0.9
+        # )
+        # return len(matches) > 1
 
     def get_page_links(self, response):
         links = self.link_pages_extractor.extract_links(response)
