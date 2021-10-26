@@ -69,10 +69,13 @@ class GenericCrawlerSpider(Spider):
             allow=self.allowed_paths,
             canonicalize=False,
             unique=True,
-            process_value=lambda url: url.strip(" /"),
+            process_value=self.normalize_url,
             deny_extensions=None,
             strip=True,
         )
+
+    def normalize_url(self, url):
+        return url.split("#")[0].strip(" /")
 
     def start_requests(self, *args, **kwargs):
         self.define_stats_attributes()

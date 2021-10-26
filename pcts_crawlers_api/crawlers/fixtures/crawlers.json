@@ -109,7 +109,7 @@
             "url_root": "https://www.icmbio.gov.br/portal/busca",
             "qs_search_keyword_param": "searchword",
             "allowed_domains": [
-                "www.gov.br"
+                "icmbio.gov.br"
             ],
             "allowed_paths": [
                 "portal"
