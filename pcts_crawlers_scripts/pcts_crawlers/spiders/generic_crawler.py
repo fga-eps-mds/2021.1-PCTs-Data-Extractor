@@ -13,7 +13,8 @@ from scrapy_splash import SplashRequest
 
 from ..items import CrawlerItem
 
-SCRAPY_REQUEST_METHOD = os.environ.get('SCRAPY_REQUEST_METHOD', default="SPLASH")
+SCRAPY_REQUEST_METHOD = os.environ.get(
+    'SCRAPY_REQUEST_METHOD', default="SPLASH")
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style)]"
@@ -101,8 +102,9 @@ class GenericCrawlerSpider(Spider):
         all_content_list = response.xpath(
             DEFAULT_ALL_CONTENT_XPATH
         ).extract()
-        all_content = '\n'.\
-            join(elem for elem in all_content_list).strip()
+        all_content = self.get_alfanumeric_from_text_list(
+            all_content_list
+        )
 
         # Follow Links
         if self.check_keyword_affinity(all_content):
@@ -150,8 +152,9 @@ class GenericCrawlerSpider(Spider):
             DEFAULT_CONTENT_XPATH
         ).extract()
 
-        restrict_content = '\n'.\
-            join(elem for elem in restrict_content_list).strip()
+        restrict_content = self.get_alfanumeric_from_text_list(
+            restrict_content_list
+        )
 
         if self.check_keyword_affinity(restrict_content):
             page_content = CrawlerItem()
@@ -169,6 +172,16 @@ class GenericCrawlerSpider(Spider):
             self.stats.inc_value(
                 'dropped_records_by_keyword_restrict_content'
             )
+
+    def get_alfanumeric_from_text_list(self, text_list):
+        full_text = ' '.join(
+            text for text in text_list if text
+        ).strip()
+        alfanumeric_text_list = re.findall("\w*", full_text)
+
+        return " ".join(
+            [text for text in alfanumeric_text_list if text]
+        )
 
     def check_keyword_affinity(self, content: str):
         return re.search(self.keyword, content, flags=re.IGNORECASE)
