@@ -21,12 +21,15 @@ def fake_response_from_file(file_name, url=None):
     else:
         file_path = file_name
 
-    file_content = open(file_path, 'r').read()
-
+    file_content = open(file_path, 'r')
+    
     response = HtmlResponse(
         url=url,
         request=request,
-        body=file_content,
+        body=file_content.read(),
         encoding='utf-8'
     )
+
+    file_content.close()
+    
     return response
