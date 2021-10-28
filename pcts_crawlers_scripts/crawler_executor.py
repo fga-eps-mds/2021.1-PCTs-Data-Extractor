@@ -70,6 +70,7 @@ if __name__ == '__main__':
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
+            "contains_dynamic_js_load": True,
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
@@ -91,6 +92,7 @@ if __name__ == '__main__':
         #     "cron_day_of_week": "*",
         #     "cron_day_of_month": "*",
         #     "cron_month_of_year": "*",
+        #     "contains_dynamic_js_load": False,
         #     "created_at": "2021-10-17T19:26:54.660443"
         # }
 

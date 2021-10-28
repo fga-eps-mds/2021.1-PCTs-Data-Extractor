@@ -178,7 +178,8 @@ def create_periodic_task(sender: Celery, crawler: Crawler, keywords=[]):
                 "allowed_domains": crawler.allowed_domains,
                 "allowed_paths": crawler.allowed_paths,
                 "retries": crawler.retries,
-                "page_load_timeout": crawler.page_load_timeout
+                "page_load_timeout": crawler.page_load_timeout,
+                "contains_dynamic_js_load": crawler.contains_dynamic_js_load,
             },
             "keywords": keywords,
         }),

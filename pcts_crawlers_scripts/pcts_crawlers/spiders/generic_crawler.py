@@ -38,7 +38,7 @@ class GenericCrawlerSpider(Spider):
 
     def __init__(self, url_root, site_name, allowed_domains=None, allowed_paths=None,
                  qs_search_keyword_param=None, contains_end_path_keyword=False, retries=1,
-                 page_load_timeout=2, keyword="", *args, **kwargs):
+                 page_load_timeout=2, contains_dynamic_js_load=True, keyword="", *args, **kwargs):
         """ Initializes GenericCrawlerSpider
 
         Args:
@@ -63,6 +63,7 @@ class GenericCrawlerSpider(Spider):
         self.retries = retries
         self.page_load_timeout = page_load_timeout
         self.keyword = keyword
+        self.contains_dynamic_js_load = contains_dynamic_js_load
         self.start_urls.append(self.source_url)
         self.search_page = True
 
@@ -134,28 +135,36 @@ class GenericCrawlerSpider(Spider):
         )
 
     def make_request(self, url, title):
+        if (self.contains_dynamic_js_load):
+            return self.dynamic_js_request(url, title)
+        else:
+            return self.simple_request(url, title)
+
+    def simple_request(self, url, title):
+        if SCRAPY_REQUEST_METHOD == "SPLASH":
+            return SplashRequest(
+                url=url,
+                callback=self.parse_page,
+                endpoint='render.html',
+                args={'wait': self.page_load_timeout},
+                cb_kwargs={"title": title},
+                headers={'User-Agent': self.user_agent}
+            )
+        else:
+            return Request(
+                url=url,
+                callback=self.parse_page,
+                meta={'donwload_timeout': self.page_load_timeout},
+                cb_kwargs={"title": title}
+            )
+
+    def dynamic_js_request(self, url, title):
         return SeleniumRequest(
             url=url,
             callback=(self.parse_page),
             meta={'donwload_timeout': self.page_load_timeout},
             cb_kwargs={"title": title}
         )
-        # if SCRAPY_REQUEST_METHOD == "SPLASH":
-        #     return SplashRequest(
-        #         url=url,
-        #         callback=self.parse_page,
-        #         endpoint='render.html',
-        #         args={'wait': self.page_load_timeout},
-        #         cb_kwargs={"title": title},
-        #         headers={'User-Agent': self.user_agent}
-        #     )
-        # else:
-        #     return Request(
-        #         url=url,
-        #         callback=self.parse_page,
-        #         meta={'donwload_timeout': self.page_load_timeout},
-        #         cb_kwargs={"title": title}
-        #     )
 
     def data_extraction(self, response: HtmlResponse, title):
         # Extracao restrita a apenas as partes importantes

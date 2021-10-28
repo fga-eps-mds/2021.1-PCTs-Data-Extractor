@@ -84,6 +84,10 @@ class Crawler(models.Model):
         default="*",
         max_length=20
     )
+    contains_dynamic_js_load = models.BooleanField(
+        "Contains Dynamic JS Loading",
+        default=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
