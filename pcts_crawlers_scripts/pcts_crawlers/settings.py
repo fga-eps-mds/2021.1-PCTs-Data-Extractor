@@ -65,10 +65,10 @@ SELENIUM_DRIVER_EXECUTABLE_PATH = ChromeDriverManager().install()
 
 SELENIUM_DRIVER_ARGUMENTS = [
     '--headless',
-    '--no-sandbox',
+    # '--no-sandbox',
     '--disable-gpu',
     '--javascript.enabled=False',
-    'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"'
+    'user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36"'
 ]
 DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'

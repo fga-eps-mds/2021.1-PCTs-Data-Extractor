@@ -57,11 +57,11 @@ if __name__ == '__main__':
             "url_root": "https://www.gov.br/ibama/pt-br/search",
             "qs_search_keyword_param": "SearchableText",
             "allowed_domains": [
-                "www.gov.br/ibama"
+                "www.gov.br"
             ],
             "allowed_paths": [
-                "pt-br/assuntos",
-                "pt-br/search"
+                "ibama/pt-br/assuntos",
+                "ibama/pt-br/search"
             ],
             "retries": 3,
             "page_load_timeout": 5,

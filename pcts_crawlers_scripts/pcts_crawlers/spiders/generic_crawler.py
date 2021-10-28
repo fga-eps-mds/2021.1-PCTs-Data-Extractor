@@ -93,14 +93,20 @@ class GenericCrawlerSpider(Spider):
 
         self.logger.info(f"INITIAL URL: {entrypoint_url}")
 
-        yield self.make_request(entrypoint_url, 'INITIAL_SEARCH_PAGE')
+        yield self.make_request(
+            entrypoint_url,
+            'INITIAL_SEARCH_PAGE',
+            self.parse_first_page
+        )
+
+    def parse_first_page(self, response: HtmlResponse, title):
+        links_found = self.get_page_links(response)
+
+        for link in links_found:
+            yield self.make_request(link['url'], link['text'], self.parse_page)
 
     def parse_page(self, response: HtmlResponse, title):
         # self.logger.info(f"PARSE PAGE: {response.url}")
-
-        # with open("output.txt", "wb") as file:
-        #     file.write(response.body)
-        # exit(0)
 
         # Extracao de todo o conteudo da pagina
         # Para buscar afinidade com o conteudo na pagina
@@ -117,7 +123,7 @@ class GenericCrawlerSpider(Spider):
             links_found = self.get_page_links(response)
 
             for link in links_found:
-                yield self.make_request(link['url'], link['text'])
+                yield self.make_request(link['url'], link['text'], self.parse_page)
             yield self.data_extraction(response, title)
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
@@ -134,17 +140,17 @@ class GenericCrawlerSpider(Spider):
             0
         )
 
-    def make_request(self, url, title):
+    def make_request(self, url, title, parse_callback):
         if (self.contains_dynamic_js_load):
-            return self.dynamic_js_request(url, title)
+            return self.dynamic_js_request(url, title, parse_callback)
         else:
-            return self.simple_request(url, title)
+            return self.simple_request(url, title, parse_callback)
 
-    def simple_request(self, url, title):
+    def simple_request(self, url, title, parse_callback):
         if SCRAPY_REQUEST_METHOD == "SPLASH":
             return SplashRequest(
                 url=url,
-                callback=self.parse_page,
+                callback=parse_callback,
                 endpoint='render.html',
                 args={'wait': self.page_load_timeout},
                 cb_kwargs={"title": title},
@@ -153,15 +159,15 @@ class GenericCrawlerSpider(Spider):
         else:
             return Request(
                 url=url,
-                callback=self.parse_page,
+                callback=parse_callback,
                 meta={'donwload_timeout': self.page_load_timeout},
                 cb_kwargs={"title": title}
             )
 
-    def dynamic_js_request(self, url, title):
+    def dynamic_js_request(self, url, title, parse_callback):
         return SeleniumRequest(
             url=url,
-            callback=(self.parse_page),
+            callback=parse_callback,
             meta={'donwload_timeout': self.page_load_timeout},
             cb_kwargs={"title": title}
         )
