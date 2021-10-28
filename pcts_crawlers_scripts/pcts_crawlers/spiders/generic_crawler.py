@@ -97,6 +97,10 @@ class GenericCrawlerSpider(Spider):
     def parse_page(self, response: HtmlResponse, title):
         # self.logger.info(f"PARSE PAGE: {response.url}")
 
+        # with open("output.txt", "wb") as file:
+        #     file.write(response.body)
+        # exit(0)
+
         # Extracao de todo o conteudo da pagina
         # Para buscar afinidade com o conteudo na pagina
         # ou a partir dos links
@@ -130,21 +134,28 @@ class GenericCrawlerSpider(Spider):
         )
 
     def make_request(self, url, title):
-        if SCRAPY_REQUEST_METHOD == "SPLASH":
-            return SplashRequest(
-                url=url,
-                callback=self.parse_page,
-                endpoint='render.html',
-                args={'wait': self.page_load_timeout},
-                cb_kwargs={"title": title}
-            )
-        else:
-            return Request(
-                url=url,
-                callback=self.parse_page,
-                meta={'donwload_timeout': self.page_load_timeout},
-                cb_kwargs={"title": title}
-            )
+        return SeleniumRequest(
+            url=url,
+            callback=(self.parse_page),
+            meta={'donwload_timeout': self.page_load_timeout},
+            cb_kwargs={"title": title}
+        )
+        # if SCRAPY_REQUEST_METHOD == "SPLASH":
+        #     return SplashRequest(
+        #         url=url,
+        #         callback=self.parse_page,
+        #         endpoint='render.html',
+        #         args={'wait': self.page_load_timeout},
+        #         cb_kwargs={"title": title},
+        #         headers={'User-Agent': self.user_agent}
+        #     )
+        # else:
+        #     return Request(
+        #         url=url,
+        #         callback=self.parse_page,
+        #         meta={'donwload_timeout': self.page_load_timeout},
+        #         cb_kwargs={"title": title}
+        #     )
 
     def data_extraction(self, response: HtmlResponse, title):
         # Extracao restrita a apenas as partes importantes

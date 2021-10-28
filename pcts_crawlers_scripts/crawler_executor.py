@@ -73,6 +73,27 @@ if __name__ == '__main__':
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
+        # crawler_args = {
+        #     "site_name": "icmbio",
+        #     "task_name_prefix": "icmbio_crawler",
+        #     "url_root": "https://www.icmbio.gov.br/portal/busca",
+        #     "qs_search_keyword_param": "searchword",
+        #     "allowed_domains": [
+        #         "icmbio.gov.br"
+        #     ],
+        #     "allowed_paths": [
+        #         "portal"
+        #     ],
+        #     "retries": 3,
+        #     "page_load_timeout": 3,
+        #     "cron_minute": "0",
+        #     "cron_hour": "6",
+        #     "cron_day_of_week": "*",
+        #     "cron_day_of_month": "*",
+        #     "cron_month_of_year": "*",
+        #     "created_at": "2021-10-17T19:26:54.660443"
+        # }
+
         run_generic_crawler(crawler_args, keyword="quilombolas")
     finally:
         gc.collect()
