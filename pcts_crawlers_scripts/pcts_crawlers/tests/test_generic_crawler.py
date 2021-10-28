@@ -29,10 +29,10 @@ class GenericCrawlerTest(unittest.TestCase):
             keyword="quilombolas"
         )
 
-        results = crawler.parse_page(fake_response_from_file('fixtures/incra_scraper/document_page.html', url), "Quilombolas tratam de titulação e acesso a créditos com gestores do Incra/RS — Português (Brasil)", True)
+        results = crawler.parse_page(fake_response_from_file('fixtures/incra/document_page.html', url), "Quilombolas tratam de titulação e acesso a créditos com gestores do Incra/RS — Português (Brasil)", True)
         
         responses_dir = os.path.dirname(os.path.realpath(__file__))
-        file_path = os.path.join(responses_dir, 'responses/fixtures/incra_scraper/parsed_content.txt')
+        file_path = os.path.join(responses_dir, 'responses/fixtures/incra/parsed_content.txt')
         file = open(file_path, 'r')
 
         expected_attributes = {
@@ -65,10 +65,10 @@ class GenericCrawlerTest(unittest.TestCase):
             keyword="quilombolas"
         )
 
-        results = crawler.parse_page(fake_response_from_file('fixtures/mpf_scraper/document_page.html', url), "Decreto de 07 de fevereiro de 2007 — 6ª Câmara - Populações Indígenas e Comunidades Tradicionais", True)
+        results = crawler.parse_page(fake_response_from_file('fixtures/mpf/document_page.html', url), "Decreto de 07 de fevereiro de 2007 — 6ª Câmara - Populações Indígenas e Comunidades Tradicionais", True)
         
         responses_dir = os.path.dirname(os.path.realpath(__file__))
-        file_path = os.path.join(responses_dir, 'responses/fixtures/mpf_scraper/parsed_content.txt')
+        file_path = os.path.join(responses_dir, 'responses/fixtures/mpf/parsed_content.txt')
         file = open(file_path, 'r')
 
         expected_attributes = {
@@ -79,7 +79,7 @@ class GenericCrawlerTest(unittest.TestCase):
         }
         file.close()
 
-        # self._test_recovered_attributes(results, expected_attributes)
+        self._test_recovered_attributes(results, expected_attributes)
 
     def _test_recovered_attributes(self, results, expected_attributes):
         for item in results:

@@ -110,7 +110,8 @@ class GenericCrawlerSpider(Spider):
                     yield self.make_request(link['url'], link['text'])
             yield self.data_extraction(response, title)
         else:
-            self.stats.inc_value('dropped_records_by_keyword_all_content')
+            if not isTest:
+                self.stats.inc_value('dropped_records_by_keyword_all_content')
 
     def define_stats_attributes(self):
         self.stats = self.crawler.stats
