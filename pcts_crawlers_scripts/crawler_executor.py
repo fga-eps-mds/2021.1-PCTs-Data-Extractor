@@ -51,37 +51,25 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 
 if __name__ == '__main__':
     try:
-        # crawler_args = {
-        #     "site_name": "incra",
-        #     "task_name_prefix": "incra_crawler",
-        #     "url_root": "https://www.gov.br/incra/pt-br/search",
-        #     "qs_search_keyword_param": "SearchableText",
-        #     "allowed_domains": [
-        #         "www.gov.br"
-        #     ],
-        #     "allowed_paths": [
-        #         "incra/pt-br/assuntos/noticias",
-        #         "incra/pt-br/assuntos/governanca-fundiaria"
-        #     ],
-        #     "retries": 3,
-        #     "page_load_timeout": 3,
-        #     "created_at": "2021-10-17T19:26:54.660443"
-        # }
-
         crawler_args = {
-            "site_name": "tcu_pesquisa_integrada",
-            "task_name_prefix": "tcu_pesquisa_integrada_crawler",
-            "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
-            "contains_end_path_keyword": True,
+            "site_name": "stj",
+            "task_name_prefix": "stj_crawler",
+            "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
+            "qs_search_keyword_param": "q",
             "allowed_domains": [
-                "pesquisa.apps.tcu.gov.br"
+                "www.stj.jus.br"
             ],
             "allowed_paths": [
-                "#/resultado",
-                "#/documento"
+                "sites/portalp/Paginas/Comunicacao/Noticias"
             ],
             "retries": 3,
-            "page_load_timeout": 3,
+            "page_load_timeout": 5,
+            "cron_minute": "0",
+            "cron_hour": "9",
+            "cron_day_of_week": "*",
+            "cron_day_of_month": "*",
+            "cron_month_of_year": "*",
+            "contains_dynamic_js_load": False,
             "created_at": "2021-10-17T19:26:54.660443"
         }
 
