@@ -70,7 +70,7 @@ class GenericCrawlerSpider(Spider):
         self.link_pages_extractor = LinkExtractor(
             allow_domains=self.allowed_domains,
             allow=self.allowed_paths,
-            canonicalize=False,
+            canonicalize=True,
             unique=True,
             process_value=self.normalize_url,
             deny_extensions=None,
@@ -79,6 +79,10 @@ class GenericCrawlerSpider(Spider):
 
     def normalize_url(self, url):
         # return url.split("#")[0].strip(" /")
+        # re.fullmatch("(\w+://)?(\w+\.)+\w+(/(\w+|\#))*/\w+", "teste4.com/#/teste/a#oi")
+        # Remove #section da url
+        # re.split("(\w)#(?=\w)", url)
+
         return url.strip(" /")
 
     def start_requests(self, *args, **kwargs):

@@ -52,22 +52,21 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 if __name__ == '__main__':
     try:
         crawler_args = {
-            "site_name": "ibge",
-            "task_name_prefix": "ibge_crawler",
-            "url_root": "https://www.ibge.gov.br/busca.html",
-            "qs_search_keyword_param": "searchword",
+            "site_name": "tcu_pesquisa_integrada",
+            "task_name_prefix": "tcu_pesquisa_integrada_crawler",
+            "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
+            "contains_end_path_keyword": True,
             "allowed_domains": [
-                "www.ibge.gov.br"
+                "pesquisa.apps.tcu.gov.br"
             ],
             "allowed_paths": [
-                "geociencias",
-                "estatisticas",
-                "agencia-sala-de-imprensa"
+                "#/resultado",
+                "#/documento"
             ],
             "retries": 3,
-            "page_load_timeout": 5,
+            "page_load_timeout": 3,
             "cron_minute": "0",
-            "cron_hour": "3",
+            "cron_hour": "6",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",

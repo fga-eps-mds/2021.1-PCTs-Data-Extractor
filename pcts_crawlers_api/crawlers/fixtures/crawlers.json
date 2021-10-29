@@ -147,7 +147,7 @@
             "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
-            "cron_hour": "3",
+            "cron_hour": "7",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
@@ -174,7 +174,32 @@
             "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
-            "cron_hour": "3",
+            "cron_hour": "8",
+            "cron_day_of_week": "*",
+            "cron_day_of_month": "*",
+            "cron_month_of_year": "*",
+            "contains_dynamic_js_load": false,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "camara_dos_deputados",
+            "task_name_prefix": "camara_dos_deputados_crawler",
+            "url_root": "https://www.camara.leg.br/busca-geral",
+            "qs_search_keyword_param": "termo",
+            "allowed_domains": [
+                "www.camara.leg.br"
+            ],
+            "allowed_paths": [
+                "noticias"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "cron_minute": "0",
+            "cron_hour": "9",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
