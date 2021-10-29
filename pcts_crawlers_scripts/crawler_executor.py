@@ -52,21 +52,20 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 if __name__ == '__main__':
     try:
         crawler_args = {
-            "site_name": "tcu_pesquisa_integrada",
-            "task_name_prefix": "tcu_pesquisa_integrada_crawler",
-            "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
-            "contains_end_path_keyword": True,
+            "site_name": "stf_jurisprudencia",
+            "task_name_prefix": "stf_jurisprudencia_crawler",
+            "url_root": "https://jurisprudencia.stf.jus.br/pages/search",
+            "qs_search_keyword_param": "queryString",
             "allowed_domains": [
-                "pesquisa.apps.tcu.gov.br"
+                "jurisprudencia.stf.jus.br"
             ],
             "allowed_paths": [
-                "#/resultado",
-                "#/documento"
+                "pages/search"
             ],
             "retries": 3,
-            "page_load_timeout": 3,
+            "page_load_timeout": 5,
             "cron_minute": "0",
-            "cron_hour": "6",
+            "cron_hour": "9",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
