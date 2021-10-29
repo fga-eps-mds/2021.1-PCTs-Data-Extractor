@@ -52,15 +52,15 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 if __name__ == '__main__':
     try:
         crawler_args = {
-            "site_name": "stf_jurisprudencia",
-            "task_name_prefix": "stf_jurisprudencia_crawler",
-            "url_root": "https://jurisprudencia.stf.jus.br/pages/search",
-            "qs_search_keyword_param": "queryString",
+            "site_name": "stj",
+            "task_name_prefix": "stj_crawler",
+            "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
+            "qs_search_keyword_param": "q",
             "allowed_domains": [
-                "jurisprudencia.stf.jus.br"
+                "www.stj.jus.br"
             ],
             "allowed_paths": [
-                "pages/search"
+                "sites/portalp/Paginas/Comunicacao/Noticias"
             ],
             "retries": 3,
             "page_load_timeout": 5,

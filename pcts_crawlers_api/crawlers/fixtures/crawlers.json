@@ -256,5 +256,30 @@
             "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
+    },
+    {
+        "pk": 11,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "stj",
+            "task_name_prefix": "stj_crawler",
+            "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
+            "qs_search_keyword_param": "q",
+            "allowed_domains": [
+                "www.stj.jus.br"
+            ],
+            "allowed_paths": [
+                "sites/portalp/Paginas/Comunicacao/Noticias"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "cron_minute": "0",
+            "cron_hour": "10",
+            "cron_day_of_week": "*",
+            "cron_day_of_month": "*",
+            "cron_month_of_year": "*",
+            "contains_dynamic_js_load": false,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
     }
 ]
