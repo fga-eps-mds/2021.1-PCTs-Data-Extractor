@@ -154,5 +154,32 @@
             "contains_dynamic_js_load": true,
             "created_at": "2021-10-17T19:26:54.660443"
         }
+    },
+    {
+        "pk": 7,
+        "model": "crawlers.crawler",
+        "fields": {
+            "site_name": "ibge",
+            "task_name_prefix": "ibge_crawler",
+            "url_root": "https://www.ibge.gov.br/busca.html",
+            "qs_search_keyword_param": "searchword",
+            "allowed_domains": [
+                "www.ibge.gov.br"
+            ],
+            "allowed_paths": [
+                "geociencias",
+                "estatisticas",
+                "agencia-sala-de-imprensa"
+            ],
+            "retries": 3,
+            "page_load_timeout": 5,
+            "cron_minute": "0",
+            "cron_hour": "3",
+            "cron_day_of_week": "*",
+            "cron_day_of_month": "*",
+            "cron_month_of_year": "*",
+            "contains_dynamic_js_load": false,
+            "created_at": "2021-10-17T19:26:54.660443"
+        }
     }
 ]

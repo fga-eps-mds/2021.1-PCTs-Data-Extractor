@@ -52,16 +52,17 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 if __name__ == '__main__':
     try:
         crawler_args = {
-            "site_name": "ibama",
-            "task_name_prefix": "ibama_crawler",
-            "url_root": "https://www.gov.br/ibama/pt-br/search",
-            "qs_search_keyword_param": "SearchableText",
+            "site_name": "ibge",
+            "task_name_prefix": "ibge_crawler",
+            "url_root": "https://www.ibge.gov.br/busca.html",
+            "qs_search_keyword_param": "searchword",
             "allowed_domains": [
-                "www.gov.br"
+                "www.ibge.gov.br"
             ],
             "allowed_paths": [
-                "ibama/pt-br/assuntos",
-                "ibama/pt-br/search"
+                "geociencias",
+                "estatisticas",
+                "agencia-sala-de-imprensa"
             ],
             "retries": 3,
             "page_load_timeout": 5,
@@ -70,7 +71,7 @@ if __name__ == '__main__':
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": True,
+            "contains_dynamic_js_load": False,
             "created_at": "2021-10-17T19:26:54.660443"
         }
 

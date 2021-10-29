@@ -103,6 +103,10 @@ class GenericCrawlerSpider(Spider):
     def parse_first_page(self, response: HtmlResponse, title):
         links_found = self.get_page_links(response)
 
+        # with open("output.html", "wb") as file:
+        #     file.write(response.body)
+        # return None
+
         for link in links_found:
             yield self.make_request(link['url'], link['text'], self.parse_page)
 
