@@ -38,7 +38,7 @@ class GenericCrawlerSpider(Spider):
 
     def __init__(self, url_root, site_name, allowed_domains=None, allowed_paths=None,
                  qs_search_keyword_param=None, contains_end_path_keyword=False, retries=1,
-                 page_load_timeout=2, keyword="", *args, **kwargs):
+                 page_load_timeout=2, contains_dynamic_js_load=True, keyword="", *args, **kwargs):
         """ Initializes GenericCrawlerSpider
 
         Args:
@@ -63,13 +63,14 @@ class GenericCrawlerSpider(Spider):
         self.retries = retries
         self.page_load_timeout = page_load_timeout
         self.keyword = keyword
+        self.contains_dynamic_js_load = contains_dynamic_js_load
         self.start_urls.append(self.source_url)
         self.search_page = True
 
         self.link_pages_extractor = LinkExtractor(
             allow_domains=self.allowed_domains,
             allow=self.allowed_paths,
-            canonicalize=False,
+            canonicalize=True,
             unique=True,
             process_value=self.normalize_url,
             deny_extensions=None,
@@ -77,7 +78,12 @@ class GenericCrawlerSpider(Spider):
         )
 
     def normalize_url(self, url):
-        return url.split("#")[0].strip(" /")
+        # return url.split("#")[0].strip(" /")
+        # re.fullmatch("(\w+://)?(\w+\.)+\w+(/(\w+|\#))*/\w+", "teste4.com/#/teste/a#oi")
+        # Remove #section da url
+        # re.split("(\w)#(?=\w)", url)
+
+        return url.strip(" /")
 
     def start_requests(self, *args, **kwargs):
         self.define_stats_attributes()
@@ -92,7 +98,21 @@ class GenericCrawlerSpider(Spider):
 
         self.logger.info(f"INITIAL URL: {entrypoint_url}")
 
-        yield self.make_request(entrypoint_url, 'INITIAL_SEARCH_PAGE')
+        yield self.make_request(
+            entrypoint_url,
+            'INITIAL_SEARCH_PAGE',
+            self.parse_first_page
+        )
+
+    def parse_first_page(self, response: HtmlResponse, title):
+        links_found = self.get_page_links(response)
+
+        # with open("output.html", "wb") as file:
+        #     file.write(response.body)
+        # return None
+
+        for link in links_found:
+            yield self.make_request(link['url'], link['text'], self.parse_page)
 
     def parse_page(self, response: HtmlResponse, title):
         # self.logger.info(f"PARSE PAGE: {response.url}")
@@ -112,7 +132,7 @@ class GenericCrawlerSpider(Spider):
             links_found = self.get_page_links(response)
 
             for link in links_found:
-                yield self.make_request(link['url'], link['text'])
+                yield self.make_request(link['url'], link['text'], self.parse_page)
             yield self.data_extraction(response, title)
         else:
             self.stats.inc_value('dropped_records_by_keyword_all_content')
@@ -129,22 +149,37 @@ class GenericCrawlerSpider(Spider):
             0
         )
 
-    def make_request(self, url, title):
+    def make_request(self, url, title, parse_callback):
+        if (self.contains_dynamic_js_load):
+            return self.dynamic_js_request(url, title, parse_callback)
+        else:
+            return self.simple_request(url, title, parse_callback)
+
+    def simple_request(self, url, title, parse_callback):
         if SCRAPY_REQUEST_METHOD == "SPLASH":
             return SplashRequest(
                 url=url,
-                callback=self.parse_page,
+                callback=parse_callback,
                 endpoint='render.html',
                 args={'wait': self.page_load_timeout},
-                cb_kwargs={"title": title}
+                cb_kwargs={"title": title},
+                # headers={'User-Agent': self.user_agent}
             )
         else:
             return Request(
                 url=url,
-                callback=self.parse_page,
+                callback=parse_callback,
                 meta={'donwload_timeout': self.page_load_timeout},
                 cb_kwargs={"title": title}
             )
+
+    def dynamic_js_request(self, url, title, parse_callback):
+        return SeleniumRequest(
+            url=url,
+            callback=parse_callback,
+            meta={'donwload_timeout': self.page_load_timeout},
+            cb_kwargs={"title": title}
+        )
 
     def data_extraction(self, response: HtmlResponse, title):
         # Extracao restrita a apenas as partes importantes

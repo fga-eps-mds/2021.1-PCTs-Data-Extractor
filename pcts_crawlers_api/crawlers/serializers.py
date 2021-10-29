@@ -28,6 +28,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
             'cron_day_of_week',
             'cron_day_of_month',
             'cron_month_of_year',
+            'contains_dynamic_js_load',
             'created_at',
             'url',
         ]
@@ -59,6 +60,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
             cron_day_of_week=validated_data.get("cron_day_of_week"),
             cron_day_of_month=validated_data.get("cron_day_of_month"),
             cron_month_of_year=validated_data.get("cron_month_of_year"),
+            contains_dynamic_js_load=validated_data.get("contains_dynamic_js_load"),
         )
 
         create_periodic_task(celery_app, crawler, KEYWORDS)
