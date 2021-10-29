@@ -78,7 +78,8 @@ class GenericCrawlerSpider(Spider):
         )
 
     def normalize_url(self, url):
-        return url.split("#")[0].strip(" /")
+        # return url.split("#")[0].strip(" /")
+        return url.strip(" /")
 
     def start_requests(self, *args, **kwargs):
         self.define_stats_attributes()
@@ -154,7 +155,7 @@ class GenericCrawlerSpider(Spider):
                 endpoint='render.html',
                 args={'wait': self.page_load_timeout},
                 cb_kwargs={"title": title},
-                headers={'User-Agent': self.user_agent}
+                # headers={'User-Agent': self.user_agent}
             )
         else:
             return Request(
