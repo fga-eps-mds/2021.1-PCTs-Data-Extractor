@@ -95,10 +95,10 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
             crawler_execution.finish_datetime = datetime.now()
             crawler_execution.save()
 
-            if prev_subtasks == None:
-                return result_state
-            else:
-                return prev_subtasks and result_state
+        if prev_subtasks == None:
+            return result_state
+        else:
+            return prev_subtasks and result_state
 
     @task(name=f"{task_group_name}_start", bind=True)
     def task_crawler_group(self, crawler_id, crawler_args, keywords, **kwargs):
