@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecutionGroup
@@ -60,10 +61,46 @@ class CrawlerSerializer(serializers.ModelSerializer):
             cron_day_of_week=validated_data.get("cron_day_of_week"),
             cron_day_of_month=validated_data.get("cron_day_of_month"),
             cron_month_of_year=validated_data.get("cron_month_of_year"),
-            contains_dynamic_js_load=validated_data.get("contains_dynamic_js_load"),
+            contains_dynamic_js_load=validated_data.get(
+                "contains_dynamic_js_load"),
         )
 
         create_periodic_task(celery_app, crawler, KEYWORDS)
+
+        from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
+
+
+        # crontab = CrontabSchedule.objects.create(
+        #     minute=crawler.cron_minute,
+        #     hour=crawler.cron_hour,
+        #     day_of_week=crawler.cron_day_of_week,
+        #     day_of_month=crawler.cron_day_of_month,
+        #     month_of_year=crawler.cron_month_of_year
+        # )
+
+        # all_crawler_args = {
+        #     "crawler_id": crawler.id,
+        #     "crawler_args": {
+        #         "site_name": crawler.site_name,
+        #         "url_root": crawler.url_root,
+        #         "qs_search_keyword_param": crawler.qs_search_keyword_param,
+        #         "contains_end_path_keyword": crawler.contains_end_path_keyword,
+        #         "task_name_prefix": crawler.task_name_prefix,
+        #         "allowed_domains": crawler.allowed_domains,
+        #         "allowed_paths": crawler.allowed_paths,
+        #         "retries": crawler.retries,
+        #         "page_load_timeout": crawler.page_load_timeout,
+        #         "contains_dynamic_js_load": crawler.contains_dynamic_js_load,
+        #     },
+        #     "keywords": KEYWORDS,
+        # }
+
+        # PeriodicTask.objects.create(
+        #     name=f"{crawler.task_name_prefix}_start",
+        #     task=f"{crawler.task_name_prefix}_start",
+        #     crontab=crontab,
+        # )
+
 
         return crawler
 
