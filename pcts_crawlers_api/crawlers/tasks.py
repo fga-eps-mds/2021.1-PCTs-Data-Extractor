@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 from datetime import datetime
 from celery import Celery
 from celery.app import task as task_obj
@@ -8,6 +9,7 @@ from crawlers.models import Crawler
 from celery.canvas import group, chain, chord
 from celery.schedules import crontab
 from celery import shared_task, task
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 from pcts_crawlers_api.celery import app as celery_app
 
@@ -160,41 +162,90 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
     return task_crawler_group
 
 
-def create_periodic_task(sender: Celery, crawler: Crawler, keywords=[]):
+def get_periodic_task(task_name):
+    try:
+        return PeriodicTask.objects.get(name=task_name)
+    except Exception:
+        return None
+
+
+def create_periodic_task(sender: Celery, taskname, crontab_args,
+                         task_kwargs):
     sender.add_periodic_task(
-        crontab(
-            minute=crawler.cron_minute,
-            hour=crawler.cron_hour,
-            day_of_week=crawler.cron_day_of_week,
-            day_of_month=crawler.cron_day_of_month,
-            month_of_year=crawler.cron_month_of_year
+        schedule=crontab(
+            **crontab_args
         ),
-        task_crawler_group_wrapper(
-            crawler.task_name_prefix,
-            f"{crawler.task_name_prefix}_keyword",
-        ).subtask(kwargs={
-            "crawler_id": crawler.id,
-            "crawler_args": {
-                "site_name": crawler.site_name,
-                "url_root": crawler.url_root,
-                "qs_search_keyword_param": crawler.qs_search_keyword_param,
-                "contains_end_path_keyword": crawler.contains_end_path_keyword,
-                "task_name_prefix": crawler.task_name_prefix,
-                "allowed_domains": crawler.allowed_domains,
-                "allowed_paths": crawler.allowed_paths,
-                "retries": crawler.retries,
-                "page_load_timeout": crawler.page_load_timeout,
-                "contains_dynamic_js_load": crawler.contains_dynamic_js_load,
-            },
-            "keywords": keywords,
-        }),
-        name=crawler.task_name_prefix,
+        sig=task_crawler_group_wrapper(
+            taskname,
+            f"{taskname}_keyword",
+        ).subtask(kwargs=task_kwargs),
+        name=taskname,
     )
+
+def get_crontab_scheduler(crontab_args):
+    try:
+        crontab_scheduler = CrontabSchedule.objects.get(**crontab_args)
+    except Exception:
+        crontab_scheduler = CrontabSchedule.objects.create(**crontab_args)
+    return crontab_scheduler
+
+def update_periodic_task(task: PeriodicTask, crontab_args, task_kwargs):
+    task.kwargs = json.dumps(task_kwargs)
+    task.crontab = get_crontab_scheduler(crontab_args)
+    task.interval = None
+    task.solar = None
+    task.clocked = None
+    task.save()
+
+
+def create_or_update_periodic_task(sender: Celery, crawler: Crawler,
+                                   keywords=[]):
+    task_kwargs = {
+        "crawler_id": crawler.id,
+        "crawler_args": {
+            "site_name": crawler.site_name,
+            "url_root": crawler.url_root,
+            "qs_search_keyword_param": crawler.qs_search_keyword_param,
+            "contains_end_path_keyword": crawler.contains_end_path_keyword,
+            "task_name_prefix": crawler.task_name_prefix,
+            "allowed_domains": crawler.allowed_domains,
+            "allowed_paths": crawler.allowed_paths,
+            "retries": crawler.retries,
+            "page_load_timeout": crawler.page_load_timeout,
+            "contains_dynamic_js_load": crawler.contains_dynamic_js_load,
+        },
+        "keywords": keywords,
+    }
+    crontab_args = {
+        "minute": crawler.cron_minute,
+        "hour": crawler.cron_hour,
+        "day_of_week": crawler.cron_day_of_week,
+        "day_of_month": crawler.cron_day_of_month,
+        "month_of_year": crawler.cron_month_of_year
+    }
+
+    taskname = crawler.task_name_prefix
+    task = get_periodic_task(taskname)
+    if task:
+        print("ATUALIZANDO TASK:", taskname)
+        update_periodic_task(
+            task,
+            crontab_args,
+            task_kwargs,
+        )
+    else:
+        print("ADICIONANDO TASK:", taskname)
+        create_periodic_task(
+            sender,
+            taskname,
+            crontab_args,
+            task_kwargs,
+        )
 
 
 # ============================= AUTO CREATE SCHEDULERS ON STARTUP
 @celery_app.on_after_finalize.connect
-def setup_periodic_crawlers(sender: Celery, **kwargs):
+def sync_periodic_crawlers(sender: Celery, **kwargs):
     """ Adiciona jobs agendados a partir dos crawler default disponiveis
     """
 
@@ -206,8 +257,12 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
     except Exception:
         keywords = []
 
-    print("ADICIONANDO PERIODIC TASKS")
-
-    crawler = Crawler.objects.all()
-    for crawler in crawler:
-        create_periodic_task(sender, crawler, keywords)
+    print("SINCRONIZANDO PERIODIC TASKS")
+    crawlers = Crawler.objects.all()
+    for crawler in crawlers:
+        print("SINCRONIZAR TASK:", crawler.task_name_prefix)
+        try:
+            create_or_update_periodic_task(sender, crawler, keywords)
+        except Exception as e:
+            print("EXCECAO AO SINCRONIZAR TASK:", str(e))
+            raise e
