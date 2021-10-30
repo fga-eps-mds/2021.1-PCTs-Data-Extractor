@@ -1,20 +1,23 @@
-from crawlers.models import STARTED
-from crawlers.models import SUCCESS
-from crawlers.models import FAILURE
-
-from crawlers.models import CrawlerExecution
-from crawlers.models import CrawlerExecutionGroup
-from crawlers.models import Crawler
 import sys
 import os
-
 from datetime import datetime
 from celery import Celery
 from celery.app import task as task_obj
-from celery import shared_task, task
-from celery.schedules import crontab
+from crawlers.models import CrawlerExecutionGroup
+from crawlers.models import Crawler
 from celery.canvas import group, chain, chord
+from celery.schedules import crontab
+from celery import shared_task, task
+
 from pcts_crawlers_api.celery import app as celery_app
+
+from crawlers.models import STARTED
+from crawlers.models import SUCCESS
+from crawlers.models import FAILURE
+from crawlers.models import CrawlerExecution
+
+from keywords.models import Keyword
+
 
 ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
 if ENVIRONMENT_EXEC == "DOCKER":
@@ -86,7 +89,6 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
             crawler_execution.dropped_records = execution_stats.get(
                 "droped_records") or 0
             crawler_execution.state = SUCCESS
-            pass
         except Exception as e:
             result_state = False
             crawler_execution.state = FAILURE
@@ -101,7 +103,7 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
             return prev_subtasks and result_state
 
     @task(name=f"{task_group_name}_start", bind=True)
-    def task_crawler_group(self, crawler_id, crawler_args, keywords, **kwargs):
+    def task_crawler_group(self, crawler_id, crawler_args, keywords=[], **kwargs):
         crawler = Crawler.objects.get(pk=crawler_id)
 
         task_id = self.request.id
@@ -120,6 +122,9 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
         )
 
         task_crawler_subtasks = []
+        if not keywords:
+            keywords.append("")
+
         for idx, keyword in enumerate(keywords):
             task_args = {
                 "crawler_execution_group_id": crawler_group.id,
@@ -193,10 +198,13 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
     """ Adiciona jobs agendados a partir dos crawler default disponiveis
     """
 
-    keywords = [
-        keyword.keyword
-        for keyword.ke in Keyword.objects.all()
-    ]
+    try:
+        keywords = [
+            keyword.keyword
+            for keyword in Keyword.objects.all()
+        ]
+    except Exception:
+        keywords = []
 
     print("ADICIONANDO PERIODIC TASKS")
 

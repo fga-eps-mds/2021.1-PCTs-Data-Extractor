@@ -20,5 +20,8 @@ python manage.py ensure_adminuser --username=$DJANGO_SUPERUSER_USERNAME \
 echo '========== LOAD DEFAULT CRAWLERS DATA'
 python manage.py loaddata crawlers/fixtures/crawlers.json
 
+echo '========== LOAD DEFAULT KEYWORDS DATA'
+python manage.py loaddata keywords/fixtures/keywords.json
+
 echo '========== RUNNING SERVER'
 python manage.py runserver 0.0.0.0:8002
