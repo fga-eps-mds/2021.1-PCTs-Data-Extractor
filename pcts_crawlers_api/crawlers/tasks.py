@@ -193,12 +193,13 @@ def setup_periodic_crawlers(sender: Celery, **kwargs):
     """ Adiciona jobs agendados a partir dos crawler default disponiveis
     """
 
-    KEYWORDS = [
-        "povos e comunidades tradicionais",
-        "quilombolas",
+    keywords = [
+        keyword.keyword
+        for keyword.ke in Keyword.objects.all()
     ]
+
     print("ADICIONANDO PERIODIC TASKS")
 
     crawler = Crawler.objects.all()
     for crawler in crawler:
-        create_periodic_task(sender, crawler, KEYWORDS)
+        create_periodic_task(sender, crawler, keywords)

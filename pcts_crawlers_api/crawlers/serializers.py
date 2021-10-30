@@ -3,6 +3,7 @@ from rest_framework import serializers
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecutionGroup
 from crawlers.models import CrawlerExecution
+from keywords.models import Keyword
 
 from rest_framework_nested.relations import NestedHyperlinkedRelatedField
 
@@ -35,9 +36,9 @@ class CrawlerSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        KEYWORDS = [
-            "povos e comunidades tradicionais",
-            "quilombolas",
+        keywords = [
+            keyword.keyword
+            for keyword.ke in Keyword.objects.all()
         ]
 
         crawler = Crawler.objects.create(
@@ -65,10 +66,9 @@ class CrawlerSerializer(serializers.ModelSerializer):
                 "contains_dynamic_js_load"),
         )
 
-        create_periodic_task(celery_app, crawler, KEYWORDS)
+        create_periodic_task(celery_app, crawler, keywords)
 
         from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
-
 
         # crontab = CrontabSchedule.objects.create(
         #     minute=crawler.cron_minute,
@@ -100,7 +100,6 @@ class CrawlerSerializer(serializers.ModelSerializer):
         #     task=f"{crawler.task_name_prefix}_start",
         #     crontab=crontab,
         # )
-
 
         return crawler
 

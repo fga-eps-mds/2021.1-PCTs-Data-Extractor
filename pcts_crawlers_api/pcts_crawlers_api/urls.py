@@ -20,14 +20,17 @@ from django.urls import include, path
 from crawlers import views
 
 from crawlers import urls as crawler_routes
+from keywords import urls as keywords_routes
 from rest_framework import routers
 
 urls = [
-    path('', include('crawlers.urls', namespace="crawlers"))
+    path('', include('crawlers.urls', namespace="crawlers")),
+    path('', include('keywords.urls', namespace="keywords")),
 ]
 
 router = routers.DefaultRouter()
 router.registry.extend(crawler_routes.router.registry)
+router.registry.extend(keywords_routes.router.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
