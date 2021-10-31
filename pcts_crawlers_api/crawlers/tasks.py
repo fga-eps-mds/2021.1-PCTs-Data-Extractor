@@ -20,7 +20,6 @@ from crawlers.models import CrawlerExecution
 
 from keywords.models import Keyword
 
-
 ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
 if ENVIRONMENT_EXEC == "DOCKER":
     sys.path.append('/app/pcts_crawlers_scripts')
@@ -31,12 +30,8 @@ else:
 from crawler_executor import run_generic_crawler
 
 
-def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
-    """ Wrapper do task group de execucao de um crawler inteiro
-        e a subtask de execucao de uma keyword por vez
-    """
-
-    @task(name=f"{task_group_name}_finish", bind=True)
+def task_crawler_finish_wrapper(task_name_prefix):
+    @task(name=f"{task_name_prefix}_finish", bind=True)
     def task_finish_group_execution(self, subtasks_result, crawler_execution_group_id):
         crawler_execution_group = CrawlerExecutionGroup.objects.get(
             pk=crawler_execution_group_id
@@ -49,7 +44,11 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
 
         return subtasks_result
 
-    @task(name=task_sub_prefix_name, bind=True, time_limit=sys.maxsize)
+    return task_finish_group_execution
+
+
+def task_crawler_keyword_wrapper(task_name_prefix):
+    @task(name=f"{task_name_prefix}_keyword", bind=True, time_limit=sys.maxsize)
     def task_crawler_subtask(self, prev_subtasks,
                              crawler_execution_group_id, crawler_args,
                              keyword, **kwargs):
@@ -104,8 +103,16 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
         else:
             return prev_subtasks and result_state
 
-    @task(name=f"{task_group_name}_start", bind=True)
-    def task_crawler_group(self, crawler_id, crawler_args, keywords=[], **kwargs):
+    return task_crawler_subtask
+
+
+def task_crawler_group_wrapper(task_name):
+    """ Wrapper do task group de execucao de um crawler inteiro
+        e a subtask de execucao de uma keyword por vez
+    """
+    @task(name=f"{task_name}_start", bind=True)
+    def task_crawler_group(self, task_name_prefix, crawler_id, crawler_args,
+                           keywords=[], **kwargs):
         crawler = Crawler.objects.get(pk=crawler_id)
 
         task_id = self.request.id
@@ -141,16 +148,17 @@ def task_crawler_group_wrapper(task_group_name, task_sub_prefix_name):
                 task_args["prev_subtasks"] = None
 
             task_crawler_subtasks.append(
-                task_crawler_subtask.subtask(
+                task_crawler_keyword_wrapper(task_name_prefix).subtask(
                     kwargs=task_args
                 )
             )
 
-        task_finish_group_exec_subtask = task_finish_group_execution.subtask(
-            kwargs={
-                "crawler_execution_group_id": crawler_group.id
-            },
-        )
+        task_finish_group_exec_subtask = \
+            task_crawler_finish_wrapper(task_name_prefix).subtask(
+                kwargs={
+                    "crawler_execution_group_id": crawler_group.id,
+                },
+            )
 
         chain(
             *task_crawler_subtasks,
@@ -171,16 +179,18 @@ def get_periodic_task(task_name):
 
 def create_periodic_task(sender: Celery, taskname, crontab_args,
                          task_kwargs):
+
+    task_kwargs["task_name_prefix"] = taskname
     sender.add_periodic_task(
         schedule=crontab(
             **crontab_args
         ),
         sig=task_crawler_group_wrapper(
-            taskname,
-            f"{taskname}_keyword",
+            taskname
         ).subtask(kwargs=task_kwargs),
         name=taskname,
     )
+
 
 def get_crontab_scheduler(crontab_args):
     try:
@@ -188,6 +198,7 @@ def get_crontab_scheduler(crontab_args):
     except Exception:
         crontab_scheduler = CrontabSchedule.objects.create(**crontab_args)
     return crontab_scheduler
+
 
 def update_periodic_task(task: PeriodicTask, crontab_args, task_kwargs):
     task.kwargs = json.dumps(task_kwargs)
@@ -243,26 +254,26 @@ def create_or_update_periodic_task(sender: Celery, crawler: Crawler,
         )
 
 
-# # ============================= AUTO CREATE SCHEDULERS ON STARTUP
-# @celery_app.on_after_finalize.connect
-# def sync_periodic_crawlers(sender: Celery, **kwargs):
-#     """ Adiciona jobs agendados a partir dos crawler default disponiveis
-#     """
+# ============================= AUTO CREATE SCHEDULERS ON STARTUP
+@celery_app.on_after_finalize.connect
+def sync_periodic_crawlers(sender: Celery, **kwargs):
+    """ Adiciona jobs agendados a partir dos crawler default disponiveis
+    """
 
-#     try:
-#         keywords = [
-#             keyword.keyword
-#             for keyword in Keyword.objects.all()
-#         ]
-#     except Exception:
-#         keywords = []
+    try:
+        keywords = [
+            keyword.keyword
+            for keyword in Keyword.objects.all()
+        ]
+    except Exception:
+        keywords = []
 
-#     print("SINCRONIZANDO PERIODIC TASKS")
-#     crawlers = Crawler.objects.all()
-#     for crawler in crawlers:
-#         print("SINCRONIZAR TASK:", crawler.task_name_prefix)
-#         try:
-#             create_or_update_periodic_task(sender, crawler, keywords)
-#         except Exception as e:
-#             print("EXCECAO AO SINCRONIZAR TASK:", str(e))
-#             raise e
+    print("SINCRONIZANDO PERIODIC TASKS")
+    crawlers = Crawler.objects.all()
+    for crawler in crawlers:
+        print("SINCRONIZAR TASK:", crawler.task_name_prefix)
+        try:
+            create_or_update_periodic_task(sender, crawler, keywords)
+        except Exception as e:
+            print("EXCECAO AO SINCRONIZAR TASK:", str(e))
+            raise e
