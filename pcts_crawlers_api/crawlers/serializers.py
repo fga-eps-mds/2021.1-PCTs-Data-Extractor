@@ -66,40 +66,49 @@ class CrawlerSerializer(serializers.ModelSerializer):
                 "contains_dynamic_js_load"),
         )
 
-        create_periodic_task(celery_app, crawler, keywords)
+        crontab_args = {
+            "minute": validated_data.get("cron_minute"),
+            "hour": validated_data.get("cron_hour"),
+            "day_of_week": validated_data.get("cron_day_of_week"),
+            "day_of_month": validated_data.get("cron_day_of_month"),
+            "month_of_year": validated_data.get("cron_month_of_year"),
+        }
+
+        task_args = {
+            "crawler_id": crawler.id,
+            "crawler_args": {
+                "site_name": validated_data.get("site_name"),
+                "url_root": validated_data.get("url_root"),
+                "task_name_prefix": validated_data.get("task_name_prefix"),
+                "qs_search_keyword_param": validated_data.get("qs_search_keyword_param"),
+                "contains_end_path_keyword": validated_data.get("contains_end_path_keyword"),
+                "allowed_domains": validated_data.get("allowed_domains"),
+                "allowed_paths": validated_data.get("allowed_paths"),
+                "retries": validated_data.get("retries"),
+                "page_load_timeout": validated_data.get("page_load_timeout"),
+                "contains_dynamic_js_load": validated_data.get("contains_dynamic_js_load"),
+            },
+            "keywords": keywords,
+        }
+
+        create_periodic_task(celery_app, crawler.task_name_prefix, crontab_args, task_args)
 
         from django_celery_beat.models import PeriodicTask, PeriodicTasks, CrontabSchedule
 
-        # crontab = CrontabSchedule.objects.create(
-        #     minute=crawler.cron_minute,
-        #     hour=crawler.cron_hour,
-        #     day_of_week=crawler.cron_day_of_week,
-        #     day_of_month=crawler.cron_day_of_month,
-        #     month_of_year=crawler.cron_month_of_year
-        # )
+        crontab = CrontabSchedule.objects.get(
+            minute=crawler.cron_minute,
+            hour=crawler.cron_hour,
+            day_of_week=crawler.cron_day_of_week,
+            day_of_month=crawler.cron_day_of_month,
+            month_of_year=crawler.cron_month_of_year
+        )
 
-        # all_crawler_args = {
-        #     "crawler_id": crawler.id,
-        #     "crawler_args": {
-        #         "site_name": crawler.site_name,
-        #         "url_root": crawler.url_root,
-        #         "qs_search_keyword_param": crawler.qs_search_keyword_param,
-        #         "contains_end_path_keyword": crawler.contains_end_path_keyword,
-        #         "task_name_prefix": crawler.task_name_prefix,
-        #         "allowed_domains": crawler.allowed_domains,
-        #         "allowed_paths": crawler.allowed_paths,
-        #         "retries": crawler.retries,
-        #         "page_load_timeout": crawler.page_load_timeout,
-        #         "contains_dynamic_js_load": crawler.contains_dynamic_js_load,
-        #     },
-        #     "keywords": KEYWORDS,
-        # }
-
-        # PeriodicTask.objects.create(
-        #     name=f"{crawler.task_name_prefix}_start",
-        #     task=f"{crawler.task_name_prefix}_start",
-        #     crontab=crontab,
-        # )
+        PeriodicTask.objects.create(
+            name=f"{crawler.task_name_prefix}_start",
+            task=f"{crawler.task_name_prefix}_start",
+            crontab=crontab,
+            kwargs=json.dumps(task_args)
+        )
 
         return crawler
 

@@ -243,26 +243,26 @@ def create_or_update_periodic_task(sender: Celery, crawler: Crawler,
         )
 
 
-# ============================= AUTO CREATE SCHEDULERS ON STARTUP
-@celery_app.on_after_finalize.connect
-def sync_periodic_crawlers(sender: Celery, **kwargs):
-    """ Adiciona jobs agendados a partir dos crawler default disponiveis
-    """
+# # ============================= AUTO CREATE SCHEDULERS ON STARTUP
+# @celery_app.on_after_finalize.connect
+# def sync_periodic_crawlers(sender: Celery, **kwargs):
+#     """ Adiciona jobs agendados a partir dos crawler default disponiveis
+#     """
 
-    try:
-        keywords = [
-            keyword.keyword
-            for keyword in Keyword.objects.all()
-        ]
-    except Exception:
-        keywords = []
+#     try:
+#         keywords = [
+#             keyword.keyword
+#             for keyword in Keyword.objects.all()
+#         ]
+#     except Exception:
+#         keywords = []
 
-    print("SINCRONIZANDO PERIODIC TASKS")
-    crawlers = Crawler.objects.all()
-    for crawler in crawlers:
-        print("SINCRONIZAR TASK:", crawler.task_name_prefix)
-        try:
-            create_or_update_periodic_task(sender, crawler, keywords)
-        except Exception as e:
-            print("EXCECAO AO SINCRONIZAR TASK:", str(e))
-            raise e
+#     print("SINCRONIZANDO PERIODIC TASKS")
+#     crawlers = Crawler.objects.all()
+#     for crawler in crawlers:
+#         print("SINCRONIZAR TASK:", crawler.task_name_prefix)
+#         try:
+#             create_or_update_periodic_task(sender, crawler, keywords)
+#         except Exception as e:
+#             print("EXCECAO AO SINCRONIZAR TASK:", str(e))
+#             raise e
