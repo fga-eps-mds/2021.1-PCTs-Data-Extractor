@@ -14,7 +14,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'site_name',
-            'task_name_prefix',
+            'task_name',
             'url_root',
             'qs_search_keyword_param',
             'contains_end_path_keyword',
@@ -41,8 +41,8 @@ class CrawlerSerializer(serializers.ModelSerializer):
         crawler = Crawler.objects.create(
             site_name=validated_data.get("site_name"),
             url_root=validated_data.get("url_root"),
-            task_name_prefix=validated_data.get(
-                "task_name_prefix"),
+            task_name=validated_data.get(
+                "task_name"),
             qs_search_keyword_param=validated_data.get(
                 "qs_search_keyword_param"),
             contains_end_path_keyword=validated_data.get(
@@ -75,7 +75,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
 
         crawler.site_name=validated_data.get("site_name")
         crawler.url_root=validated_data.get("url_root")
-        crawler.task_name_prefix=validated_data.get("task_name_prefix")
+        crawler.task_name=validated_data.get("task_name")
         crawler.qs_search_keyword_param=validated_data.get("qs_search_keyword_param")
         crawler.contains_end_path_keyword=validated_data.get("contains_end_path_keyword")
         crawler.allowed_domains=validated_data.get("allowed_domains")

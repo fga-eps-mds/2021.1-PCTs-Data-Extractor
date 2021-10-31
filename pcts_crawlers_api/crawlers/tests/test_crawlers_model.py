@@ -11,17 +11,17 @@ class TestCrawlerModel(TestCase):
     def test_document_creation(self):
         site_name = "mpf"
         url_root = "www.mpf.mp.br"
-        task_name_prefix = "mpf_crawler"
+        task_name = "mpf_crawler"
 
         crawler = Crawler.objects.create(
             site_name=site_name,
             url_root=url_root,
-            task_name_prefix=task_name_prefix,
+            task_name=task_name,
         )
 
         self.assertEqual(site_name, crawler.site_name)
         self.assertEqual(url_root, crawler.url_root)
-        self.assertEqual(task_name_prefix, crawler.task_name_prefix)
+        self.assertEqual(task_name, crawler.task_name)
         self.assertIsNotNone(crawler.created_at)
 
 
@@ -31,7 +31,7 @@ class TestCrawlerExecutionGroupModel(TestCase):
         crawler_model = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
-            task_name_prefix="mpf_crawler",
+            task_name="mpf_crawler",
         )
 
         crawler = crawler_model
@@ -60,7 +60,7 @@ class TestCrawlerExecutionModel(TestCase):
         crawler_model = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
-            task_name_prefix="mpf_crawler",
+            task_name="mpf_crawler",
         )
 
         crawler_execution_group_model = CrawlerExecutionGroup.objects.create(

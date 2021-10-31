@@ -4,7 +4,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "mpf",
-            "task_name_prefix": "mpf_crawler",
+            "task_name": "mpf_crawler",
             "url_root": "http://www.mpf.mp.br/@@search",
             "qs_search_keyword_param": "SearchableText",
             "allowed_domains": [
@@ -31,7 +31,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "incra",
-            "task_name_prefix": "incra_crawler",
+            "task_name": "incra_crawler",
             "url_root": "https://www.gov.br/incra/pt-br/search",
             "qs_search_keyword_param": "SearchableText",
             "allowed_domains": [
@@ -57,7 +57,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "senado",
-            "task_name_prefix": "senado_crawler",
+            "task_name": "senado_crawler",
             "url_root": "https://www6g.senado.leg.br/busca",
             "qs_search_keyword_param": "q",
             "allowed_domains": [
@@ -83,7 +83,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "tcu_pesquisa_integrada",
-            "task_name_prefix": "tcu_pesquisa_integrada_crawler",
+            "task_name": "tcu_pesquisa_integrada_crawler",
             "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
             "contains_end_path_keyword": true,
             "allowed_domains": [
@@ -109,7 +109,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "icmbio",
-            "task_name_prefix": "icmbio_crawler",
+            "task_name": "icmbio_crawler",
             "url_root": "https://www.icmbio.gov.br/portal/busca",
             "qs_search_keyword_param": "searchword",
             "allowed_domains": [
@@ -134,7 +134,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "ibama",
-            "task_name_prefix": "ibama_crawler",
+            "task_name": "ibama_crawler",
             "url_root": "https://www.gov.br/ibama/pt-br/search",
             "qs_search_keyword_param": "SearchableText",
             "allowed_domains": [
@@ -160,7 +160,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "ibge",
-            "task_name_prefix": "ibge_crawler",
+            "task_name": "ibge_crawler",
             "url_root": "https://www.ibge.gov.br/busca.html",
             "qs_search_keyword_param": "searchword",
             "allowed_domains": [
@@ -187,7 +187,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "camara_dos_deputados",
-            "task_name_prefix": "camara_dos_deputados_crawler",
+            "task_name": "camara_dos_deputados_crawler",
             "url_root": "https://www.camara.leg.br/busca-geral",
             "qs_search_keyword_param": "termo",
             "allowed_domains": [
@@ -212,7 +212,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stf_noticias",
-            "task_name_prefix": "stf_noticias_crawler",
+            "task_name": "stf_noticias_crawler",
             "url_root": "http://portal.stf.jus.br/listagem/listarNoticias.asp",
             "qs_search_keyword_param": "termoPesquisa",
             "allowed_domains": [
@@ -237,7 +237,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stf_jurisprudencia",
-            "task_name_prefix": "stf_jurisprudencia_crawler",
+            "task_name": "stf_jurisprudencia_crawler",
             "url_root": "https://jurisprudencia.stf.jus.br/pages/search",
             "qs_search_keyword_param": "queryString",
             "allowed_domains": [
@@ -262,7 +262,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stj",
-            "task_name_prefix": "stj_crawler",
+            "task_name": "stj_crawler",
             "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
             "qs_search_keyword_param": "q",
             "allowed_domains": [

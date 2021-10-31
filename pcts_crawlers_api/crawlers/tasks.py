@@ -187,7 +187,7 @@ def get_crontab_scheduler(minute, hour, day_of_week, day_of_month, month_of_year
 
 def create_crawler_periodic_task(crawler: Crawler, keywords=[]):
     task = PeriodicTask.objects.create(
-        name=crawler.task_name_prefix,
+        name=crawler.task_name,
         task=TASK_CRAWLER_GROUP_START_NAME,
         crontab=get_crontab_scheduler(
             crawler.cron_minute,
@@ -203,7 +203,7 @@ def create_crawler_periodic_task(crawler: Crawler, keywords=[]):
                 "url_root": crawler.url_root,
                 "qs_search_keyword_param": crawler.qs_search_keyword_param,
                 "contains_end_path_keyword": crawler.contains_end_path_keyword,
-                "task_name_prefix": crawler.task_name_prefix,
+                "task_name": crawler.task_name,
                 "allowed_domains": crawler.allowed_domains,
                 "allowed_paths": crawler.allowed_paths,
                 "retries": crawler.retries,
@@ -226,7 +226,7 @@ def update_periodic_task(task: PeriodicTask, crawler: Crawler,
             "url_root": crawler.url_root,
             "qs_search_keyword_param": crawler.qs_search_keyword_param,
             "contains_end_path_keyword": crawler.contains_end_path_keyword,
-            "task_name_prefix": crawler.task_name_prefix,
+            "task_name": crawler.task_name,
             "allowed_domains": crawler.allowed_domains,
             "allowed_paths": crawler.allowed_paths,
             "retries": crawler.retries,
@@ -249,7 +249,7 @@ def update_periodic_task(task: PeriodicTask, crawler: Crawler,
 
 
 def create_or_update_periodic_task(crawler: Crawler, keywords=[]):
-    taskname = crawler.task_name_prefix
+    taskname = crawler.task_name
     task = get_periodic_task(taskname)
     if task:
         print("ATUALIZANDO TASK:", taskname)
@@ -283,7 +283,7 @@ def sync_periodic_crawlers(sender: Celery, **kwargs):
     print("SINCRONIZANDO PERIODIC TASKS")
     crawlers = Crawler.objects.all()
     for crawler in crawlers:
-        print("SINCRONIZAR TASK:", crawler.task_name_prefix)
+        print("SINCRONIZAR TASK:", crawler.task_name)
         try:
             create_or_update_periodic_task(crawler, keywords)
         except Exception as e:

@@ -20,11 +20,11 @@ class CrawlerEndpoint(APITestCase):
     def test_list_all_crawlers(self):
         Crawler.objects.bulk_create([
             Crawler(site_name="mpf", url_root="www.mpf.mp.br",
-                    task_name_prefix="mpf_crawler"),
+                    task_name="mpf_crawler"),
             Crawler(site_name="incra", url_root="www.gov.br/incra/pt-br",
-                    task_name_prefix="incra_crawler"),
+                    task_name="incra_crawler"),
             Crawler(site_name="tcu", url_root="pesquisa.apps.tcu.gov.br",
-                    task_name_prefix="tcu_crawler"),
+                    task_name="tcu_crawler"),
         ])
 
         response = json.loads(self.client.get(
@@ -50,7 +50,7 @@ class CrawlerExecutionsEndpoint(APITestCase):
         crawler = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
-            task_name_prefix="mpf_crawler"
+            task_name="mpf_crawler"
         )
 
         crawler_group_exec = CrawlerExecutionGroup.objects.create(
