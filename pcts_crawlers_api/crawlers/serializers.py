@@ -35,7 +35,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         keywords = [
             keyword.keyword
-            for keyword.ke in Keyword.objects.all()
+            for keyword in Keyword.objects.all()
         ]
 
         crawler = Crawler.objects.create(
@@ -70,7 +70,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
     def update(self, crawler: Crawler, validated_data):
         keywords = [
             keyword.keyword
-            for keyword.ke in Keyword.objects.all()
+            for keyword in Keyword.objects.all()
         ]
 
         crawler.site_name=validated_data.get("site_name")
