@@ -31,6 +31,14 @@ class Crawler(models.Model):
         unique=True,
         max_length=50
     )
+    task_enabled = models.BooleanField(
+        "Periodic Task Enabled",
+        default=True
+    )
+    task_one_off = models.BooleanField(
+        "Task  One-off (Disable after execution)",
+        default=False
+    )
     allowed_domains = models.JSONField(
         "Allowed Domains (JSON List of strings)",
         null=True
@@ -46,7 +54,6 @@ class Crawler(models.Model):
     )
     contains_end_path_keyword = models.BooleanField(
         "Contains End Path with Keyword for Search",
-        null=True,
         default=False
     )
     retries = models.IntegerField(

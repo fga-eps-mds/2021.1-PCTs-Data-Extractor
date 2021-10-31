@@ -196,14 +196,16 @@ def create_crawler_periodic_task(crawler: Crawler, keywords=[]):
             crawler.cron_day_of_month,
             crawler.cron_month_of_year
         ),
+        enabled=crawler.task_enabled,
+        one_off=crawler.task_one_off,
         kwargs=json.dumps({
             "crawler_id": crawler.id,
             "crawler_args": {
                 "site_name": crawler.site_name,
+                "task_name": crawler.task_name,
                 "url_root": crawler.url_root,
                 "qs_search_keyword_param": crawler.qs_search_keyword_param,
                 "contains_end_path_keyword": crawler.contains_end_path_keyword,
-                "task_name": crawler.task_name,
                 "allowed_domains": crawler.allowed_domains,
                 "allowed_paths": crawler.allowed_paths,
                 "retries": crawler.retries,
@@ -219,14 +221,16 @@ def create_crawler_periodic_task(crawler: Crawler, keywords=[]):
 
 def update_periodic_task(task: PeriodicTask, crawler: Crawler,
                          keywords=[]):
+    task.enabled=crawler.task_enabled
+    task.one_off=crawler.task_one_off
     task.kwargs = json.dumps({
         "crawler_id": crawler.id,
         "crawler_args": {
             "site_name": crawler.site_name,
+            "task_name": crawler.task_name,
             "url_root": crawler.url_root,
             "qs_search_keyword_param": crawler.qs_search_keyword_param,
             "contains_end_path_keyword": crawler.contains_end_path_keyword,
-            "task_name": crawler.task_name,
             "allowed_domains": crawler.allowed_domains,
             "allowed_paths": crawler.allowed_paths,
             "retries": crawler.retries,
