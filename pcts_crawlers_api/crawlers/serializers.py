@@ -54,13 +54,13 @@ class CrawlerSerializer(serializers.ModelSerializer):
             retries=validated_data.get("retries"),
             page_load_timeout=validated_data.get(
                 "page_load_timeout"),
-            cron_minute=validated_data.get("cron_minute"),
-            cron_hour=validated_data.get("cron_hour"),
-            cron_day_of_week=validated_data.get("cron_day_of_week"),
-            cron_day_of_month=validated_data.get("cron_day_of_month"),
-            cron_month_of_year=validated_data.get("cron_month_of_year"),
             contains_dynamic_js_load=validated_data.get(
                 "contains_dynamic_js_load"),
+            cron_minute=validated_data.get("cron_minute") or '0',
+            cron_hour=validated_data.get("cron_hour") or '4',
+            cron_day_of_week=validated_data.get("cron_day_of_week") or '*',
+            cron_day_of_month=validated_data.get("cron_day_of_month") or '*',
+            cron_month_of_year=validated_data.get("cron_month_of_year") or '*',
         )
 
         create_or_update_periodic_task(crawler, keywords)
@@ -82,12 +82,12 @@ class CrawlerSerializer(serializers.ModelSerializer):
         crawler.allowed_paths=validated_data.get("allowed_paths")
         crawler.retries=validated_data.get("retries")
         crawler.page_load_timeout=validated_data.get("page_load_timeout")
-        crawler.cron_minute=validated_data.get("cron_minute")
-        crawler.cron_hour=validated_data.get("cron_hour")
-        crawler.cron_day_of_week=validated_data.get("cron_day_of_week")
-        crawler.cron_day_of_month=validated_data.get("cron_day_of_month")
-        crawler.cron_month_of_year=validated_data.get("cron_month_of_year")
         crawler.contains_dynamic_js_load=validated_data.get("contains_dynamic_js_load")
+        crawler.cron_minute=validated_data.get("cron_minute") or '0'
+        crawler.cron_hour=validated_data.get("cron_hour") or '4'
+        crawler.cron_day_of_week=validated_data.get("cron_day_of_week") or '*'
+        crawler.cron_day_of_month=validated_data.get("cron_day_of_month") or '*'
+        crawler.cron_month_of_year=validated_data.get("cron_month_of_year") or '*'
 
         crawler.save()
 
