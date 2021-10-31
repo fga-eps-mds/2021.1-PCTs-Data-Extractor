@@ -54,7 +54,7 @@ def task_crawler_keyword(self, prev_subtasks,
                          crawler_execution_group_id, crawler_args,
                          keyword, **kwargs):
     print("INICIANDO CRAWLER KEYWORD")
-    
+
     crawler_execution_group = CrawlerExecutionGroup.objects.get(
         pk=crawler_execution_group_id
     )
@@ -221,8 +221,8 @@ def create_crawler_periodic_task(crawler: Crawler, keywords=[]):
 
 def update_periodic_task(task: PeriodicTask, crawler: Crawler,
                          keywords=[]):
-    task.enabled=crawler.task_enabled
-    task.one_off=crawler.task_one_off
+    task.enabled = crawler.task_enabled
+    task.one_off = crawler.task_one_off
     task.kwargs = json.dumps({
         "crawler_id": crawler.id,
         "crawler_args": {
@@ -270,9 +270,18 @@ def create_or_update_periodic_task(crawler: Crawler, keywords=[]):
         )
 
 
-# ============================= AUTO CREATE SCHEDULERS ON STARTUP
-@celery_app.on_after_finalize.connect
-def sync_periodic_crawlers(sender: Celery, **kwargs):
+def delete_crawler_periodic_task(crawler: Crawler):
+    task = PeriodicTask.objects.get(name=crawler.task_name)
+    task.delete()
+
+
+def truncate_crawler_celery_periodic_tasks():
+    PeriodicTask.objects.filter(
+        task=TASK_CRAWLER_GROUP_START_NAME
+    ).delete()
+
+
+def sync_periodic_crawlers():
     """ Adiciona jobs agendados a partir dos crawler default disponiveis
     """
 
@@ -285,7 +294,9 @@ def sync_periodic_crawlers(sender: Celery, **kwargs):
         keywords = []
 
     print("SINCRONIZANDO PERIODIC TASKS")
+
     crawlers = Crawler.objects.all()
+    truncate_crawler_celery_periodic_tasks()
     for crawler in crawlers:
         print("SINCRONIZAR TASK:", crawler.task_name)
         try:
@@ -293,3 +304,12 @@ def sync_periodic_crawlers(sender: Celery, **kwargs):
         except Exception as e:
             print("EXCECAO AO SINCRONIZAR TASK:", str(e))
             raise e
+
+# ============================= AUTO CREATE SCHEDULERS ON STARTUP
+
+
+@celery_app.on_after_finalize.connect
+def sync_periodic_crawlers_startup(sender: Celery, **kwargs):
+    """ Setup periodic tasks on start up
+    """
+    sync_periodic_crawlers()
