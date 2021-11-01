@@ -8,21 +8,32 @@ from crawlers.models import STARTED, SUCCESS, FAILURE
 
 class TestCrawlerModel(TestCase):
 
+    def setUp(self):
+        self.crawler = Crawler.objects.create(
+            site_name="mpf",
+            url_root="www.mpf.mp.br",
+            task_name="mpf_crawler",
+        )
+
     def test_document_creation(self):
         site_name = "mpf"
         url_root = "www.mpf.mp.br"
         task_name = "mpf_crawler"
 
-        crawler = Crawler.objects.create(
-            site_name=site_name,
-            url_root=url_root,
-            task_name=task_name,
-        )
+        self.assertEqual(site_name, self.crawler.site_name)
+        self.assertEqual(url_root, self.crawler.url_root)
+        self.assertEqual(task_name, self.crawler.task_name)
+        self.assertIsNotNone(self.crawler.created_at)
 
-        self.assertEqual(site_name, crawler.site_name)
-        self.assertEqual(url_root, crawler.url_root)
-        self.assertEqual(task_name, crawler.task_name)
-        self.assertIsNotNone(crawler.created_at)
+    def test_document_delete(self):
+        crawler = Crawler.objects.filter(id=self.crawler.id).get()
+        self.assertIsNotNone(crawler)
+        
+        crawler.delete()
+
+        print(Crawler.objects.filter(id=self.crawler.id).get())
+    
+
 
 
 class TestCrawlerExecutionGroupModel(TestCase):
