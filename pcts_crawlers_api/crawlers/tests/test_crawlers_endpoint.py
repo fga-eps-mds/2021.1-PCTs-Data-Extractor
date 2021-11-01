@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from datetime import datetime
 import json
-
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecution
 from crawlers.models import CrawlerExecutionGroup
@@ -23,6 +22,12 @@ class CrawlerEndpoint(APITestCase):
                     task_name="tcu_crawler"),
         ])
 
+        self.crawler = {
+            "site_name":"ibama",
+            "url_root":"www.gov.br/ibama/pt-br",
+            "task_name":"ibama_crawler",
+        }
+
     def tearDown(self):
         Crawler.objects.all().delete()
 
@@ -37,6 +42,66 @@ class CrawlerEndpoint(APITestCase):
             len(response['results']),
         )
 
+    def test_create(self):
+        response = self.client.post(
+            self.endpoint,
+            self.crawler
+        )
+
+        json_response = json.loads(response.content)
+        
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(self.crawler['site_name'], json_response['site_name'])
+        self.assertEqual(self.crawler['url_root'], json_response['url_root'])
+        self.assertEqual(self.crawler['task_name'], json_response['task_name'])
+
+        return json_response['id']
+
+    def test_get(self):
+        crawler_id = self.test_create()
+
+        response = self.client.get(
+            f"{self.endpoint}{crawler_id}/",
+            format='json'
+        )
+
+        json_response = json.loads(response.content)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(self.crawler['site_name'], json_response['site_name'])
+        self.assertEqual(self.crawler['url_root'], json_response['url_root'])
+        self.assertEqual(self.crawler['task_name'], json_response['task_name'])
+
+        return json_response
+
+    def test_update(self):
+        crawler_id = self.test_create()
+
+        crawler_update = {
+            "site_name":"ibge",
+            "url_root":"www.ibge.gov.br",
+            "task_name":"ibge_crawler",
+        }
+        updated_response = self.client.put(
+            f"{self.endpoint}{crawler_id}/",
+            crawler_update
+        )
+
+        json_response = json.loads(updated_response.content)
+
+        self.assertEqual(200, updated_response.status_code)
+        self.assertEqual(crawler_update['site_name'], json_response['site_name'])
+        self.assertEqual(crawler_update['url_root'], json_response['url_root'])
+        self.assertEqual(crawler_update['task_name'], json_response['task_name'])
+        
+    def test_delete(self):
+        crawler_id = self.test_create()
+        response = self.client.delete(
+            f"{self.endpoint}{crawler_id}/",
+            format='json'
+        )
+        print(response.status_code)
+        self.assertEqual(204, response.status_code)
 
 class CrawlerExecutionsEndpoint(APITestCase):
 
