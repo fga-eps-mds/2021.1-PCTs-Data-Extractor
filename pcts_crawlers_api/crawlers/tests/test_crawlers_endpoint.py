@@ -100,7 +100,6 @@ class CrawlerEndpoint(APITestCase):
             f"{self.endpoint}{crawler_id}/",
             format='json'
         )
-        print(response.status_code)
         self.assertEqual(204, response.status_code)
 
 class CrawlerExecutionsEndpoint(APITestCase):
