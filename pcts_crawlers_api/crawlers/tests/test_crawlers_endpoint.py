@@ -14,10 +14,6 @@ class CrawlerEndpoint(APITestCase):
     def setUp(self):
         self.endpoint = '/api/crawlers/'
 
-    def tearDown(self):
-        Crawler.objects.all().delete()
-
-    def test_list_all_crawlers(self):
         Crawler.objects.bulk_create([
             Crawler(site_name="mpf", url_root="www.mpf.mp.br",
                     task_name="mpf_crawler"),
@@ -27,6 +23,10 @@ class CrawlerEndpoint(APITestCase):
                     task_name="tcu_crawler"),
         ])
 
+    def tearDown(self):
+        Crawler.objects.all().delete()
+
+    def test_list_all_crawlers(self):
         response = json.loads(self.client.get(
             self.endpoint,
             format='json'
@@ -42,19 +42,14 @@ class CrawlerExecutionsEndpoint(APITestCase):
 
     def setUp(self):
         self.endpoint_base = '/api/crawlers'
-
-    def tearDown(self):
-        Crawler.objects.all().delete()
-
-    def test_list_all_crawler_executions(self):
-        crawler = Crawler.objects.create(
+        self.crawler = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
             task_name="mpf_crawler"
         )
 
-        crawler_group_exec = CrawlerExecutionGroup.objects.create(
-            crawler=crawler,
+        self.crawler_group_exec = CrawlerExecutionGroup.objects.create(
+            crawler=self.crawler,
             task_name="mpf_crawler_group",
             finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
             state=STARTED,
@@ -62,24 +57,28 @@ class CrawlerExecutionsEndpoint(APITestCase):
 
         CrawlerExecution.objects.bulk_create([
             CrawlerExecution(
-                crawler_execution_group=crawler_group_exec,
+                crawler_execution_group=self.crawler_group_exec,
                 task_id="352c6526-3153-11ec-8d3d-0242ac130003",
                 finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
             ),
             CrawlerExecution(
-                crawler_execution_group=crawler_group_exec,
+                crawler_execution_group=self.crawler_group_exec,
                 task_id="352c6742-3153-11ec-8d3d-0242ac130003",
                 finish_datetime=datetime(2021, 10, 10, 8, 40, 10),
             ),
             CrawlerExecution(
-                crawler_execution_group=crawler_group_exec,
+                crawler_execution_group=self.crawler_group_exec,
                 task_id="352c6832-3153-11ec-8d3d-0242ac130003",
                 finish_datetime=datetime(2021, 10, 10, 8, 50, 15),
             ),
         ])
 
+    def tearDown(self):
+        Crawler.objects.all().delete()
+
+    def test_list_all_crawler_executions(self):
         response = json.loads(self.client.get(
-            f"{self.endpoint_base}/{crawler.id}/executions/",
+            f"{self.endpoint_base}/{self.crawler.id}/executions/",
             format='json'
         ).content)
 
