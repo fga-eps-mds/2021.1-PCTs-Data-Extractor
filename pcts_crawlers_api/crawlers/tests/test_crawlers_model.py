@@ -45,10 +45,7 @@ class TestCrawlerModel(TestCase):
         self.assertEqual(task_name, updated_crawler.task_name)
 
     def test_document_delete(self):
-        crawler = Crawler.objects.filter(id=self.crawler.id).get()
-        self.assertIsNotNone(crawler)
-        
-        crawler.delete()
+        self.crawler.delete()
 
         try:
             Crawler.objects.filter(id=self.crawler.id).get()
@@ -83,6 +80,14 @@ class TestCrawlerExecutionGroupModel(TestCase):
             finish_datetime, self.crawler_execution_group.finish_datetime)
         self.assertEqual(state, self.crawler_execution_group.state)
         self.assertIsNotNone(self.crawler_execution_group.start_datetime)
+
+    def test_document_delete(self):
+        self.crawler_execution_group.delete()
+
+        try:
+            Crawler.objects.filter(id=self.crawler_execution_group.id).get()
+        except Crawler.DoesNotExist:
+            self.assertTrue(True)
 
 
 class TestCrawlerExecutionModel(TestCase):
