@@ -114,7 +114,7 @@ class GenericCrawlerSpider(Spider):
         for link in links_found:
             yield self.make_request(link['url'], link['text'], self.parse_page)
 
-    def parse_page(self, response: HtmlResponse, title, isTest: bool = False):
+    def parse_page(self, response: HtmlResponse, title, is_test: bool = False):
         # self.logger.info(f"PARSE PAGE: {response.url}")
 
         # Extracao de todo o conteudo da pagina
@@ -130,12 +130,12 @@ class GenericCrawlerSpider(Spider):
         # Follow Links
         if self.check_keyword_affinity(all_content):
             links_found = self.get_page_links(response)
-            if not isTest:
+            if not is_test:
                 for link in links_found:
                     yield self.make_request(link['url'], link['text'], self.parse_page)
             yield self.data_extraction(response, title)
         else:
-            if not isTest:
+            if not is_test:
                 self.stats.inc_value('dropped_records_by_keyword_all_content')
 
     def define_stats_attributes(self):
