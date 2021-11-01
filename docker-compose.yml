@@ -98,9 +98,9 @@ services:
       test: ["CMD", "curl", "http://localhost:8002/api"]
       interval: 10s
       retries: 5
-    # depends_on:
-    #   pcts-crawlers-splash:
-    #     condition: service_healthy
+    depends_on:
+      pcts-crawlers-splash:
+        condition: service_healthy
 
   pcts-crawlers-celery:
     <<: *pcts-crawlers-api-template
@@ -126,6 +126,9 @@ services:
     ports:
       - 5555:5555
     command: ["sh", "scripts/start_celery_flower.sh"]
+    depends_on:
+      pcts-crawlers-api:
+        condition: service_healthy
   # =======================================================================================================
 
 volumes:

@@ -53,7 +53,7 @@ if __name__ == '__main__':
     try:
         crawler_args = {
             "site_name": "stj",
-            "task_name_prefix": "stj_crawler",
+            "task_name": "stj_crawler",
             "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
             "qs_search_keyword_param": "q",
             "allowed_domains": [

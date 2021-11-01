@@ -26,10 +26,18 @@ STATE_CHOICES = [
 class Crawler(models.Model):
     site_name = models.CharField("Site Name", unique=True, max_length=100)
     url_root = models.CharField("Root Url", unique=True, max_length=1024)
-    task_name_prefix = models.CharField(
+    task_name = models.CharField(
         "Task Name Prefix",
         unique=True,
         max_length=50
+    )
+    task_enabled = models.BooleanField(
+        "Periodic Task Enabled",
+        default=True
+    )
+    task_one_off = models.BooleanField(
+        "Task  One-off (Disable after execution)",
+        default=False
     )
     allowed_domains = models.JSONField(
         "Allowed Domains (JSON List of strings)",
@@ -46,7 +54,6 @@ class Crawler(models.Model):
     )
     contains_end_path_keyword = models.BooleanField(
         "Contains End Path with Keyword for Search",
-        null=True,
         default=False
     )
     retries = models.IntegerField(

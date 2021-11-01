@@ -11,6 +11,7 @@ from crawlers.serializers import CrawlerSerializer
 from crawlers.serializers import CrawlerExecutionGroupSerializer
 from multiprocessing import Process
 
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from rest_framework.decorators import api_view
@@ -20,6 +21,8 @@ from rest_framework import generics
 
 from pcts_crawlers_api import celery as root_tasks
 from crawlers import tasks
+
+from crawlers.tasks import delete_crawler_periodic_task
 
 ENVIRONMENT_EXEC = os.environ.get("PROJECT_ENV_EXECUTOR", default="HOST")
 if ENVIRONMENT_EXEC == "DOCKER":
@@ -37,6 +40,10 @@ class CrawlerViewSet(viewsets.ModelViewSet):
     """
     queryset = Crawler.objects.all().order_by('site_name')
     serializer_class = CrawlerSerializer
+
+    def perform_destroy(self, crawler_instance: Crawler):
+        delete_crawler_periodic_task(crawler_instance)
+        super(CrawlerViewSet, self).perform_destroy(crawler_instance)
 
 
 class CrawlerExecutionGroupViewSet(viewsets.ModelViewSet):
