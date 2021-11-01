@@ -31,9 +31,10 @@ class TestCrawlerModel(TestCase):
         
         crawler.delete()
 
-        print(Crawler.objects.filter(id=self.crawler.id).get())
-    
-
+        try:
+            Crawler.objects.filter(id=self.crawler.id).get()
+        except Crawler.DoesNotExist:
+            self.assertTrue(True)
 
 
 class TestCrawlerExecutionGroupModel(TestCase):
