@@ -57,32 +57,32 @@ class TestCrawlerModel(TestCase):
 
 
 class TestCrawlerExecutionGroupModel(TestCase):
-
-    def test_document_creation(self):
-        crawler_model = Crawler.objects.create(
+    def setUp(self):
+        self.crawler_model = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
             task_name="mpf_crawler",
         )
 
-        crawler = crawler_model
+        self.crawler_execution_group = CrawlerExecutionGroup.objects.create(
+            crawler=self.crawler_model,
+            task_name="mpf_crawler_group",
+            finish_datetime=datetime(2021, 10, 10, 8, 34, 56),
+            state=SUCCESS,
+        )
+
+    def test_document_creation(self):
+        crawler = self.crawler_model
         task_name = "mpf_crawler_group"
         finish_datetime = datetime(2021, 10, 10, 8, 34, 56)
         state = SUCCESS
 
-        crawler_execution_group = CrawlerExecutionGroup.objects.create(
-            crawler=crawler,
-            task_name=task_name,
-            finish_datetime=finish_datetime,
-            state=state,
-        )
-
-        self.assertEqual(crawler.id, crawler_execution_group.crawler.id)
-        self.assertEqual(task_name, crawler_execution_group.task_name)
+        self.assertEqual(crawler.id, self.crawler_execution_group.crawler.id)
+        self.assertEqual(task_name, self.crawler_execution_group.task_name)
         self.assertEqual(
-            finish_datetime, crawler_execution_group.finish_datetime)
-        self.assertEqual(state, crawler_execution_group.state)
-        self.assertIsNotNone(crawler_execution_group.start_datetime)
+            finish_datetime, self.crawler_execution_group.finish_datetime)
+        self.assertEqual(state, self.crawler_execution_group.state)
+        self.assertIsNotNone(self.crawler_execution_group.start_datetime)
 
 
 class TestCrawlerExecutionModel(TestCase):
