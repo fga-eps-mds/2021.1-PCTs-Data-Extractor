@@ -25,6 +25,25 @@ class TestCrawlerModel(TestCase):
         self.assertEqual(task_name, self.crawler.task_name)
         self.assertIsNotNone(self.crawler.created_at)
 
+    def test_document_get(self):
+        crawler = Crawler.objects.filter(id=self.crawler.id).get()
+        self.assertEqual(crawler, self.crawler)
+
+    def test_document_update(self):
+        site_name = "incra"
+        url_root = "www.gov.br/incra/pt-br"
+        task_name = "incra_crawler"
+
+        self.crawler.site_name = site_name
+        self.crawler.url_root = url_root
+        self.crawler.task_name = task_name
+        self.crawler.save()
+        
+        updated_crawler = Crawler.objects.filter(id=self.crawler.id).get()
+        self.assertEqual(site_name, updated_crawler.site_name)
+        self.assertEqual(url_root, updated_crawler.url_root)
+        self.assertEqual(task_name, updated_crawler.task_name)
+
     def test_document_delete(self):
         crawler = Crawler.objects.filter(id=self.crawler.id).get()
         self.assertIsNotNone(crawler)
