@@ -72,8 +72,6 @@ class CrawlerEndpoint(APITestCase):
         self.assertEqual(self.crawler['url_root'], json_response['url_root'])
         self.assertEqual(self.crawler['task_name'], json_response['task_name'])
 
-        return json_response
-
     def test_update(self):
         crawler_id = self.test_create()
 
