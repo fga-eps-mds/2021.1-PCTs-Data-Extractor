@@ -81,12 +81,31 @@ class TestCrawlerExecutionGroupModel(TestCase):
         self.assertEqual(state, self.crawler_execution_group.state)
         self.assertIsNotNone(self.crawler_execution_group.start_datetime)
 
+    def test_document_get(self):
+        crawler_execution_group = CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
+        self.assertEqual(crawler_execution_group, self.crawler_execution_group)
+
+    def test_document_update(self):
+        crawler_model = Crawler.objects.create(
+            site_name="incra",
+            url_root="www.gov.br/incra/pt-br",
+            task_name="incra_crawler",
+        )
+
+        self.crawler_execution_group.crawler = crawler_model
+        self.crawler_execution_group.task_name = "incra_crawler_group"
+        self.crawler_execution_group.finish_datetime = datetime(2021, 10, 14, 8, 34, 56)
+        self.crawler_execution_group.state = SUCCESS
+
+        updated_crawler_execution_group = CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
+        self.assertEqual(updated_crawler_execution_group, self.crawler_execution_group)
+
     def test_document_delete(self):
         self.crawler_execution_group.delete()
 
         try:
-            Crawler.objects.filter(id=self.crawler_execution_group.id).get()
-        except Crawler.DoesNotExist:
+            CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
+        except CrawlerExecutionGroup.DoesNotExist:
             self.assertTrue(True)
 
 
