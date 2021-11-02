@@ -14,6 +14,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'site_name',
+            'site_name_display',
             'task_name',
             'task_enabled',
             'task_one_off',
@@ -39,9 +40,11 @@ class CrawlerSerializer(serializers.ModelSerializer):
             keyword.keyword
             for keyword in Keyword.objects.all()
         ]
+        
 
         crawler = Crawler.objects.create(
             site_name=validated_data.get("site_name"),
+            site_name_display=validated_data.get("site_name_display"),
             url_root=validated_data.get("url_root"),
             task_name=validated_data.get(
                 "task_name"),
@@ -80,6 +83,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
         ]
 
         crawler.site_name=validated_data.get("site_name")
+        crawler.site_name_display=validated_data.get("site_name_display")
         crawler.url_root=validated_data.get("url_root")
         crawler.task_name=validated_data.get("task_name")
         crawler.task_enabled=validated_data.get("task_enabled")

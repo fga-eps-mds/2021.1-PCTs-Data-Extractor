@@ -25,6 +25,11 @@ STATE_CHOICES = [
 
 class Crawler(models.Model):
     site_name = models.CharField("Site Name", unique=True, max_length=100)
+    site_name_display = models.CharField(
+        "Site Name Display",
+        unique=True,
+        max_length=100
+    )
     url_root = models.CharField("Root Url", unique=True, max_length=1024)
     task_name = models.CharField(
         "Task Name Prefix",

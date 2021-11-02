@@ -4,6 +4,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "mpf",
+            "site_name_display": "MPF",
             "task_name": "mpf_crawler",
             "url_root": "http://www.mpf.mp.br/@@search",
             "qs_search_keyword_param": "SearchableText",
@@ -31,6 +32,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "incra",
+            "site_name_display": "INCRA",
             "task_name": "incra_crawler",
             "url_root": "https://www.gov.br/incra/pt-br/search",
             "qs_search_keyword_param": "SearchableText",
@@ -57,6 +59,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "senado",
+            "site_name_display": "Senado",
             "task_name": "senado_crawler",
             "url_root": "https://www6g.senado.leg.br/busca",
             "qs_search_keyword_param": "q",
@@ -83,6 +86,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "tcu_pesquisa_integrada",
+            "site_name_display": "TCU Pesquisa Integrada",
             "task_name": "tcu_pesquisa_integrada_crawler",
             "url_root": "https://pesquisa.apps.tcu.gov.br/#/resultado/todas-bases",
             "contains_end_path_keyword": true,
@@ -109,6 +113,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "icmbio",
+            "site_name_display": "ICMBIO",
             "task_name": "icmbio_crawler",
             "url_root": "https://www.icmbio.gov.br/portal/busca",
             "qs_search_keyword_param": "searchword",
@@ -134,6 +139,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "ibama",
+            "site_name_display": "IBAMA",
             "task_name": "ibama_crawler",
             "url_root": "https://www.gov.br/ibama/pt-br/search",
             "qs_search_keyword_param": "SearchableText",
@@ -160,6 +166,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "ibge",
+            "site_name_display": "IBGE",
             "task_name": "ibge_crawler",
             "url_root": "https://www.ibge.gov.br/busca.html",
             "qs_search_keyword_param": "searchword",
@@ -187,6 +194,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "camara_dos_deputados",
+            "site_name_display": "Camara dos Deputados",
             "task_name": "camara_dos_deputados_crawler",
             "url_root": "https://www.camara.leg.br/busca-geral",
             "qs_search_keyword_param": "termo",
@@ -212,6 +220,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stf_noticias",
+            "site_name_display": "STF Notícias",
             "task_name": "stf_noticias_crawler",
             "url_root": "http://portal.stf.jus.br/listagem/listarNoticias.asp",
             "qs_search_keyword_param": "termoPesquisa",
@@ -237,6 +246,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stf_jurisprudencia",
+            "site_name_display": "STF Jurisprudência",
             "task_name": "stf_jurisprudencia_crawler",
             "url_root": "https://jurisprudencia.stf.jus.br/pages/search",
             "qs_search_keyword_param": "queryString",
@@ -262,6 +272,7 @@
         "model": "crawlers.crawler",
         "fields": {
             "site_name": "stj",
+            "site_name_display": "STJ",
             "task_name": "stj_crawler",
             "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
             "qs_search_keyword_param": "q",
