@@ -11,6 +11,7 @@ class TestCrawlerModel(TestCase):
     def setUp(self):
         self.crawler = Crawler.objects.create(
             site_name="mpf",
+            site_name_display="MPF",
             url_root="www.mpf.mp.br",
             task_name="mpf_crawler",
         )
@@ -38,7 +39,7 @@ class TestCrawlerModel(TestCase):
         self.crawler.url_root = url_root
         self.crawler.task_name = task_name
         self.crawler.save()
-        
+
         updated_crawler = Crawler.objects.filter(id=self.crawler.id).get()
         self.assertEqual(site_name, updated_crawler.site_name)
         self.assertEqual(url_root, updated_crawler.url_root)
@@ -82,30 +83,36 @@ class TestCrawlerExecutionGroupModel(TestCase):
         self.assertIsNotNone(self.crawler_execution_group.start_datetime)
 
     def test_document_get(self):
-        crawler_execution_group = CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
+        crawler_execution_group = CrawlerExecutionGroup.objects.filter(
+            id=self.crawler_execution_group.id).get()
         self.assertEqual(crawler_execution_group, self.crawler_execution_group)
 
     def test_document_update(self):
         crawler_model = Crawler.objects.create(
             site_name="incra",
+            site_name_display="INCRA",
             url_root="www.gov.br/incra/pt-br",
             task_name="incra_crawler",
         )
 
         self.crawler_execution_group.crawler = crawler_model
         self.crawler_execution_group.task_name = "incra_crawler_group"
-        self.crawler_execution_group.finish_datetime = datetime(2021, 10, 14, 8, 34, 56)
+        self.crawler_execution_group.finish_datetime = datetime(
+            2021, 10, 14, 8, 34, 56)
         self.crawler_execution_group.state = SUCCESS
         self.crawler_execution_group.save()
 
-        updated_crawler_execution_group = CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
-        self.assertEqual(updated_crawler_execution_group, self.crawler_execution_group)
+        updated_crawler_execution_group = CrawlerExecutionGroup.objects.filter(
+            id=self.crawler_execution_group.id).get()
+        self.assertEqual(updated_crawler_execution_group,
+                         self.crawler_execution_group)
 
     def test_document_delete(self):
         self.crawler_execution_group.delete()
 
         try:
-            CrawlerExecutionGroup.objects.filter(id=self.crawler_execution_group.id).get()
+            CrawlerExecutionGroup.objects.filter(
+                id=self.crawler_execution_group.id).get()
         except CrawlerExecutionGroup.DoesNotExist:
             self.assertTrue(True)
 
@@ -154,46 +161,52 @@ class TestCrawlerExecutionModel(TestCase):
                          self.crawler_execution.crawler_execution_group.id)
         self.assertEqual(task_id, self.crawler_execution.task_id)
         self.assertEqual(task_name, self.crawler_execution.task_name)
-        self.assertEqual(finish_datetime, self.crawler_execution.finish_datetime)
+        self.assertEqual(
+            finish_datetime, self.crawler_execution.finish_datetime)
         self.assertEqual(keyword, self.crawler_execution.keyword)
         self.assertEqual(state, self.crawler_execution.state)
         self.assertEqual(crawled_pages, self.crawler_execution.crawled_pages)
         self.assertEqual(saved_records, self.crawler_execution.saved_records)
-        self.assertEqual(dropped_records, self.crawler_execution.dropped_records)
+        self.assertEqual(
+            dropped_records, self.crawler_execution.dropped_records)
         self.assertEqual(error_log, self.crawler_execution.error_log)
         self.assertIsNotNone(self.crawler_execution.start_datetime)
-    
+
     def test_document_get(self):
-        crawler_execution = CrawlerExecution.objects.filter(id=self.crawler_execution.id).get()
+        crawler_execution = CrawlerExecution.objects.filter(
+            id=self.crawler_execution.id).get()
         self.assertEqual(crawler_execution, self.crawler_execution)
 
     def test_document_update(self):
         crawler_model = Crawler.objects.create(
             site_name="incra",
+            site_name_display="INCRA",
             url_root="www.gov.br/incra/pt-br",
             task_name="incra_crawler",
         )
 
         crawler_execution_group_model = CrawlerExecutionGroup.objects.create(
-            crawler = crawler_model,
-            task_name = "incra_crawler_group",
-            finish_datetime = datetime(2021, 10, 14, 8, 34, 56),
-            state = SUCCESS
+            crawler=crawler_model,
+            task_name="incra_crawler_group",
+            finish_datetime=datetime(2021, 10, 14, 8, 34, 56),
+            state=SUCCESS
         )
 
-        self.crawler_execution.crawler_execution_group=crawler_execution_group_model
-        self.crawler_execution.task_id="ec7a5f20-314f-11ec-8d3d-0242ac130003"
-        self.crawler_execution.task_name="mpf_incra_keyword"
-        self.crawler_execution.finish_datetime=datetime(2021, 10, 10, 8, 45, 00)
-        self.crawler_execution.keyword="quilombolas"
-        self.crawler_execution.state=SUCCESS
-        self.crawler_execution.crawled_pages=35
-        self.crawler_execution.saved_records=20
-        self.crawler_execution.dropped_records=6
-        self.crawler_execution.error_log=""
+        self.crawler_execution.crawler_execution_group = crawler_execution_group_model
+        self.crawler_execution.task_id = "ec7a5f20-314f-11ec-8d3d-0242ac130003"
+        self.crawler_execution.task_name = "mpf_incra_keyword"
+        self.crawler_execution.finish_datetime = datetime(
+            2021, 10, 10, 8, 45, 00)
+        self.crawler_execution.keyword = "quilombolas"
+        self.crawler_execution.state = SUCCESS
+        self.crawler_execution.crawled_pages = 35
+        self.crawler_execution.saved_records = 20
+        self.crawler_execution.dropped_records = 6
+        self.crawler_execution.error_log = ""
         self.crawler_execution.save()
 
-        updated_crawler_execution = CrawlerExecution.objects.filter(id=self.crawler_execution.id).get()
+        updated_crawler_execution = CrawlerExecution.objects.filter(
+            id=self.crawler_execution.id).get()
         self.assertEqual(updated_crawler_execution, self.crawler_execution)
 
     def test_document_delete(self):

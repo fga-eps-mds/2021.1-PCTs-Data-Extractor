@@ -14,18 +14,19 @@ class CrawlerEndpoint(APITestCase):
         self.endpoint = '/api/crawlers/'
 
         Crawler.objects.bulk_create([
-            Crawler(site_name="mpf", url_root="www.mpf.mp.br",
-                    task_name="mpf_crawler"),
-            Crawler(site_name="incra", url_root="www.gov.br/incra/pt-br",
-                    task_name="incra_crawler"),
-            Crawler(site_name="tcu", url_root="pesquisa.apps.tcu.gov.br",
-                    task_name="tcu_crawler"),
+            Crawler(site_name="mpf", site_name_display="MPF",
+                    url_root="www.mpf.mp.br", task_name="mpf_crawler"),
+            Crawler(site_name="incra", site_name_display="INCRA",
+                    url_root="www.gov.br/incra/pt-br", task_name="incra_crawler"),
+            Crawler(site_name="tcu", site_name_display="TCU",
+                    url_root="pesquisa.apps.tcu.gov.br", task_name="tcu_crawler"),
         ])
 
-        self.crawler = {
-            "site_name":"ibama",
-            "url_root":"www.gov.br/ibama/pt-br",
-            "task_name":"ibama_crawler",
+        self.crawler_to_be_create = {
+            "site_name": "ibama",
+            "site_name_display": "IBAMA",
+            "url_root": "www.gov.br/ibama/pt-br",
+            "task_name": "ibama_crawler",
         }
 
     def tearDown(self):
@@ -45,15 +46,18 @@ class CrawlerEndpoint(APITestCase):
     def test_create(self):
         response = self.client.post(
             self.endpoint,
-            self.crawler
+            self.crawler_to_be_create
         )
 
         json_response = json.loads(response.content)
-        
+
         self.assertEqual(201, response.status_code)
-        self.assertEqual(self.crawler['site_name'], json_response['site_name'])
-        self.assertEqual(self.crawler['url_root'], json_response['url_root'])
-        self.assertEqual(self.crawler['task_name'], json_response['task_name'])
+        self.assertEqual(
+            self.crawler_to_be_create['site_name'], json_response['site_name'])
+        self.assertEqual(
+            self.crawler_to_be_create['url_root'], json_response['url_root'])
+        self.assertEqual(
+            self.crawler_to_be_create['task_name'], json_response['task_name'])
 
         return json_response['id']
 
@@ -68,17 +72,21 @@ class CrawlerEndpoint(APITestCase):
         json_response = json.loads(response.content)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(self.crawler['site_name'], json_response['site_name'])
-        self.assertEqual(self.crawler['url_root'], json_response['url_root'])
-        self.assertEqual(self.crawler['task_name'], json_response['task_name'])
+        self.assertEqual(
+            self.crawler_to_be_create['site_name'], json_response['site_name'])
+        self.assertEqual(
+            self.crawler_to_be_create['url_root'], json_response['url_root'])
+        self.assertEqual(
+            self.crawler_to_be_create['task_name'], json_response['task_name'])
 
     def test_update(self):
         crawler_id = self.test_create()
 
         crawler_update = {
-            "site_name":"ibge",
-            "url_root":"www.ibge.gov.br",
-            "task_name":"ibge_crawler",
+            "site_name": "ibge",
+            "site_name_display": "IBGE",
+            "url_root": "www.ibge.gov.br",
+            "task_name": "ibge_crawler",
         }
         updated_response = self.client.put(
             f"{self.endpoint}{crawler_id}/",
@@ -88,10 +96,12 @@ class CrawlerEndpoint(APITestCase):
         json_response = json.loads(updated_response.content)
 
         self.assertEqual(200, updated_response.status_code)
-        self.assertEqual(crawler_update['site_name'], json_response['site_name'])
+        self.assertEqual(
+            crawler_update['site_name'], json_response['site_name'])
         self.assertEqual(crawler_update['url_root'], json_response['url_root'])
-        self.assertEqual(crawler_update['task_name'], json_response['task_name'])
-        
+        self.assertEqual(
+            crawler_update['task_name'], json_response['task_name'])
+
     def test_delete(self):
         crawler_id = self.test_create()
         response = self.client.delete(
@@ -100,18 +110,19 @@ class CrawlerEndpoint(APITestCase):
         )
         self.assertEqual(204, response.status_code)
 
+
 class CrawlerExecutionsEndpoint(APITestCase):
 
     def setUp(self):
         self.endpoint_base = '/api/crawlers'
-        self.crawler = Crawler.objects.create(
+        self.crawler_to_be_create = Crawler.objects.create(
             site_name="mpf",
             url_root="www.mpf.mp.br",
             task_name="mpf_crawler"
         )
 
         self.crawler_group_exec = CrawlerExecutionGroup.objects.create(
-            crawler=self.crawler,
+            crawler=self.crawler_to_be_create,
             task_name="mpf_crawler_group",
             finish_datetime=datetime(2021, 10, 10, 8, 35, 21),
             state=STARTED,
@@ -140,7 +151,7 @@ class CrawlerExecutionsEndpoint(APITestCase):
 
     def test_list_all_crawler_executions(self):
         response = json.loads(self.client.get(
-            f"{self.endpoint_base}/{self.crawler.id}/executions/",
+            f"{self.endpoint_base}/{self.crawler_to_be_create.id}/executions/",
             format='json'
         ).content)
 
