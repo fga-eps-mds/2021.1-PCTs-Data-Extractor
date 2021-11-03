@@ -13,18 +13,18 @@ jobs:
       GIT_SHA: ${{ github.sha }}
 
     services:
-      pcts-scrapers-postgres:
+      pcts-crawlers-postgres:
         image: postgres:13
 
         env:
-          POSTGRES_HOST: pcts-scrapers-postgres
+          POSTGRES_HOST: pcts-crawlers-postgres
           POSTGRES_PORT: 5432
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: test1234
-          POSTGRES_DB: pcts_scrapers
+          POSTGRES_DB: pcts_crawlers
 
         options: >-
-          --name pcts-scrapers-postgres
+          --name pcts-crawlers-postgres
         ports:
           - 5432:5432
 
@@ -35,57 +35,57 @@ jobs:
         run: echo 'stylesheet check'
 
       - name: Build image
-        run: docker build -t pcts-scrapers-api .
+        run: docker build -t pcts-crawlers-api .
 
-      - name: Run Scrapers tests
+      - name: Run Crawlers tests
         run: |
           docker run\
             --volume ${PWD}/:/app\
             --env PROJECT_ENV_EXECUTOR="TEST"\
-            --env PCTS_SCRAPERS_SPLASH_HOST=http://pcts-scrapers-splash:8050\
+            --env PCTS_CRAWLERS_SPLASH_HOST=http://pcts-crawlers-splash:8050\
             --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
             --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
-            --env POSTGRES_HOST=pcts-scrapers-postgres\
+            --env POSTGRES_HOST=pcts-crawlers-postgres\
             --env POSTGRES_PORT=5432\
             --env POSTGRES_USER=postgres\
             --env POSTGRES_PASSWORD=test1234\
-            --env POSTGRES_DB=pcts_scrapers\
+            --env POSTGRES_DB=pcts_crawlers\
             --env ENVIRONMENT=development\
             --env ALLOWED_HOSTS=*\
             --env DJANGO_SUPERUSER_EMAIL=admin@example.com\
             --env DJANGO_SUPERUSER_USERNAME=admin\
             --env DJANGO_SUPERUSER_PASSWORD=admin\
-            --env CELERY_BROKER_URL=amqp:"//guest@pcts-scrapers-rabbitmq:5672"\
+            --env CELERY_BROKER_URL=amqp:"//guest@pcts-crawlers-rabbitmq:5672"\
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
-            pcts-scrapers-api bash -c\
-            "coverage run -m --source='pcts_scraper_jobs' unittest discover &&\
-            coverage xml -o coverage_scrapers.xml"
+            pcts-crawlers-api bash -c\
+            "coverage run -m --source='pcts_crawlers_scripts' unittest discover &&\
+            coverage xml -o coverage_crawlers.xml"
 
       - name: Run API tests
         run: |
           docker run\
             --volume ${PWD}/:/app\
             --env PROJECT_ENV_EXECUTOR="DOCKER"\
-            --env PCTS_SCRAPERS_SPLASH_HOST=http://pcts-scrapers-splash:8050\
+            --env PCTS_CRAWLERS_SPLASH_HOST=http://pcts-crawlers-splash:8050\
             --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
             --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
-            --env POSTGRES_HOST=pcts-scrapers-postgres\
+            --env POSTGRES_HOST=pcts-crawlers-postgres\
             --env POSTGRES_PORT=5432\
             --env POSTGRES_USER=postgres\
             --env POSTGRES_PASSWORD=test1234\
-            --env POSTGRES_DB=pcts_scrapers\
+            --env POSTGRES_DB=pcts_crawlers\
             --env ENVIRONMENT=development\
             --env ALLOWED_HOSTS=*\
             --env DJANGO_SUPERUSER_EMAIL=admin@example.com\
             --env DJANGO_SUPERUSER_USERNAME=admin\
             --env DJANGO_SUPERUSER_PASSWORD=admin\
-            --env CELERY_BROKER_URL=amqp:"//guest@pcts-scrapers-rabbitmq:5672"\
+            --env CELERY_BROKER_URL=amqp:"//guest@pcts-crawlers-rabbitmq:5672"\
             --volume ${PWD}/:/app\
             --network ${{ job.container.network }}\
-            pcts-scrapers-api bash -c\
-            "python pcts_scrapers_api/manage.py migrate &&\
-            coverage run --source='pcts_scrapers_api/' pcts_scrapers_api/manage.py test pcts_scrapers_api/ &&\
+            pcts-crawlers-api bash -c\
+            "python pcts_crawlers_api/manage.py migrate &&\
+            coverage run --source='pcts_crawlers_api/' pcts_crawlers_api/manage.py test pcts_crawlers_api/ &&\
             coverage xml -o coverage_api.xml"
 
       - name: SonarCloud Report coverage
