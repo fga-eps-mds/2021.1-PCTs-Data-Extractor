@@ -59,22 +59,6 @@ class CrawlerExecutionGroupViewSet(viewsets.ModelViewSet):
 
         return queryset.order_by(order_by)
 
-# class CrawlerViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows crawlers to be viewed or edited.
-#     """
-#     serializer_class = CrawlerSerializer
-
-#     def get_queryset(self):
-#         queryset = Crawler.objects.all()
-#         order_by = self.request.GET.get('order-by', '-created_at')
-
-#         return queryset.order_by(order_by)
-
-#     def perform_destroy(self, crawler_instance: Crawler):
-#         delete_crawler_periodic_task(crawler_instance)
-#         super(CrawlerViewSet, self).perform_destroy(crawler_instance)
-
 
 class CrawlerExecutorViewSet(generics.GenericAPIView):
 
