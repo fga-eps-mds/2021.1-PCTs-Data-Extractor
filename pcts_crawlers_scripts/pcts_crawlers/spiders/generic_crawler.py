@@ -197,12 +197,9 @@ class GenericCrawlerSpider(Spider):
             page_content = CrawlerItem()
             page_content['source'] = self.site_name
             page_content['url'] = response.url.strip(" /")
-            if title:
-                page_content['title'] = title
-            else:
-                page_content['title'] = response.xpath(
-                    DEFAULT_TITLE_XPATH
-                ).extract_first()
+            page_content['title'] = response.xpath(
+                DEFAULT_TITLE_XPATH
+            ).extract_first()
             page_content['content'] = restrict_content
             return page_content
         else:
