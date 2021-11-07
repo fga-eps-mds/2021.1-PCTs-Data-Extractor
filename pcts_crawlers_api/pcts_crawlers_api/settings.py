@@ -186,8 +186,8 @@ LOGGING = {
 }
 
 # ================================= CELERY SETTINGS
-# if 'celery' in sys.argv[0]:
-#     DEBUG = False
+if 'celery' in sys.argv[0]:
+    DEBUG = False
 
 CELERY_TIMEZONE = "America/Sao_Paulo"
 CELERY_TASK_TRACK_STARTED = True

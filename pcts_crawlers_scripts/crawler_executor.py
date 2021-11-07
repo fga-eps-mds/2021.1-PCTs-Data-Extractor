@@ -64,14 +64,12 @@ if __name__ == '__main__':
             "allowed_paths": [
                 "noticias"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "5",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": False,
             "created_at": "2021-10-17T19:26:54.660443"
         }
 

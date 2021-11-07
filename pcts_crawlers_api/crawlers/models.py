@@ -61,11 +61,6 @@ class Crawler(models.Model):
         "Contains End Path with Keyword for Search",
         default=False
     )
-    retries = models.IntegerField(
-        "Retries",
-        default=3,
-        null=True
-    )
     page_load_timeout = models.IntegerField(
         "Page Load Timeout",
         default=3,
@@ -95,10 +90,6 @@ class Crawler(models.Model):
         "Crontab Month of Year",
         default="*",
         max_length=20
-    )
-    contains_dynamic_js_load = models.BooleanField(
-        "Contains Dynamic JS Loading",
-        default=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
