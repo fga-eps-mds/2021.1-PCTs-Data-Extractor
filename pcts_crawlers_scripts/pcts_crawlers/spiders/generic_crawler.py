@@ -10,12 +10,8 @@ from scrapy_selenium import SeleniumRequest
 from scrapy.selector.unified import Selector
 from scrapy import Request
 
-from scrapy_splash import SplashRequest
-
 from ..items import CrawlerItem
 
-SCRAPY_REQUEST_METHOD = os.environ.get(
-    'SCRAPY_REQUEST_METHOD', default="SPLASH")
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style)]"
@@ -157,22 +153,12 @@ class GenericCrawlerSpider(Spider):
             return self.simple_request(url, title, parse_callback)
 
     def simple_request(self, url, title, parse_callback):
-        if SCRAPY_REQUEST_METHOD == "SPLASH":
-            return SplashRequest(
-                url=url,
-                callback=parse_callback,
-                endpoint='render.html',
-                args={'wait': self.page_load_timeout},
-                cb_kwargs={"title": title},
-                # headers={'User-Agent': self.user_agent}
-            )
-        else:
-            return Request(
-                url=url,
-                callback=parse_callback,
-                meta={'donwload_timeout': self.page_load_timeout},
-                cb_kwargs={"title": title}
-            )
+        return Request(
+            url=url,
+            callback=parse_callback,
+            meta={'donwload_timeout': self.page_load_timeout},
+            cb_kwargs={"title": title}
+        )
 
     def dynamic_js_request(self, url, title, parse_callback):
         return SeleniumRequest(

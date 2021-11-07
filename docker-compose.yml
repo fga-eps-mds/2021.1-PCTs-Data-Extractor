@@ -17,22 +17,6 @@ x-pcts-crawlers-api-template:
     - pip-cache:/usr/local/lib/python3.8/site-packages
 
 services:
-  pcts-crawlers-splash:
-    hostname: pcts-crawlers-splash
-    image: scrapinghub/splash
-    container_name: pcts-crawlers-splash
-    restart: unless-stopped
-    ports:
-      - 8050:8050
-    networks:
-      - pcts-network
-    command: "--disable-private-mode"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8050"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-
   pcts-crawlers-postgres:
     image: postgres:13
     container_name: pcts-crawlers-postgres
@@ -81,8 +65,6 @@ services:
       retries: 5
     depends_on:
       pcts-crawlers-postgres:
-        condition: service_healthy
-      pcts-crawlers-splash:
         condition: service_healthy
 
   pcts-crawlers-celery:

@@ -42,7 +42,6 @@ jobs:
           docker run\
             --volume ${PWD}/:/app\
             --env PROJECT_ENV_EXECUTOR="TEST"\
-            --env PCTS_CRAWLERS_SPLASH_HOST=http://pcts-crawlers-splash:8050\
             --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
             --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
             --env POSTGRES_HOST=pcts-crawlers-postgres\
@@ -67,7 +66,6 @@ jobs:
           docker run\
             --volume ${PWD}/:/app\
             --env PROJECT_ENV_EXECUTOR="DOCKER"\
-            --env PCTS_CRAWLERS_SPLASH_HOST=http://pcts-crawlers-splash:8050\
             --env PCTS_DOCUMENTS_API_URL=http://pcts-documents:8000\
             --env PCTS_DOCUMENTS_API_RECORDS_ENDPOINT=api/documents/\
             --env POSTGRES_HOST=pcts-crawlers-postgres\
