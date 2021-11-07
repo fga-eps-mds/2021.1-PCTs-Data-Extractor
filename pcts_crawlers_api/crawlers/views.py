@@ -11,6 +11,7 @@ from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from crawlers.models import Crawler
 from crawlers.models import CrawlerExecutionGroup
@@ -39,7 +40,7 @@ class CrawlerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows crawlers to be viewed or edited.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Crawler.objects.all().order_by('site_name')
     serializer_class = CrawlerSerializer
 
