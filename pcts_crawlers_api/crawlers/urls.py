@@ -9,7 +9,6 @@ app_name = 'crawlers'
 router = routers.DefaultRouter()
 router.register(r'crawlers', views.CrawlerViewSet)
 
-
 crawler_routes = routers.NestedSimpleRouter(
     router, r'crawlers', lookup='crawler'
 )

@@ -3,14 +3,6 @@ import sys
 import logging
 from django.conf import settings
 
-from crawlers.models import Crawler
-from crawlers.models import CrawlerExecutionGroup
-from rest_framework import viewsets
-from rest_framework import permissions
-from crawlers.serializers import CrawlerSerializer
-from crawlers.serializers import CrawlerExecutionGroupSerializer
-from multiprocessing import Process
-
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -18,6 +10,16 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from crawlers.models import Crawler
+from crawlers.models import CrawlerExecutionGroup
+from rest_framework import viewsets
+from rest_framework import permissions
+from crawlers.serializers import CrawlerSerializer
+from crawlers.serializers import CrawlerExecutionGroupSerializer
+from multiprocessing import Process
 
 from pcts_crawlers_api import celery as root_tasks
 from crawlers import tasks
@@ -38,6 +40,7 @@ class CrawlerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows crawlers to be viewed or edited.
     """
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Crawler.objects.all().order_by('site_name')
     serializer_class = CrawlerSerializer
 
@@ -50,15 +53,19 @@ class CrawlerExecutionGroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows crawler executions to be viewed.
     """
+    permission_classes = [IsAuthenticated]
     serializer_class = CrawlerExecutionGroupSerializer
 
     def get_queryset(self):
-        return CrawlerExecutionGroup.objects.\
-            filter(crawler=self.kwargs['crawler_pk']).\
-            order_by('task_name')
+        queryset = CrawlerExecutionGroup.objects.\
+            filter(crawler=self.kwargs['crawler_pk'])
+        order_by = self.request.GET.get('order-by', '-finish_datetime')
+
+        return queryset.order_by(order_by)
 
 
 class CrawlerExecutorViewSet(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         keyword = request.query_params.get('keyword')

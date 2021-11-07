@@ -23,14 +23,12 @@ class CrawlerSerializer(serializers.ModelSerializer):
             'contains_end_path_keyword',
             'allowed_domains',
             'allowed_paths',
-            'retries',
             'page_load_timeout',
             'cron_minute',
             'cron_hour',
             'cron_day_of_week',
             'cron_day_of_month',
             'cron_month_of_year',
-            'contains_dynamic_js_load',
             'created_at',
             'url',
         ]
@@ -60,11 +58,8 @@ class CrawlerSerializer(serializers.ModelSerializer):
                 "allowed_domains"),
             allowed_paths=validated_data.get(
                 "allowed_paths"),
-            retries=validated_data.get("retries"),
             page_load_timeout=validated_data.get(
                 "page_load_timeout"),
-            contains_dynamic_js_load=validated_data.get(
-                "contains_dynamic_js_load"),
             cron_minute=validated_data.get("cron_minute") or '0',
             cron_hour=validated_data.get("cron_hour") or '4',
             cron_day_of_week=validated_data.get("cron_day_of_week") or '*',
@@ -92,9 +87,7 @@ class CrawlerSerializer(serializers.ModelSerializer):
         crawler.contains_end_path_keyword=validated_data.get("contains_end_path_keyword")
         crawler.allowed_domains=validated_data.get("allowed_domains")
         crawler.allowed_paths=validated_data.get("allowed_paths")
-        crawler.retries=validated_data.get("retries")
         crawler.page_load_timeout=validated_data.get("page_load_timeout")
-        crawler.contains_dynamic_js_load=validated_data.get("contains_dynamic_js_load")
         crawler.cron_minute=validated_data.get("cron_minute") or '0'
         crawler.cron_hour=validated_data.get("cron_hour") or '4'
         crawler.cron_day_of_week=validated_data.get("cron_day_of_week") or '*'

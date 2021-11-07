@@ -16,14 +16,12 @@
                 "pgr/documentos",
                 "atuacao-tematica"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "4",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -43,14 +41,12 @@
                 "incra/pt-br/assuntos",
                 "incra/pt-br/search"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "3",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": true,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -70,14 +66,12 @@
             "allowed_paths": [
                 "noticias"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "5",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -97,14 +91,12 @@
                 "#/resultado",
                 "#/documento"
             ],
-            "retries": 3,
             "page_load_timeout": 3,
             "cron_minute": "0",
             "cron_hour": "6",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -123,14 +115,12 @@
             "allowed_paths": [
                 "portal"
             ],
-            "retries": 3,
             "page_load_timeout": 3,
             "cron_minute": "0",
             "cron_hour": "6",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -150,14 +140,12 @@
                 "ibama/pt-br/assuntos",
                 "ibama/pt-br/search"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "7",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": true,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -178,14 +166,12 @@
                 "estatisticas",
                 "agencia-sala-de-imprensa"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "8",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -204,14 +190,12 @@
             "allowed_paths": [
                 "noticias"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "9",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -230,14 +214,12 @@
             "allowed_paths": [
                 "noticias"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "9",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -256,14 +238,12 @@
             "allowed_paths": [
                 "pages/search"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "9",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     },
@@ -282,14 +262,12 @@
             "allowed_paths": [
                 "sites/portalp/Paginas/Comunicacao/Noticias"
             ],
-            "retries": 3,
             "page_load_timeout": 5,
             "cron_minute": "0",
             "cron_hour": "10",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
-            "contains_dynamic_js_load": false,
             "created_at": "2021-10-17T19:26:54.660443"
         }
     }

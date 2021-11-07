@@ -10,12 +10,8 @@ from scrapy_selenium import SeleniumRequest
 from scrapy.selector.unified import Selector
 from scrapy import Request
 
-from scrapy_splash import SplashRequest
-
 from ..items import CrawlerItem
 
-SCRAPY_REQUEST_METHOD = os.environ.get(
-    'SCRAPY_REQUEST_METHOD', default="SPLASH")
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
 DEFAULT_ALL_CONTENT_XPATH = (
     "//body//*//text()[not(ancestor::script) and not(ancestor::noscript) and not(ancestor::style)]"
@@ -37,8 +33,8 @@ class GenericCrawlerSpider(Spider):
     start_urls = []
 
     def __init__(self, url_root, site_name, allowed_domains=None, allowed_paths=None,
-                 qs_search_keyword_param=None, contains_end_path_keyword=False, retries=1,
-                 page_load_timeout=2, contains_dynamic_js_load=True, keyword="", *args, **kwargs):
+                 qs_search_keyword_param=None, contains_end_path_keyword=False,
+                 page_load_timeout=2, keyword="", *args, **kwargs):
         """ Initializes GenericCrawlerSpider
 
         Args:
@@ -47,7 +43,6 @@ class GenericCrawlerSpider(Spider):
             allowed_domains(list<str>): url domains allowed to be crawled
             allowed_paths(list<str>): url paths allowed to be crawled
             qs_search_keyword_param(str): query string param where the keyword should be imputed
-            retries(int): number of attempts to crawled page
             page_load_timeout(int): time limit to load page
             keyword(str): word or expression used to search the first page or check affinity
             *args: Extra arguments
@@ -60,10 +55,8 @@ class GenericCrawlerSpider(Spider):
         self.allowed_paths = allowed_paths
         self.qs_search_keyword_param = qs_search_keyword_param
         self.contains_end_path_keyword = contains_end_path_keyword
-        self.retries = retries
         self.page_load_timeout = page_load_timeout
         self.keyword = keyword
-        self.contains_dynamic_js_load = contains_dynamic_js_load
         self.start_urls.append(self.source_url)
         self.search_page = True
 
@@ -151,30 +144,6 @@ class GenericCrawlerSpider(Spider):
         )
 
     def make_request(self, url, title, parse_callback):
-        if (self.contains_dynamic_js_load):
-            return self.dynamic_js_request(url, title, parse_callback)
-        else:
-            return self.simple_request(url, title, parse_callback)
-
-    def simple_request(self, url, title, parse_callback):
-        if SCRAPY_REQUEST_METHOD == "SPLASH":
-            return SplashRequest(
-                url=url,
-                callback=parse_callback,
-                endpoint='render.html',
-                args={'wait': self.page_load_timeout},
-                cb_kwargs={"title": title},
-                # headers={'User-Agent': self.user_agent}
-            )
-        else:
-            return Request(
-                url=url,
-                callback=parse_callback,
-                meta={'donwload_timeout': self.page_load_timeout},
-                cb_kwargs={"title": title}
-            )
-
-    def dynamic_js_request(self, url, title, parse_callback):
         return SeleniumRequest(
             url=url,
             callback=parse_callback,
