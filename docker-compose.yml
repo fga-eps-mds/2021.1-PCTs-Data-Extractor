@@ -99,6 +99,8 @@ services:
       interval: 10s
       retries: 5
     depends_on:
+      pcts-crawlers-postgres:
+        condition: service_healthy
       pcts-crawlers-splash:
         condition: service_healthy
 

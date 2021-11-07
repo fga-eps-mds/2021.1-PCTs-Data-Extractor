@@ -28,3 +28,4 @@ pycodestyle
 coverage
 dnspython
 drf-nested-routers
+djangorestframework-simplejwt==5.0.0
