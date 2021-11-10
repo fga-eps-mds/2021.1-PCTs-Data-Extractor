@@ -12,7 +12,36 @@ Esse método atualmente está sendo utilizado sem uma API para o Crawler, portan
 
 __Importante:__ Esse método apenas foi adicionado para facilitar a execução por parte dos integrantes ainda não familiarizados com o framework Scrapy. Futuramente, toda execução será realizada por uma API com um cronjob.
 
+### Pré requisitos
+
+- [Docker](https://docs.docker.com/engine/install/ubuntu/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+
+1. Configurar variáveis de ambiente (containers):
+  * Atualizar arquivo "env" na raiz do repositório
+  * Adicionar os hosts (ips) das apis de documentos e crawlers
+  * Variáveis necessárias:
+  ```shell
+    POSTGRES_HOST # Host do banco
+    POSTGRES_PORT # Porta do banco
+    POSTGRES_USER # Usuário do banco
+    POSTGRES_PASSWORD # Senha do banco
+    POSTGRES_DB # Nome do banco
+    PCTS_DOCUMENTS_API_URL # Host da api de documentos. Exemplo: http://pcts-documents:8000
+    PCTS_DOCUMENTS_API_RECORDS_ENDPOINT # Endpoint da api de bancos. Exemplo: api/documents/
+    DJANGO_SUPERUSER_EMAIL # Email do usuario admnistrador
+    DJANGO_SUPERUSER_USERNAME # Username do usuario admnistrador
+    DJANGO_SUPERUSER_PASSWORD # Senhado do usuario admnistrador
+    PROJECT_ENV_EXECUTOR=DOCKER # Ambiente de execução. Não precisa alterar
+    CELERY_BROKER_URL=amqp://guest@pcts-crawlers-rabbitmq:5672 # Host do rabbitmq. Não precisa alterar
+  ```
+
+
+2. Construir imagens e executar containers
+
 ```shell
+docker-compose build
 docker-compose up
 ```
 
