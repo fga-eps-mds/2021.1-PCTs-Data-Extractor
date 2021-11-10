@@ -1,6 +1,7 @@
 import os
 import re
 import difflib
+from time import sleep
 
 from scrapy.spiders import Spider
 from scrapy.linkextractors import LinkExtractor
@@ -10,6 +11,8 @@ from scrapy_selenium import SeleniumRequest
 from scrapy.selector.unified import Selector
 from scrapy import Request
 
+
+from selenium.webdriver.chrome.webdriver import WebDriver
 from ..items import CrawlerItem
 
 DEFAULT_TITLE_XPATH = "/html/head/title/text()"
@@ -98,17 +101,18 @@ class GenericCrawlerSpider(Spider):
         )
 
     def parse_first_page(self, response: HtmlResponse, title):
+        driver: WebDriver = response.request.meta['driver']
+        sleep(2)
+        response = self.create_current_page_response(driver)
         links_found = self.get_page_links(response)
-
-        # with open("output.html", "wb") as file:
-        #     file.write(response.body)
-        # return None
 
         for link in links_found:
             yield self.make_request(link['url'], link['text'], self.parse_page)
 
     def parse_page(self, response: HtmlResponse, title, is_test: bool = False):
-        # self.logger.info(f"PARSE PAGE: {response.url}")
+        driver: WebDriver = response.request.meta['driver']
+        sleep(2)
+        response = self.create_current_page_response(driver)
 
         # Extracao de todo o conteudo da pagina
         # Para buscar afinidade com o conteudo na pagina
@@ -187,6 +191,16 @@ class GenericCrawlerSpider(Spider):
 
         return " ".join(
             [text for text in alfanumeric_text_list if text]
+        )
+
+    def create_current_page_response(self, driver: WebDriver):
+        # Workaround to get always the current
+        # response (after js load)
+        return HtmlResponse(
+            url=driver.current_url,
+            body=driver.find_element_by_xpath(
+                '//*').get_attribute("outerHTML"),
+            encoding='utf-8'
         )
 
     def check_keyword_affinity(self, content: str):

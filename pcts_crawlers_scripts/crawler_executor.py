@@ -52,21 +52,20 @@ def run_generic_crawler(crawler_args, keyword, settings_file_path="pcts_crawlers
 if __name__ == '__main__':
     try:
         crawler_args = {
-            "site_name": "senado",
-            "site_name_display": "Senado",
-            "task_name": "senado_crawler",
-            "url_root": "https://www6g.senado.leg.br/busca",
+            "site_name": "stj",
+            "site_name_display": "STJ",
+            "task_name": "stj_crawler",
+            "url_root": "https://www.stj.jus.br/sites/portalp/Paginas/inc/ResultadoDaBusca.aspx",
             "qs_search_keyword_param": "q",
             "allowed_domains": [
-                "www12.senado.leg.br",
-                "www25.senado.leg.br"
+                "www.stj.jus.br"
             ],
             "allowed_paths": [
-                "noticias"
+                "sites/portalp/Paginas/Comunicacao/Noticias"
             ],
             "page_load_timeout": 5,
             "cron_minute": "0",
-            "cron_hour": "5",
+            "cron_hour": "10",
             "cron_day_of_week": "*",
             "cron_day_of_month": "*",
             "cron_month_of_year": "*",
