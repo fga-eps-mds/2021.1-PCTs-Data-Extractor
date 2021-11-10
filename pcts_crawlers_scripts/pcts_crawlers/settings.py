@@ -67,7 +67,7 @@ SELENIUM_DRIVER_ARGUMENTS = [
     '--headless',
     '--no-sandbox',
     '--disable-gpu',
-    '--javascript.enabled=False',
+    '--javascript.enabled=True',
     'user-agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36"'
 ]
 # DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
