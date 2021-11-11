@@ -35,6 +35,34 @@ Repositório com o serviço de extração de dados
 
 2. Construir imagens e executar containers
 
+### Pré requisitos
+
+- [Docker](https://docs.docker.com/engine/install/ubuntu/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+
+1. Configurar variáveis de ambiente (containers):
+  * Atualizar arquivo "env" na raiz do repositório
+  * Adicionar os hosts (ips) das apis de documentos e crawlers
+  * Variáveis necessárias:
+  ```shell
+    POSTGRES_HOST # Host do banco
+    POSTGRES_PORT # Porta do banco
+    POSTGRES_USER # Usuário do banco
+    POSTGRES_PASSWORD # Senha do banco
+    POSTGRES_DB # Nome do banco
+    PCTS_DOCUMENTS_API_URL # Host da api de documentos. Exemplo: http://pcts-documents:8000
+    PCTS_DOCUMENTS_API_RECORDS_ENDPOINT # Endpoint da api de bancos. Exemplo: api/documents/
+    DJANGO_SUPERUSER_EMAIL # Email do usuario admnistrador
+    DJANGO_SUPERUSER_USERNAME # Username do usuario admnistrador
+    DJANGO_SUPERUSER_PASSWORD # Senhado do usuario admnistrador
+    PROJECT_ENV_EXECUTOR=DOCKER # Ambiente de execução. Não precisa alterar
+    CELERY_BROKER_URL=amqp://guest@pcts-crawlers-rabbitmq:5672 # Host do rabbitmq. Não precisa alterar
+  ```
+
+
+2. Construir imagens e executar containers
+
 ```shell
 docker-compose build
 docker-compose up
