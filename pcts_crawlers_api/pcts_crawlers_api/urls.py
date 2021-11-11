@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
-
 from django.urls import include, path
 from crawlers import views
 
@@ -25,6 +23,7 @@ router.registry.extend(crawler_routes.router.registry)
 router.registry.extend(keywords_routes.router.registry)
 
 urlpatterns = [
+    path('check/', include('health_check.urls')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

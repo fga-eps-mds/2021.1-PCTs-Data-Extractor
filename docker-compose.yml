@@ -60,7 +60,7 @@ services:
       - 8002:8002
     command: ["sh", "scripts/start_dev.sh"]
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:8002/api"]
+      test: ["CMD", "curl", "http://localhost:8002/check/"]
       interval: 10s
       retries: 5
     depends_on:

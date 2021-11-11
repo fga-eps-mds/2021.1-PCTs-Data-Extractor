@@ -29,3 +29,4 @@ coverage
 dnspython
 drf-nested-routers
 djangorestframework-simplejwt==5.0.0
+django-health-check
